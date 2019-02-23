@@ -1,0 +1,21 @@
+{
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/out": true,
+    "**/.vscode-test": true
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.vscode-test": true,
+    "**/out": false
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.tslint": true
+  },
+  //uncomment the following if tslint's formatting is overwritten
+  //"editor.formatOnSave": false,
+  //"javascript.format.enable": false,
+  //"typescript.format.enable": false,
+}

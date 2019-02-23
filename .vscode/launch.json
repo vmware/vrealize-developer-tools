@@ -1,0 +1,84 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [{
+    "name": "Extension",
+    "type": "extensionHost",
+    "request": "launch",
+    "runtimeExecutable": "${execPath}",
+    "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+    "stopOnEntry": false,
+    "trace": true,
+    "sourceMaps": true,
+    "outFiles": [
+      "${workspaceRoot}/common/out/**/*.js",
+      "${workspaceRoot}/language-server/out/**/*.js",
+      "${workspaceRoot}/extension/out/**/*.js"
+    ],
+    "preLaunchTask": "gulp: watch"
+  },
+  {
+    "name": "Language Server",
+    "type": "node",
+    "request": "attach",
+    "protocol": "inspector",
+    "timeout": 10000,
+    "outFiles": [
+      "${workspaceRoot}/language-server/out/**/*.js"
+    ],
+    "trace": true,
+    "port": 6014,
+    "sourceMaps": true
+  },
+  {
+    "name": "Test Extension",
+    "type": "extensionHost",
+    "request": "launch",
+    "runtimeExecutable": "${execPath}",
+    "args": [
+      "--extensionDevelopmentPath=${workspaceRoot}",
+      "--extensionTestsPath=${workspaceRoot}/extension/out/test"
+    ],
+    "stopOnEntry": false,
+    "sourceMaps": true,
+    "outFiles": [
+      "${workspaceRoot}/extension/out/test/**/*.test.js"
+    ],
+    "preLaunchTask": "gulp: compile"
+  },
+  {
+    "name": "Test Language Server",
+    "type": "node",
+    "request": "launch",
+    "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+    "args": ["test:language-server"],
+    "internalConsoleOptions": "openOnSessionStart"
+  },
+  {
+    "name": "Test Common Lib",
+    "type": "node",
+    "request": "launch",
+    "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+    "args": ["test:common"],
+    "internalConsoleOptions": "openOnSessionStart"
+  },
+  {
+    "name": "Gulpfile",
+    "type": "node",
+    "request": "launch",
+    "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+    "stopOnEntry": false,
+    "args": [],
+    "cwd": "${workspaceRoot}",
+    "runtimeArgs": [
+      "--nolazy"
+    ],
+    "console": "internalConsole",
+  }],
+  "compounds": [{
+    "name": "Extension + Language Server",
+    "configurations": ["Extension", "Language Server"]
+  }]
+}

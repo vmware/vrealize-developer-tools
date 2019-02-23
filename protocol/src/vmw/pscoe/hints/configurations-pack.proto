@@ -1,0 +1,38 @@
+/*
+ * Copyright 2018-2019 VMware, Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
+syntax = "proto3";
+
+package vmw.pscoe.hints;
+
+option java_package = "com.vmware.pscoe.o11n.hints.proto";
+option java_outer_classname = "ConfigurationsPackProto";
+option java_multiple_files = false;
+
+message ConfigurationsPack {
+    uint32 version = 1;
+    string uuid = 2;
+    Metadata metadata = 3;
+    repeated ConfigCategory categories = 4;
+
+    message Metadata {
+        int64 timestamp = 1;
+        string server_name = 2;
+        string server_version = 3;
+        string hinting_version = 4;
+    }
+}
+
+message ConfigCategory {
+    string path = 1;
+    repeated Config configurations = 2;
+}
+
+message Config {
+    string uuid = 1;
+    string name = 2;
+    string version = 3;
+    string description = 4;
+}

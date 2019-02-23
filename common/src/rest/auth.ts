@@ -1,0 +1,55 @@
+/*!
+ * Copyright 2018-2019 VMware, Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
+export type AuthMethod = "basic" | "vra" | "vc"
+
+export interface Auth {
+    readonly method: AuthMethod
+    toRequestJson(): object
+}
+
+export class Credentials {
+    readonly username: string
+    readonly password: string
+}
+
+export class BasicAuth implements Auth {
+    readonly method: AuthMethod = "basic"
+    readonly credentials: Credentials
+
+    constructor(username?: string, password?: string) {
+        if (!username) {
+            throw new Error("Missing username parameter for basic auth")
+        }
+
+        if (!password) {
+            throw new Error("Missing pasword parameter for basic auth")
+        }
+
+        this.credentials = { username, password }
+    }
+
+    toRequestJson(): object {
+        return {
+            user: this.credentials.username,
+            pass: this.credentials.password
+        }
+    }
+}
+
+export class VraSsoAuth implements Auth {
+    readonly method: AuthMethod = "vra"
+    readonly token: string
+
+    constructor(token: string) {
+        this.token = token
+    }
+
+    toRequestJson(): object {
+        return {
+            bearer: this.token
+        }
+    }
+}

@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "vro-language-server": ["language-server/src/public/"],
+      "vrealize-common": ["common/src/"]
+    },
+    "target": "es2017",
+    "lib": ["es2017"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "newLine": "LF",
+    "pretty": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "removeComments": true,
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true
+  },
+  "include": [],
+  "references": [
+    {"path": "./extension"}
+  ]
+}

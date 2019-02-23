@@ -1,0 +1,21 @@
+{
+	"Import vRO action": {
+		"prefix": "vroImport",
+		"body": [
+			"System.getModule(\"com.vmware.pscoe.${1:library.class}\").${2:Class}()"
+		]
+	},
+  "Create JS function action in vRO": {
+    "prefix": "vroFunc",
+    "body": [
+      "/**",
+      " *",
+      " * @param {string} str",
+      " */",
+      "(function(str) {",
+      "// code goes here",
+      "});"
+    ],
+    "description": "Create JS action in vRO"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "extends": [
+    "tslint:recommended",
+    "tslint-no-unused-expression-chai"
+  ],
+  "rules": {
+    "file-header": {
+      "options": [
+        "Copyright \\d{4}-\\d{4} VMware, Inc\\.",
+        "Copyright 2018-2019 VMware, Inc.\nSPDX-License-Identifier: MIT"
+      ]
+    },
+    "ban-types": {
+      "options": [
+        ["Object", "Avoid using the `Object` type. Did you mean `object`?"],
+        ["Function", "Avoid using the `Function` type. Prefer a specific function type, like `() => void`, or use `ts.AnyFunction`."],
+        ["Boolean", "Avoid using the `Boolean` type. Did you mean `boolean`?"],
+        ["Number", "Avoid using the `Number` type. Did you mean `number`?"],
+        ["String", "Avoid using the `String` type. Did you mean `string`?"]
+      ]
+    },
+    "semicolon": [true, "never"],
+    "indent": [true, "spaces"],
+    "eofline": true,
+    "max-line-length": [true, 120],
+    "linebreak-style": [true, "LF"],
+    "quotemark": [true, "double", "avoid-escape"],
+    "array-type": [true, "array"],
+    "comment-format": [true, "check-space"],
+    "interface-over-type-literal": true,
+    "prefer-for-of": true,
+    "object-literal-shorthand": true,
+    "one-variable-per-declaration": [true, "ignore-for-loop"],
+    "prefer-method-signature": true,
+    "space-before-function-paren": [true, {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      },
+      {
+        "call-signature": "onespace",
+        "index-signature": "onespace",
+        "parameter": "onespace",
+        "property-declaration": "onespace",
+        "variable-declaration": "onespace"
+      }
+    ],
+    "whitespace": [true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-module",
+      "check-separator",
+      "check-type"
+    ],
+    "switch-default": false,
+    "interface-name": [true, "never-prefix"],
+    "no-var-requires": false,
+    "no-empty-interface": false,
+    "no-namespace": [true, "allow-declarations"],
+    "no-trailing-whitespace": [true, "ignore-template-strings"],
+    "no-consecutive-blank-lines": [true],
+    "no-shadowed-variable": false,
+    "no-console": [true, "log", "info", "warn", "error", "trace", "time", "timeEnd", "assert", "count", "dir", "table"],
+    "member-access": [false],
+    "max-classes-per-file": [false, 2],
+    "object-literal-sort-keys": false,
+    "member-ordering": [false],
+    "trailing-comma": [true, {
+      "singleline": "never",
+      "multiline": "never"
+    }],
+    "prefer-const": [true, {
+      "destructuring": "all"
+    }],
+    "arrow-parens": false,
+    "ordered-imports": [true, {
+      "import-sources-order": "lowercase-first",
+      "grouped-imports": true,
+      "named-imports-order": "lowercase-first"
+    }]
+  }
+}

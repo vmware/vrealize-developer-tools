@@ -1,83 +1,99 @@
+# Contributing
 
+**Thanks for taking the time to contribute!** 👍
 
-# Contributing to vrealize-developer-tools
+When contributing to this project, please first discuss the changes you wish to make via an issue before making changes.
 
-The vrealize-developer-tools project team welcomes contributions from the community. If you wish to contribute code and you have not
-signed our contributor license agreement (CLA), our bot will update the issue when you open a Pull Request. For any
-questions about the CLA process, please refer to our [FAQ](https://cla.vmware.com/faq).
+## Certificate of Origin
 
-## Community
+By contributing to this project you agree to the [Developer Certificate of Origin](https://cla.vmware.com/dco). All contributions to this repository must be signed as described on that page. Your signature certifies that you wrote the patch or have the right to pass it on as an open-source patch.
 
 ## Getting Started
 
-## Contribution Flow
+Looking for places to contribute to the codebase? You can start by looking through the [`help-wanted`](https://github.com/vmware/vrealize-developer-tools/labels/help%20wanted) issues.
 
-This is a rough outline of what a contributor's workflow looks like:
+### Getting the code
 
-- Create a topic branch from where you want to base your work
-- Make commits of logical units
-- Make sure your commit messages are in the proper format (see below)
-- Push your changes to a topic branch in your fork of the repository
-- Submit a pull request
-
-Example:
-
-``` shell
-git remote add upstream https://github.com/vmware/vrealize-developer-tools.git
-git checkout -b my-new-feature master
-git commit -a
-git push origin my-new-feature
+```
+git clone https://github.com/vmware/vrealize-developer-tools.git
 ```
 
-### Staying In Sync With Upstream
+#### Prerequisites
 
-When your branch gets out of sync with the vmware/master branch, use the following to update:
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/en/), `>= 9.0.0`
+- [yarn](https://yarnpkg.com/en/), `>= 1.10.1`
+- [gulp CLI](https://gulpjs.com/), `>= 2.0.1`
+- [Visual Studio Code](https://code.visualstudio.com/), `>= 1.30.0`
 
-``` shell
-git checkout my-new-feature
-git fetch -a
-git pull --rebase upstream master
-git push --force-with-lease origin my-new-feature
+### Dependencies
+
+From a terminal, where you have cloned the repository, execute the following command to install the required dependencies:
+
+```
+yarn install
 ```
 
-### Updating pull requests
+### Building
 
-If your PR fails to pass CI or needs changes based on code review, you'll most likely want to squash these changes into
-existing commits.
+During development you can use a watcher to make builds on changes quick and easy. From a terminal, where you have cloned the repository, execute the following command:
 
-If your pull request contains a single commit or your changes are related to the most recent commit, you can simply
-amend the commit.
-
-``` shell
-git add .
-git commit --amend
-git push --force-with-lease origin my-new-feature
+```
+gulp watch
 ```
 
-If you need to squash changes into an earlier commit, you can use:
+This will first do an initial full build and then watch for file changes, compiling those changes incrementally, enabling a fast, iterative coding experience.
 
-``` shell
-git add .
-git commit --fixup <commit>
-git rebase -i --autosquash master
-git push --force-with-lease origin my-new-feature
+:bulb:**Tip!** You can press <kbd>CMD+SHIFT+B</kbd> (<kbd>CTRL+SHIFT+B</kbd> on Windows, Linux) to start the watch task.
+
+:bulb:**Tip!** You don't need to stop and restart the development version of VS Code after each change. You can just execute `Reload Window` from the command palette.
+
+To do a complete rebuild, from a terminal, where you have cloned the repository, execute the following command:
+
+```
+gulp compile
 ```
 
-Be sure to add a comment to the PR indicating your new changes are ready to review, as GitHub does not generate a
-notification when you git push.
+### Linting
 
-### Code Style
+This project uses [tslint](https://palantir.github.io/tslint/) for code linting. You can run tslint across the code by calling `gulp lint` from a terminal. Warnings from tslint show up in the `Errors and Warnings` panel and you can navigate to them from inside VS Code.
 
-### Formatting Commit Messages
+To lint the code as you make changes you can install the [TSLint](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-tslint-plugin) extension.
 
-We follow the conventions on [How to Write a Git Commit Message](http://chris.beams.io/posts/git-commit/).
+:scroll:**NOTE!** Linting rules that have auto-fixes available will be automatically applied on file save and during compilation.
 
-Be sure to include any related GitHub issue references in the commit message.  See
-[GFM syntax](https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown) for referencing issues
-and commits.
+### Testing
+To run the tests execute the following from a terminal:
+```
+gulp test
+```
 
-## Reporting Bugs and Creating Issues
+### Bundling
 
-When opening a new issue, try to roughly follow the commit message format conventions above.
+To generate a VSIX (installation package) run the following from a terminal:
 
-## Repository Structure
+```
+gulp package
+```
+
+### Debugging
+
+#### Using VS Code
+
+1. Open the `vrealize-developer-tools` folder
+2. Ensure the required [dependencies](#dependencies) are installed
+3. Start the [`watch`](#building) task
+4. Choose the `Launch Extension` launch configuration from the launch dropdown in the Debug viewlet and press `F5`.
+
+:scroll:**NOTE!** In the *[Extension Development Host]* instance, the extension will be activated when any folder with vRO JavaScript code is opened __AND__ one of the following events occurs.
+- a `.o11n/` folder is located at the root of the opened project
+- a JavaScript file is opened in the editor
+- a `vRealize: ...` action is executed from the command palette
+
+> Make sure the `window.openFoldersInNewWindow` setting is not `"on"`, otherwise a new, *non-[Extension Development Host]*, window may be opened.
+
+:bulb:**Tip!** If you make edits to the code, just execute `Reload Window` from the command palette and the debugger will reattach.
+
+## Submitting a Pull Request
+
+Please follow the instructions in the [PR template](.github/PULL_REQUEST_TEMPLATE.md).

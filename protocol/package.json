@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "name": "vro-hint-protocol",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Protocol Buffer message deffinitions that describe hints collected from vRealize Orchestrator content.",
+  "author": "VMware",
+  "files": [
+    "src"
+  ]
+}

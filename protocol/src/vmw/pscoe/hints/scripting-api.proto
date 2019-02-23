@@ -1,0 +1,25 @@
+/*
+ * Copyright 2018-2019 VMware, Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
+syntax = "proto3";
+
+package vmw.pscoe.hints;
+
+option java_package = "com.vmware.pscoe.o11n.hints.proto";
+option java_outer_classname = "ScriptingApiProto";
+option java_multiple_files = false;
+
+message ScriptingApi {
+    message Reference {
+        string name = 1;
+    }
+
+    enum Stage {
+        RELEASE = 0;
+        ALPHA = 1;
+        BETA = 2;
+        DEPRECATED = 3;
+    }
+}
