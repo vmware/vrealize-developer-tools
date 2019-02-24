@@ -130,8 +130,7 @@ gulp.task("test", ["compile", "chmod-vsc-test"], (done) => {
 
     // run extension tests
     process.env["CODE_TESTS_PATH"] = path.join(rootPath, "extension", "out", "test");
-    const cmd = (process.env.bamboo_buildKey ? "xvfb-run -a " : "") + vsctest;
-    cp.execSync(cmd, {
+    cp.execSync(vsctest, {
         cwd: rootPath,
         stdio: "inherit",
         env: process.env
