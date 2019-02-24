@@ -20,3 +20,19 @@ steps:
     displayName: 'gulp package'
     env:
       DISPLAY: :10
+
+  - task: CopyFiles@2
+    displayName: Stage VSIX for publishing
+    condition: eq(variables['Agent.OS'], 'Linux')
+    inputs:
+      contents: |-
+        *.vsix
+        version.txt
+      targetFolder: $(Build.ArtifactStagingDirectory)
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish VSIX
+    condition: eq(variables['Agent.OS'], 'Linux')
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: vrealize-developer-tools
