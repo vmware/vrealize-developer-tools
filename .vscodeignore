@@ -2,7 +2,6 @@
 .vscode-test/**
 .idea/**
 .github/**
-.azure-pipelines/**
 
 build/**
 typings/**

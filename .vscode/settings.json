@@ -12,7 +12,7 @@
     "**/out": false
   },
   "files.associations": {
-    "**/.azure-pipelines/**/*.yml": "azure-pipelines"
+    "**/build/azure-pipelines/**/*.yml": "azure-pipelines"
   },
   "editor.codeActionsOnSave": {
     "source.fixAll.tslint": true
