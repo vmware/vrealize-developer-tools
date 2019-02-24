@@ -1,3 +1,6 @@
+
+[![Build Status](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_apis/build/status/CI%20Pipeline?branchName=master)](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_build/latest?definitionId=1&branchName=master)
+
 # vRealize Developer Tools
 
 A [Visual Studio Code](https://code.visualstudio.com/) extension that provides code intelligence features and enables a more
