@@ -27,7 +27,6 @@ steps:
     inputs:
       contents: |-
         *.vsix
-        version.txt
       targetFolder: $(Build.ArtifactStagingDirectory)
 
   - task: PublishBuildArtifacts@1

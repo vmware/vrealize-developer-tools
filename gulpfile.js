@@ -130,7 +130,7 @@ gulp.task("test", ["compile", "chmod-vsc-test"], (done) => {
 
     // run extension tests
     process.env["CODE_TESTS_PATH"] = path.join(rootPath, "extension", "out", "test");
-    cp.execSync(vsctest, {
+    cp.execSync("node " + vsctest, {
         cwd: rootPath,
         stdio: "inherit",
         env: process.env
