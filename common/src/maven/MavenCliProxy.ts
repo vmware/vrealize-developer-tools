@@ -66,7 +66,7 @@ export class MavenCliProxy {
         let command = `mvn archetype:generate -DinteractiveMode=false ` +
             `-DarchetypeGroupId=com.vmware.pscoe.${archetypeGroup}.archetypes ` +
             `-DarchetypeArtifactId=${archetypeId} ` +
-            `-DarchetypeVersion=1.5.2-SNAPSHOT ` +
+            `-DarchetypeVersion=1.5.2 ` +
             `-DgroupId=${groupId} ` +
             `-DartifactId=${artifactId}`
 
@@ -77,6 +77,19 @@ export class MavenCliProxy {
 
             command += ` -DworkflowsPath="${workflowsPath}"`
         }
+
+        return proc.exec(command, { cwd: destinationDir }, this.logger)
+    }
+
+    copyDependency(groupId: string,
+                   artifactId: string,
+                   version: string,
+                   packaging: string,
+                   destinationDir: string): Promise<proc.CmdResult> {
+        const command = `mvn dependency:copy ` +
+            `-Dartifact=${groupId}:${artifactId}:${version}:${packaging} ` +
+            `-DoutputDirectory="${destinationDir}" ` +
+            `-Dmdep.stripVersion=true `
 
         return proc.exec(command, { cwd: destinationDir }, this.logger)
     }

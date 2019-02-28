@@ -8,7 +8,7 @@ import * as moment from "moment"
 import * as path from "path"
 import * as semver from "semver"
 import * as tmp from "tmp"
-import { sleep, AutoWire, Logger, PomFile, VrotscCliProxy, VroRestClient } from "vrealize-common"
+import { sleep, AutoWire, Logger, MavenCliProxy, PomFile, VrotscCliProxy, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"
@@ -20,12 +20,12 @@ import { Command } from "./Command"
 const IIFE_WRAPPER_PATTERN = /\(function\s*\(\)\s*{([\s\S]*)}\);?/
 const SCRIPT_ERROR_LINE_PATTERN = /\(eval\)#(\d+)\)\s+(.*)/
 const RUN_SCRIPT_WORKFLOW_ID = "98568979-76ed-4a4a-854b-1e730e2ef4f1"
-const EXEC_PACKAGE_PATH = path.join("assets", "com.vmware.pscoe.o11n.exec-1.1.0.package")
 
 @AutoWire
 export class RunAction extends Command {
     private readonly logger = Logger.get("RunAction")
     private readonly restClient: VroRestClient
+    private readonly mavenProxy: MavenCliProxy
     private readonly vrotsc: VrotscCliProxy
     private readonly outputChannel = vscode.window.createOutputChannel(OutputChannels.RunActionLogs)
     private runtimeExceptionDecoration: vscode.TextEditorDecorationType
@@ -39,6 +39,7 @@ export class RunAction extends Command {
     constructor(private config: ConfigurationManager, environment: EnvironmentManager) {
         super()
         this.restClient = new VroRestClient(config, environment)
+        this.mavenProxy = new MavenCliProxy(environment, config.vrdev.maven, this.logger)
         this.vrotsc = new VrotscCliProxy(this.logger)
     }
 
@@ -99,8 +100,9 @@ export class RunAction extends Command {
             const finished = finalState.charAt(0).toUpperCase() + finalState.slice(1)
             this.outputChannel.appendLine(`\n# ${finished} after ${duration}`)
         } catch (e) {
-            this.outputChannel.appendLine(`# An error occurred: ${e.message}`)
-            vscode.window.showErrorMessage(e.message)
+            const errorMessage = typeof e === "string" ? e : e.message
+            this.outputChannel.appendLine(`# An error occurred: ${errorMessage}`)
+            vscode.window.showErrorMessage(errorMessage)
         } finally {
             this.running = false
         }
@@ -163,7 +165,7 @@ export class RunAction extends Command {
             this.logger.debug(`Input TS file: ${inputFilePath}`)
             const outputFilePath = await this.vrotsc.compileFile(tsFileRelativePath, rootPath, tsNamespace)
             this.logger.debug(`Output JS file: ${outputFilePath}`)
-            const scriptContent = fs.readFileSync(outputFilePath, {encoding: "utf8"})
+            const scriptContent = fs.readFileSync(outputFilePath, { encoding: "utf8" })
 
             return scriptContent
         }
@@ -176,19 +178,26 @@ export class RunAction extends Command {
                             supportsSysLog: boolean): Promise<string> {
         try {
             this.logger.info(`Checking if workflow with ID ${RUN_SCRIPT_WORKFLOW_ID} exists in target vRO`)
-            const workflowMetadata = await this.restClient.getWorkflow(RUN_SCRIPT_WORKFLOW_ID)
-            if (semver.lt(workflowMetadata.version, "1.1.0")) {
-                throw new Error(`Found earlier version: ${workflowMetadata.version}`)
-            }
+            await this.restClient.getWorkflow(RUN_SCRIPT_WORKFLOW_ID)
         } catch (e) {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window
             }, progress => {
-                progress.report({ message: "Importing exec package in vRO" })
-                this.logger.info("Importing package 'com.vmware.pscoe.o11n.exec'.")
-                this.logger.debug(`Cause: ${e.message}`)
-                const execPackage = context.asAbsolutePath(EXEC_PACKAGE_PATH)
-                return this.restClient.importPackage(execPackage)
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        this.logger.debug(`Error: ${e.message}`)
+                        progress.report({ message: "Downloading exec package" })
+                        this.logger.info("Downloading package 'com.vmware.pscoe.o11n.exec'.")
+                        const execPackage = await this.getExecPackage(context)
+                        progress.report({ message: "Importing exec package in vRO" })
+                        this.logger.info("Importing package 'com.vmware.pscoe.o11n.exec'.")
+                        await this.restClient.importPackage(execPackage)
+                        resolve()
+                    } catch (e) {
+                        const errorMessage = `Could not import exec package into vRO: ${e.message}`
+                        reject(errorMessage)
+                    }
+                })
             })
         }
 
@@ -215,6 +224,17 @@ export class RunAction extends Command {
 
         const token = await this.restClient.startWorkflow(RUN_SCRIPT_WORKFLOW_ID, ...params)
         return token
+    }
+
+    private async getExecPackage(context: vscode.ExtensionContext): Promise<string> {
+        // tslint:disable-next-line: no-string-literal
+        const storagePath = context["globalStoragePath"]
+        if (!fs.existsSync(storagePath)) {
+            fs.mkdirSync(storagePath)
+        }
+
+        await this.mavenProxy.copyDependency("com.vmware.pscoe.library", "exec", "1.5.2", "package", storagePath)
+        return path.join(storagePath, "exec.package")
     }
 
     private async waitToFinish(token: string, editor: vscode.TextEditor, supportsSysLog: boolean): Promise<string> {
