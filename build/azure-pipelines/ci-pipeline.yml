@@ -4,24 +4,8 @@ trigger:
 variables:
   is_ci_build: true
 
-jobs:
-- job: Windows
-  pool:
-    vmImage: VS2017-Win2016
-  steps:
-  - template: steps/ci.yml
-  - template: steps/common.yml
-
-- job: Linux
-  pool:
-    vmImage: ubuntu-16.04
-  steps:
-  - template: steps/ci.yml
-  - template: steps/common.yml
-
-- job: macOS
-  pool:
-    vmImage: macOS 10.13
-  steps:
-  - template: steps/ci.yml
-  - template: steps/common.yml
+pool:
+  vmImage: ubuntu-16.04
+steps:
+- template: steps/ci.yml
+- template: steps/common.yml
