@@ -204,7 +204,7 @@
     "vscode": "^1.1.26"
   },
   "dependencies": {
-    "adm-zip": "^0.4.11",
+    "adm-zip": "^0.4.13",
     "chokidar": "^2.0.4",
     "fast-xml-parser": "3.11.0",
     "fs-extra": "^7.0.0",
