@@ -3,6 +3,7 @@
 .idea/**
 .github/**
 
+assets/images/**
 build/**
 typings/**
 protocol/**
