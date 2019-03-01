@@ -11,6 +11,9 @@ and [vRealize Automation](https://www.vmware.com/products/vrealize-automation.ht
 
 To use most of the vRealize Developer Tools's functionality, you will need a development [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html) instance and to set up vRealize Build Tools.
 
+* vRealize Build Tools
+* maven 3.3.9+ available on the PATH system variable
+
 ## Features
 
 ### Multiple environments
@@ -53,26 +56,31 @@ Active profile name and the IP address of the vRealize Orchestrator instance is 
 ### Project on-boarding
 
 The `vRealize: New Project` command from the VS Code comand palette (<kbd>Cmd+Shift+P</kbd> / <kbd>Ctrl+Shift+P</kbd>) can be used to on-board a new vRealize project.
+
 ![Project on-boarding](./assets/images/new-project.png)
 
 ### vRO-aware IntelliSense
 
 Visual Studio Code's IntelliSense feature for JavaScript files is enhanced with with symbols and information from the vRO’s core scripting API, plug-in objects and actions.
+
 ![vRO-aware IntelliSense](./assets/images/autocomplete.gif)
 
 ### Run action
 
 The `vRealize: Run Action` command from the VS Code comand palette (<kbd>Cmd+Shift+P</kbd> / <kbd>Ctrl+Shift+P</kbd>) allows running an action JavaScript file in live vRO instance while seeing the logs in the OUTPUT panel.
+
 ![Run action](./assets/images/run-action.png)
 
 ### Open action's source
 
 The source code of actions that are available only on the remove vRO instance can be viewed by using the `vRealize: Open Action` command.
+
 ![Open action's source](./assets/images/open-action.gif)
 
 ### Push and Pull content
 
 The VS Code build tasks palette (<kbd>Cmd+Shift+B</kbd> / <kbd>Ctrl+Shift+B</kbd>) contains commands for pushing content to a live vRO/vRA instance and for pulling workflows, configurations, resources and vRA content back to your local machine – in a form suitable for committing into source control.
+
 ![Push and Pull content](./assets/images/push-pull.png)
 
 The `vrdev.tasks.exclude` setting can be used to *exclude* certain projects from the list of build tasks (`Cmd+Shift+B`) by using glob patterns
