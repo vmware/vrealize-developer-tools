@@ -140,7 +140,11 @@ gulp.task("test", ["compile", "chmod-vsc-test"], (done) => {
 });
 
 gulp.task("package", ["lint", "test", "copy-changelog"], (done) => {
-    exec(vsce, ["package", "--yarn", "--baseContentUrl", "."], rootPath);
+    exec(vsce, [
+        "package", "--yarn",
+        "--baseContentUrl", "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/",
+        "--baseImagesUrl", "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/"
+    ], rootPath);
     done();
 });
 
@@ -172,6 +176,12 @@ function testWithMocha(root, testSrc) {
 }
 
 function exec(cmd, args, cwd, stdio = "inherit") {
-    console.log(`${cmd} ${args.join(" ")}`);
-    return cp.spawnSync(cmd, args, { stdio, cwd });
+    var cmdString = `${cmd} ${args.join(" ")}`
+    console.log(cmdString);
+    var result = cp.spawnSync(cmd, args, { stdio, cwd });
+    if (result.status != 0) {
+        throw new Error(`Command "${cmdString}" exited with code ` + result.status);
+    }
+
+    return result;
 }
