@@ -66,7 +66,7 @@ export class MavenCliProxy {
         let command = `mvn archetype:generate -DinteractiveMode=false ` +
             `-DarchetypeGroupId=com.vmware.pscoe.${archetypeGroup}.archetypes ` +
             `-DarchetypeArtifactId=${archetypeId} ` +
-            `-DarchetypeVersion=1.5.2 ` +
+            `-DarchetypeVersion=1.5.3` +
             `-DgroupId=${groupId} ` +
             `-DartifactId=${artifactId}`
 

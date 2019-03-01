@@ -233,7 +233,7 @@ export class RunAction extends Command {
             fs.mkdirSync(storagePath)
         }
 
-        await this.mavenProxy.copyDependency("com.vmware.pscoe.library", "exec", "1.5.2", "package", storagePath)
+        await this.mavenProxy.copyDependency("com.vmware.pscoe.o11n", "exec", "1.5.3", "package", storagePath)
         return path.join(storagePath, "exec.package")
     }
 
