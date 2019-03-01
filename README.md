@@ -39,38 +39,41 @@ Connect to different vRO environments by configuring maven profiles in `~/.m2/se
 </profile>
 ```
 Once vRealize Developer Tools extension is activated in VS Code, on the bottom left corner of the status bar, an idicator is shown if there is no currently active profile.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/no-profile.png" alt="Missing profile" width="25%"/></p>
+
+![Missing profile](./assets/images/no-profile.png)
 
 Click on it to see list of all available profiles and select one to activate.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/env-profile.png" alt="Environment profiles" width="75%"/></p>
+
+![Environment profiles](./assets/images/env-profile.png)
 
 Active profile name and the IP address of the vRealize Orchestrator instance is shown in the status bar.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/with-profile.png" alt="Active profile" width="35%"/></p>
+
+![Active profile](./assets/images/with-profile.png)
 
 ### Project on-boarding
 
 The `vRealize: New Project` command from the VS Code comand palette (<kbd>Cmd+Shift+P</kbd> / <kbd>Ctrl+Shift+P</kbd>) can be used to on-board a new vRealize project.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/new-project.png" alt="Project on-boarding" width="75%"/></p>
+![Project on-boarding](./assets/images/new-project.png)
 
 ### vRO-aware IntelliSense
 
 Visual Studio Code's IntelliSense feature for JavaScript files is enhanced with with symbols and information from the vRO’s core scripting API, plug-in objects and actions.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/autocomplete.gif" alt="vRO-aware IntelliSense" width="85%"/></p>
+![vRO-aware IntelliSense](./assets/images/autocomplete.gif)
 
 ### Run action
 
 The `vRealize: Run Action` command from the VS Code comand palette (<kbd>Cmd+Shift+P</kbd> / <kbd>Ctrl+Shift+P</kbd>) allows running an action JavaScript file in live vRO instance while seeing the logs in the OUTPUT panel.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/run-action.png" alt="Run action" width="85%"/></p>
+![Run action](./assets/images/run-action.png)
 
 ### Open action's source
 
 The source code of actions that are available only on the remove vRO instance can be viewed by using the `vRealize: Open Action` command.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/open-action.gif" alt="Open action's source" width="85%"/></p>
+![Open action's source](./assets/images/open-action.gif)
 
 ### Push and Pull content
 
 The VS Code build tasks palette (<kbd>Cmd+Shift+B</kbd> / <kbd>Ctrl+Shift+B</kbd>) contains commands for pushing content to a live vRO/vRA instance and for pulling workflows, configurations, resources and vRA content back to your local machine – in a form suitable for committing into source control.
-<p><img src="https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/assets/images/push-pull.png" alt="Push and Pull content" width="75%"/></p>
+![Push and Pull content](./assets/images/push-pull.png)
 
 The `vrdev.tasks.exclude` setting can be used to *exclude* certain projects from the list of build tasks (`Cmd+Shift+B`) by using glob patterns
 ```javascript
