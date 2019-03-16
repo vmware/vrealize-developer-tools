@@ -1,0 +1,22 @@
+# Only trigger manually
+trigger: none
+pr: none
+
+variables:
+  is_ci_build: false
+
+pool:
+  vmImage: ubuntu-16.04
+
+steps:
+- bash: |
+    PACKAGE_VERSION=$(node -p "require('./package.json').version")
+    echo "##vso[build.updatebuildnumber]${PACKAGE_VERSION}-release+${BUILD_BUILDID}"
+  displayName: Set version number of build
+
+- template: steps/common.yml
+
+- script: 'node node_modules/gulp/bin/gulp.js release'
+  displayName: 'gulp release'
+  env:
+    GITHUB_SECRET: $(GitHubSecret)

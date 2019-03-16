@@ -8,6 +8,7 @@ const fs = require("fs-extra");
 const minimist = require("minimist");
 const chmod = require("gulp-chmod");
 const log = require("fancy-log");
+const publishRelease = require("gulp-github-release");
 
 const rootPath = __dirname;
 const nodeModulesPathPrefix = path.resolve("./node_modules");
@@ -147,6 +148,25 @@ gulp.task("package", ["lint", "test", "copy-changelog"], (done) => {
     ], rootPath);
     done();
 });
+
+gulp.task("publish-release", (done) => {
+    const releaseVersion = require("./package.json").version;
+    log.info(`Creating GitHub release v${releaseVersion}`)
+    gulp.src("./*.vsix").pipe(publishRelease({
+        token: process.env.GITHUB_TOKEN,
+        owner: "vmware",
+        repo: "vrealize-developer-tools",
+        name: releaseVersion,
+        notes: "Pending changelog",
+        tag: `v${releaseVersion}`,
+        draft: false,
+        prerelease: true,
+        reuseDraftOnly: true,
+        skipIfPublished: true
+    }))
+});
+
+gulp.task("release", ["publish-release"]);
 
 gulp.task("default", ["watch"]);
 
