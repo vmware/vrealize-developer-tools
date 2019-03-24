@@ -1,0 +1,12 @@
+# Configuration for new-issue-welcome - https://github.com/behaviorbot/new-issue-welcome
+
+# Comment to be posted to on first time issues
+newIssueWelcomeComment: >
+  Thanks for opening this issue! If you would like to help implement an improvement, [read more about contributing](https://github.com/vmware/vrealize-developer-tools/blob/master/CONTRIBUTING.md) and consider submitting a pull request.
+
+# Configuration for new-pr-welcome - https://github.com/behaviorbot/new-pr-welcome
+# Comment to be posted to on PRs from first time contributors
+newPRWelcomeComment: >
+  Thank you for taking the time to contribute! We'll check this out soon and let you know if we have any questions or feedback.
+
+  If you haven't already, please be sure to check out [the contributing guidelines](https://github.com/vmware/vrealize-developer-tools/blob/master/CONTRIBUTING.md).
