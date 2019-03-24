@@ -16,7 +16,7 @@ Put an `x` in the boxes that apply. You can also fill these out after creating t
 This is simply a reminder of what we are going to look for before merging your code.
 -->
 
-- [ ] I have read the guidelines in the [CONTRIBUTING](CONTRIBUTING.md) document
+- [ ] I have read the guidelines in the [CONTRIBUTING](https://github.com/vmware/vrealize-developer-tools/blob/master/CONTRIBUTING.md) document
 - [ ] Lint and unit tests pass locally with my changes
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] I have added necessary documentation (if appropriate)

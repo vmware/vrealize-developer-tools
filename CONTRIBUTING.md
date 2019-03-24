@@ -10,7 +10,7 @@ By contributing to this project you agree to the [Developer Certificate of Origi
 
 ## Getting Started
 
-Looking for places to contribute to the codebase? You can start by looking through the [`help-wanted`](https://github.com/vmware/vrealize-developer-tools/labels/help%20wanted) issues.
+Looking for places to contribute to the codebase? You can start by looking through the [`good-first-issue`](https://github.com/vmware/vrealize-developer-tools/labels/good-first-issue) and [`help-wanted`](https://github.com/vmware/vrealize-developer-tools/labels/status:help-wanted) issues.
 
 ### Getting the code
 
