@@ -36,7 +36,7 @@ export class RunAction extends Command {
         return Commands.RunAction
     }
 
-    constructor(private config: ConfigurationManager, environment: EnvironmentManager) {
+    constructor(private config: ConfigurationManager, private environment: EnvironmentManager) {
         super()
         this.restClient = new VroRestClient(config, environment)
         this.mavenProxy = new MavenCliProxy(environment, config.vrdev.maven, this.logger)
@@ -233,7 +233,8 @@ export class RunAction extends Command {
             fs.mkdirSync(storagePath)
         }
 
-        await this.mavenProxy.copyDependency("com.vmware.pscoe.o11n", "exec", "1.5.3", "package", storagePath)
+        await this.mavenProxy.copyDependency("com.vmware.pscoe.o11n", "exec",
+            this.environment.buildToolsVersion, "package", storagePath)
         return path.join(storagePath, "exec.package")
     }
 

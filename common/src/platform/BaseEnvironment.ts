@@ -22,6 +22,10 @@ export abstract class BaseEnvironment {
         return packageJson.version.trim()
     }
 
+    public get buildToolsVersion(): string {
+        return this.config.vrdev.buildTools.defaultVersion
+    }
+
     public getWorkspaceFolderOf(resourcePath: string): WorkspaceFolder | undefined {
         if (!this.workspaceFolders || this.workspaceFolders.length === 0) {
             return undefined

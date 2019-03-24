@@ -66,7 +66,7 @@ export class MavenCliProxy {
         let command = `mvn archetype:generate -DinteractiveMode=false ` +
             `-DarchetypeGroupId=com.vmware.pscoe.${archetypeGroup}.archetypes ` +
             `-DarchetypeArtifactId=${archetypeId} ` +
-            `-DarchetypeVersion=1.5.3` +
+            `-DarchetypeVersion=${this.environment.buildToolsVersion} ` +
             `-DgroupId=${groupId} ` +
             `-DartifactId=${artifactId}`
 
@@ -118,7 +118,7 @@ export class MavenCliProxy {
     <parent>
 		<groupId>com.vmware.pscoe.o11n</groupId>
 		<artifactId>base-package</artifactId>
-		<version>${this.environment.version}</version>
+		<version>${this.environment.buildToolsVersion}</version>
 	</parent>
 </project>`
 
