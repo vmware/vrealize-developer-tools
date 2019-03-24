@@ -23,11 +23,16 @@ export interface ExperimentalFlags {
     typescript: boolean
 }
 
+export interface BuildTools {
+    defaultVersion: string
+}
+
 export interface VrealizeSettings {
     log: LogLevel
     trace: TraceLevel
     commandPalette: CommandPaletteInfo
     tasks: TasksInfo
-    maven: MavenInfo,
+    maven: MavenInfo
     experimental: ExperimentalFlags
+    buildTools: BuildTools
 }
