@@ -3,29 +3,24 @@
  * SPDX-License-Identifier: MIT
  */
 
-require("module-alias/register")
-
-import * as chai from "chai"
+import createMockInstance from "jest-create-mock-instance"
 import { VroElementPickInfo } from "vrealize-common"
 import { remote } from "vro-language-server"
-import * as sinon from "sinon"
-import * as sinonChai from "sinon-chai"
 import * as vscode from "vscode"
 import * as client from "vscode-languageclient"
 
 import { ShowActions, ShowConfigurations, TriggerCollection } from "../client/command"
 import { ClientWindow } from "../client/ui"
 
-const expect = chai.expect
-chai.use(sinonChai)
+import { jestSpy } from "./jestSpy"
 
 describe("Commands", () => {
-    let languageClient: sinon.SinonStubbedInstance<client.LanguageClient>
+    let languageClient: jest.Mocked<client.LanguageClient>
     let extensionContext: vscode.ExtensionContext
-    let quickPickStub: sinon.SinonStub
-    let openDocStub: sinon.SinonStub
-    let showDocStub: sinon.SinonStub
-    let configStub: sinon.SinonStub
+    let quickPickStub: jest.Mock
+    let openDocStub: jest.Mock
+    let showDocStub: jest.Mock
+    let configStub: jest.Mock
 
     const languageServices = {
         get client() {
@@ -34,27 +29,33 @@ describe("Commands", () => {
     }
 
     const mockedConfig = {
-        get: sinon.stub()
+        get: jest.fn()
     }
 
-    beforeEach("prepare vscode stubs", () => {
-        languageClient = sinon.createStubInstance<client.LanguageClient>(client.LanguageClient)
+    beforeEach(() => {
+        languageClient = createMockInstance<client.LanguageClient>(client.LanguageClient)
         extensionContext = {} as vscode.ExtensionContext
-        quickPickStub = sinon.stub(vscode.window, "showQuickPick")
-        openDocStub = sinon.stub(vscode.workspace, "openTextDocument")
-        showDocStub = sinon.stub(vscode.window, "showTextDocument")
+        quickPickStub = jestSpy(vscode.window, "showQuickPick")
+        openDocStub = jestSpy(vscode.workspace, "openTextDocument")
+        showDocStub = jestSpy(vscode.window, "showTextDocument")
 
-        configStub = sinon.stub(vscode.workspace, "getConfiguration")
-        configStub.withArgs("vrdev").returns(mockedConfig)
+        configStub = jestSpy(vscode.workspace, "getConfiguration")
+        configStub.mockImplementation((...args) => {
+            if (args[0] === "vrdev") {
+                return mockedConfig
+            } else {
+                return undefined
+            }
+        })
     })
 
-    afterEach("reset vscode stubs", () => {
-        languageClient.sendRequest.restore()
-        quickPickStub.restore()
-        openDocStub.restore()
-        showDocStub.restore()
-        configStub.restore()
-        mockedConfig.get.reset()
+    afterEach(() => {
+        languageClient.sendRequest.mockRestore()
+        quickPickStub.mockRestore()
+        openDocStub.mockRestore()
+        showDocStub.mockRestore()
+        configStub.mockRestore()
+        mockedConfig.get.mockReset()
     })
 
     describe("Show Actions", () => {
@@ -62,7 +63,7 @@ describe("Commands", () => {
         let fakeModules: VroElementPickInfo[]
         let fakeActions: VroElementPickInfo[]
 
-        beforeEach("prepare fake modules and actions", () => {
+        beforeEach(() => {
             testActionUri = vscode.Uri.parse("o11n://action/test.module/TestAction.js#test.module/TestAction")
             fakeModules = [
                 {
@@ -84,62 +85,62 @@ describe("Commands", () => {
         it("should open the selected action", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(true)
 
-            languageClient.sendRequest.resolves(fakeActions)
-            quickPickStub.resolves(fakeActions[0])
-            openDocStub.resolves("content")
-            showDocStub.resolves()
+            languageClient.sendRequest.mockResolvedValue(fakeActions)
+            quickPickStub.mockResolvedValue(fakeActions[0])
+            openDocStub.mockResolvedValue("content")
+            showDocStub.mockResolvedValue()
 
             await new ShowActions(languageServices as any).execute(extensionContext)
 
-            expect(quickPickStub).to.have.been.calledWith(fakeActions)
-            expect(openDocStub).to.have.been.calledWith(testActionUri)
-            expect(showDocStub).to.have.been.calledWith("content")
+            expect(quickPickStub).toHaveBeenCalledWith(fakeActions)
+            expect(openDocStub).toHaveBeenCalledWith(testActionUri)
+            expect(showDocStub).toHaveBeenCalledWith("content")
         })
 
         it("should not try to open an action, if no action selection was made", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(true)
 
-            languageClient.sendRequest.resolves(fakeActions)
-            quickPickStub.resolves(undefined)
-            openDocStub.resolves()
-            showDocStub.resolves()
+            languageClient.sendRequest.mockResolvedValue(fakeActions)
+            quickPickStub.mockResolvedValue(undefined)
+            openDocStub.mockResolvedValue(undefined)
+            showDocStub.mockResolvedValue(undefined)
 
             await new ShowActions(languageServices as any).execute(extensionContext)
 
-            expect(quickPickStub).to.have.been.calledWith(fakeActions)
-            expect(openDocStub).to.not.have.been.calledWith()
-            expect(showDocStub).to.not.have.been.calledWith()
+            expect(quickPickStub).toHaveBeenCalledWith(fakeActions)
+            expect(openDocStub).not.toHaveBeenCalledWith()
+            expect(showDocStub).not.toHaveBeenCalledWith()
         })
 
         it("should be able to provide separate selections for module and action", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(false)
 
-            languageClient.sendRequest.onFirstCall().resolves(fakeModules)
-            languageClient.sendRequest.onSecondCall().resolves(fakeActions)
+            languageClient.sendRequest.onFirstCall().mockResolvedValue(fakeModules)
+            languageClient.sendRequest.onSecondCall().mockResolvedValue(fakeActions)
 
-            quickPickStub.onFirstCall().resolves("test.module")
-            quickPickStub.onSecondCall().resolves(fakeActions[0])
-            openDocStub.resolves("content")
-            showDocStub.resolves()
+            quickPickStub.onFirstCall().mockResolvedValue("test.module")
+            quickPickStub.onSecondCall().mockResolvedValue(fakeActions[0])
+            openDocStub.mockResolvedValue("content")
+            showDocStub.mockResolvedValue(undefined)
 
             await new ShowActions(languageServices as any).execute(extensionContext)
 
-            expect(quickPickStub).to.have.been.calledWith(fakeModules)
-            expect(quickPickStub).to.have.been.calledWith(fakeActions)
-            expect(openDocStub).to.have.been.calledWith(testActionUri)
-            expect(showDocStub).to.have.been.calledWith("content")
+            expect(quickPickStub).toHaveBeenCalledWith(fakeModules)
+            expect(quickPickStub).toHaveBeenCalledWith(fakeActions)
+            expect(openDocStub).toHaveBeenCalledWith(testActionUri)
+            expect(showDocStub).toHaveBeenCalledWith("content")
         })
 
         it("should not try to open an action, if no module selection was made", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(false)
-            languageClient.sendRequest.onFirstCall().resolves(fakeModules)
-            quickPickStub.resolves()
+            languageClient.sendRequest.onFirstCall().mockResolvedValue(fakeModules)
+            quickPickStub.mockResolvedValue()
 
             await new ShowActions(languageServices as any).execute(extensionContext)
 
-            expect(quickPickStub).to.have.been.calledOnce.calledWith()
-            expect(openDocStub).to.not.have.been.calledWith()
-            expect(showDocStub).to.not.have.been.calledWith()
+            expect(quickPickStub).toHaveBeenNthCalledWith(1)
+            expect(openDocStub).not.toHaveBeenCalledWith()
+            expect(showDocStub).not.toHaveBeenCalledWith()
         })
     })
 
@@ -148,7 +149,7 @@ describe("Commands", () => {
         let fakeCategories: VroElementPickInfo[]
         let fakeConfigurations: VroElementPickInfo[]
 
-        beforeEach("prepare fake categories and configurations", () => {
+        beforeEach(() => {
             testConfigUri = vscode.Uri.parse(
                 "o11n://configuration/PSCoE/Library/vRA/Extensibility.xml#90ee9bdb-ba13-4bf5-92ee-2ef9393f12de")
 
@@ -172,62 +173,62 @@ describe("Commands", () => {
         it("should open the selected configuration element", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(true)
 
-            languageClient.sendRequest.resolves(fakeConfigurations)
-            quickPickStub.resolves(fakeConfigurations[0])
-            openDocStub.resolves("content")
-            showDocStub.resolves()
+            languageClient.sendRequest.mockResolvedValue(fakeConfigurations)
+            quickPickStub.mockResolvedValue(fakeConfigurations[0])
+            openDocStub.mockResolvedValue("content")
+            showDocStub.mockResolvedValue()
 
             await new ShowConfigurations(languageServices as any).execute(extensionContext)
 
-            expect(quickPickStub).to.have.been.calledWith(fakeConfigurations)
-            expect(openDocStub).to.have.been.calledWith(testConfigUri)
-            expect(showDocStub).to.have.been.calledWith("content")
+            expect(quickPickStub).toHaveBeenCalledWith(fakeConfigurations)
+            expect(openDocStub).toHaveBeenCalledWith(testConfigUri)
+            expect(showDocStub).toHaveBeenCalledWith("content")
         })
 
         it("should not try to open a configuration element, if no selection was made", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(true)
 
-            languageClient.sendRequest.resolves(fakeConfigurations)
-            quickPickStub.resolves(undefined)
-            openDocStub.resolves()
-            showDocStub.resolves()
+            languageClient.sendRequest.mockResolvedValue(fakeConfigurations)
+            quickPickStub.mockResolvedValue(undefined)
+            openDocStub.mockResolvedValue()
+            showDocStub.mockResolvedValue()
 
             await new ShowConfigurations(languageServices as any).execute(extensionContext)
 
-            expect(quickPickStub).to.have.been.calledWith(fakeConfigurations)
-            expect(openDocStub).to.not.have.been.calledWith()
-            expect(showDocStub).to.not.have.been.calledWith()
+            expect(quickPickStub).toHaveBeenCalledWith(fakeConfigurations)
+            expect(openDocStub).not.toHaveBeenCalledWith()
+            expect(showDocStub).not.toHaveBeenCalledWith()
         })
 
         it("should be able to provide separate selections for category and configuration element", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(false)
 
-            languageClient.sendRequest.onFirstCall().resolves(fakeCategories)
-            languageClient.sendRequest.onSecondCall().resolves(fakeConfigurations)
+            languageClient.sendRequest.onFirstCall().mockResolvedValue(fakeCategories)
+            languageClient.sendRequest.onSecondCall().mockResolvedValue(fakeConfigurations)
 
-            quickPickStub.onFirstCall().resolves("PSCoE/Library/vRA")
-            quickPickStub.onSecondCall().resolves(fakeConfigurations[0])
-            openDocStub.resolves("content")
-            showDocStub.resolves()
+            quickPickStub.onFirstCall().mockResolvedValue("PSCoE/Library/vRA")
+            quickPickStub.onSecondCall().mockResolvedValue(fakeConfigurations[0])
+            openDocStub.mockResolvedValue("content")
+            showDocStub.mockResolvedValue()
 
             await new ShowConfigurations(languageServices as any).execute(extensionContext)
 
-            expect(quickPickStub).to.have.been.calledWith(fakeCategories)
-            expect(quickPickStub).to.have.been.calledWith(fakeConfigurations)
-            expect(openDocStub).to.have.been.calledWith(testConfigUri)
-            expect(showDocStub).to.have.been.calledWith("content")
+            expect(quickPickStub).toHaveBeenCalledWith(fakeCategories)
+            expect(quickPickStub).toHaveBeenCalledWith(fakeConfigurations)
+            expect(openDocStub).toHaveBeenCalledWith(testConfigUri)
+            expect(showDocStub).toHaveBeenCalledWith("content")
         })
 
         it("should not try to open a configuration element, if no category selection was made", async () => {
             mockedConfig.get.withArgs("commandPalette.useFullyQualifiedNames").returns(false)
-            languageClient.sendRequest.onFirstCall().resolves(fakeCategories)
-            quickPickStub.resolves()
+            languageClient.sendRequest.onFirstCall().mockResolvedValue(fakeCategories)
+            quickPickStub.mockResolvedValue()
 
             await new ShowConfigurations(languageServices as any).execute(extensionContext)
 
             expect(quickPickStub).to.have.been.calledOnce.calledWith()
-            expect(openDocStub).to.not.have.been.calledWith()
-            expect(showDocStub).to.not.have.been.calledWith()
+            expect(openDocStub).not.toHaveBeenCalledWith()
+            expect(showDocStub).not.toHaveBeenCalledWith()
         })
     })
 
@@ -240,7 +241,7 @@ describe("Commands", () => {
         let collectionErrorSpy: sinon.SinonSpy
         let progressSpy: sinon.SinonSpy
 
-        beforeEach("prepare dependencies", () => {
+        beforeEach(() => {
             clientWindow = new ClientWindow("fake-vro")
 
             triggerCollectionStub = languageClient.sendRequest.withArgs(remote.server.triggerVroCollection)
@@ -251,7 +252,7 @@ describe("Commands", () => {
             collectionErrorSpy = sinon.spy(clientWindow, "onCollectionError")
         })
 
-        afterEach("reset stubs", () => {
+        afterEach(() => {
             collectionStartSpy.restore()
             collectionSuccessSpy.restore()
             collectionErrorSpy.restore()
@@ -259,8 +260,8 @@ describe("Commands", () => {
         })
 
         it("should not show errors if the collection succeeded", done => {
-            triggerCollectionStub.resolves()
-            collectionStatusStub.resolves({
+            triggerCollectionStub.mockResolvedValue()
+            collectionStatusStub.mockResolvedValue({
                 finished: true
             })
 
@@ -269,7 +270,7 @@ describe("Commands", () => {
 
                 expect(collectionStartSpy).to.have.been.calledOnce.calledWith()
                 expect(collectionSuccessSpy).to.have.been.calledOnce.calledWith()
-                expect(collectionErrorSpy).to.not.have.been.calledWith()
+                expect(collectionErrorSpy).not.toHaveBeenCalledWith()
 
                 done()
             })
@@ -278,8 +279,8 @@ describe("Commands", () => {
         })
 
         it("should show error if the collection failed", done => {
-            triggerCollectionStub.resolves()
-            collectionStatusStub.resolves({
+            triggerCollectionStub.mockResolvedValue()
+            collectionStatusStub.mockResolvedValue({
                 error: "some error",
                 data: {
                     hintsPluginBuild: 15
@@ -290,9 +291,9 @@ describe("Commands", () => {
             progressSpy = sinon.stub(vscode.window, "withProgress").callsFake(async (options, task) => {
                 await task()
 
-                expect(collectionStartSpy).to.have.been.calledOnce.calledWith()
-                expect(collectionSuccessSpy).to.not.have.been.calledWith()
-                expect(collectionErrorSpy).to.have.been.calledOnce.calledWith("some error")
+                expect(collectionStartSpy).toHaveBeenNthCalledWith(1)
+                expect(collectionSuccessSpy).not.toHaveBeenCalledWith()
+                expect(collectionErrorSpy).toHaveBeenNthCalledWith(1, "some error")
 
                 done()
             })

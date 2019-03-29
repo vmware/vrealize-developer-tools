@@ -6,20 +6,18 @@ const path = require("path");
 const cp = require("child_process");
 const fs = require("fs-extra");
 const minimist = require("minimist");
-const chmod = require("gulp-chmod");
 const log = require("fancy-log");
 const publishRelease = require("gulp-github-release");
 
 const rootPath = __dirname;
 const nodeModulesPathPrefix = path.resolve("./node_modules");
 const isWin = /^win/.test(process.platform);
-const mocha = path.join(nodeModulesPathPrefix, ".bin", "mocha") + (isWin ? ".cmd" : "");
+const jest = path.join(nodeModulesPathPrefix, ".bin", "jest") + (isWin ? ".cmd" : "");
 const pbjs = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbjs");
 const pbts = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbts");
 const vsce = path.join(nodeModulesPathPrefix, ".bin", "vsce");
 const tsc = path.join(nodeModulesPathPrefix, ".bin", "tsc");
 const tslint = path.join(nodeModulesPathPrefix, ".bin", "tslint");
-const vsctest = path.join(nodeModulesPathPrefix, "vscode", "bin", "test");
 
 const cmdLineOptions = minimist(process.argv.slice(2), {
     boolean: ["debug", "inspect"],
@@ -34,12 +32,6 @@ const cmdLineOptions = minimist(process.argv.slice(2), {
         timeout: process.env.timeout || 40000,
         tests: process.env.test || process.env.tests || process.env.t
     }
-});
-
-gulp.task("chmod-vsc-test", () => {
-    return gulp.src(vsctest)
-        .pipe(chmod(0o755))
-        .pipe(gulp.dest(path.dirname(vsctest)));
 });
 
 gulp.task("generate-proto", (done) => {
@@ -118,24 +110,18 @@ gulp.task("lint", (done) => {
     done();
 });
 
-gulp.task("test", ["compile", "chmod-vsc-test"], (done) => {
+gulp.task("test", ["compile"], (done) => {
     // run common tests
     var commonRoot = path.join(rootPath, "common");
-    var commonTests = path.join(commonRoot, "src", "test", "**", "*.ts");
-    testWithMocha(commonRoot, commonTests);
+    testWithJest(commonRoot);
 
     // run language server tests
     var lsRoot = path.join(rootPath, "language-server");
-    var lsTests = path.join(lsRoot, "src", "test", "**", "*.ts");
-    testWithMocha(rootPath, lsTests);
+    testWithJest(lsRoot);
 
     // run extension tests
-    process.env["CODE_TESTS_PATH"] = path.join(rootPath, "extension", "out", "test");
-    cp.execSync("node " + vsctest, {
-        cwd: rootPath,
-        stdio: "inherit",
-        env: process.env
-    });
+    var extRoot = path.join(rootPath, "extension");
+    testWithJest(extRoot);
 
     done();
 });
@@ -170,29 +156,17 @@ gulp.task("release", ["publish-release"]);
 
 gulp.task("default", ["watch"]);
 
-function testWithMocha(root, testSrc) {
+function testWithJest(root) {
     const args = [
-        "--colors", "-u", "bdd",
-        "-r", "ts-node/register",
-        "-r", "tsconfig-paths/register",
-        "-r", "module-alias/register"
+        "--rootDir", root,
+        "--config", "./jest.config.js"
     ];
 
     if (cmdLineOptions.tests) {
-        args.push("-g", `"${cmdLineOptions.tests}"`);
+        args.push("-t", `"${cmdLineOptions.tests}"`);
     }
 
-    if (cmdLineOptions.inspect) {
-        args.unshift("--inspect-brk");
-    } else if (cmdLineOptions.debug) {
-        args.unshift("--debug-brk");
-    } else {
-        args.push("-t", cmdLineOptions.timeout || 40000);
-    }
-
-    args.push(path.resolve(testSrc));
-
-    exec(mocha, args, root);
+    exec(jest, args, rootPath);
 }
 
 function exec(cmd, args, cwd, stdio = "inherit") {

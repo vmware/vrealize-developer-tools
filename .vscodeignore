@@ -8,7 +8,7 @@ build/**
 typings/**
 protocol/**
 **/src/**
-**/out/test/**
+**/out/__tests__/**
 
 **/*.ts
 **/*.map

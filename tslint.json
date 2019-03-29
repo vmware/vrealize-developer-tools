@@ -74,6 +74,7 @@
     "member-access": [false],
     "max-classes-per-file": [false, 2],
     "object-literal-sort-keys": false,
+    "no-string-literal": false,
     "member-ordering": [false],
     "trailing-comma": [true, {
       "singleline": "never",
