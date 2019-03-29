@@ -12,15 +12,13 @@ import * as client from "vscode-languageclient"
 import { ShowActions, ShowConfigurations, TriggerCollection } from "../client/command"
 import { ClientWindow } from "../client/ui"
 
-import { jestSpy } from "./jestSpy"
-
 describe("Commands", () => {
     let languageClient: jest.Mocked<client.LanguageClient>
     let extensionContext: vscode.ExtensionContext
-    let quickPickStub: jest.Mock
-    let openDocStub: jest.Mock
-    let showDocStub: jest.Mock
-    let configStub: jest.Mock
+    let quickPickStub: jest.SpyInstance
+    let openDocStub: jest.SpyInstance
+    let showDocStub: jest.SpyInstance
+    let configStub: jest.SpyInstance
 
     const languageServices = {
         get client() {
@@ -35,11 +33,11 @@ describe("Commands", () => {
     beforeEach(() => {
         languageClient = createMockInstance<client.LanguageClient>(client.LanguageClient)
         extensionContext = {} as vscode.ExtensionContext
-        quickPickStub = jestSpy(vscode.window, "showQuickPick")
-        openDocStub = jestSpy(vscode.workspace, "openTextDocument")
-        showDocStub = jestSpy(vscode.window, "showTextDocument")
+        quickPickStub = jest.spyOn(vscode.window, "showQuickPick")
+        openDocStub = jest.spyOn(vscode.workspace, "openTextDocument")
+        showDocStub = jest.spyOn(vscode.window, "showTextDocument")
 
-        configStub = jestSpy(vscode.workspace, "getConfiguration")
+        configStub = jest.spyOn(vscode.workspace, "getConfiguration")
         configStub.mockImplementation((...args) => {
             if (args[0] === "vrdev") {
                 return mockedConfig

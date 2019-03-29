@@ -6,7 +6,9 @@ module.exports = {
     "testMatch": [
         "**/__tests__/**/*.test.ts"
     ],
-    "moduleNameMapper": pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/../" } ),
+    "moduleNameMapper": pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/../" }),
+    "collectCoverage": true,
+    "coveragePathIgnorePatterns": [".*/__tests__/.*"],
     "globals": {
         "ts-jest": {
             "tsConfig": "<rootDir>/tsconfig.json",

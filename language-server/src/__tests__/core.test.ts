@@ -8,8 +8,6 @@ import { CancellationToken } from "vscode-languageserver"
 
 import { ConnectionLocator, Initializer } from "../server/core"
 
-import { jestSpy } from "./jestSpy"
-
 type EventHandler = server.RequestHandler<
     server.InitializeParams, server.InitializeResult, server.InitializeError>
 
@@ -17,7 +15,7 @@ describe("Core", () => {
     describe("Initializer", () => {
         it("should notify all listeners once the initialize event is triggered", () => {
             let callback: EventHandler | undefined
-            const createConnectionStub = jestSpy(server, "createConnection")
+            const createConnectionStub = jest.spyOn(server, "createConnection")
                 .mockReturnValue({
                     onInitialize: (cb: EventHandler) => {
                         callback = cb
@@ -25,7 +23,7 @@ describe("Core", () => {
                     onInitialized: () => {
                         // empty
                     }
-                })
+                } as any)
 
             const initializer = new Initializer(new ConnectionLocator())
 
