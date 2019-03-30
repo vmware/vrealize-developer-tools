@@ -39,7 +39,14 @@ export class Container {
         const types = Reflect.getMetadata("design:paramtypes", clazz)
         let params = []
         if (types) {
-            params = types.map((t: any) => this.get(t))
+            params = types.map((t: any) => {
+                // Parameter type will be undefined when there is a circualar dependency
+                if (t === undefined) {
+                    throw new CircularDependencyError(clazz.name, Array.from(this.visited))
+                }
+
+                return this.get(t)
+            })
         }
         return new clazz(...params)
     }

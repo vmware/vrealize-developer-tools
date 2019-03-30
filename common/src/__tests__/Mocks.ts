@@ -17,13 +17,13 @@ export class WithOneParam {
 }
 
 @AutoWire
-export class C1 {
-    constructor(public c: C2) { }
+export class C2 {
+    constructor(public c: C1) { }
 }
 
 @AutoWire
-export class C2 {
-    constructor(public c: C1) { }
+export class C1 {
+    constructor(public c: C2) { }
 }
 
 export class NotAutoWired {

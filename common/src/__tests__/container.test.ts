@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: MIT
  */
 
- import { Container } from "../di/Container"
+import { Container } from "../di/Container"
 
- import * as Mocks from "./Mocks"
+import * as Mocks from "./Mocks"
 
- describe("Container tests", () => {
+describe("Container", () => {
 
     it("Can load class without constructor", () => {
         const container = new Container()
@@ -27,14 +27,14 @@
         const container = new Container()
         expect(() => {
             container.get(Mocks.C1)
-        }).toThrow()
+        }).toThrow("Circular dependency detected")
     })
 
     it("Should throw on not annotated class", () => {
         const container = new Container()
         expect(() => {
             container.get(Mocks.NotAutoWired)
-        }).toThrow()
+        }).toThrow("Class doesn't have property __autowire.")
     })
 
     it("Should not throw if the instance was aready set", () => {
@@ -49,6 +49,6 @@
         const container = new Container()
         expect(() => {
             container.get(Mocks.IntInConst)
-        }).toThrow()
+        }).toThrow("Class doesn't have property __autowire.")
     })
 })
