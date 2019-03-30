@@ -87,12 +87,15 @@ gulp.task("clean", (done) => {
     projects.forEach(name => {
         var outPath = path.join(rootPath, name, "out");
         fs.removeSync(outPath);
+
+        var tsBuildInfo = path.join(rootPath, name, "tsconfig.tsbuildinfo");
+        fs.removeSync(tsBuildInfo);
     });
 
     done();
 });
 
-gulp.task("compile", ["clean", "generate-proto", "copy-proto"], (done) => {
+gulp.task("compile", ["generate-proto", "copy-proto"], (done) => {
     // TODO: Evaluate using gulp-typescript and gulp-sourcemaps
     // once they fully support project references
     exec(tsc, ["-b"], rootPath);
@@ -112,14 +115,17 @@ gulp.task("lint", (done) => {
 
 gulp.task("test", ["compile"], (done) => {
     // run common tests
+    log.info("Running tests on 'common'... ");
     var commonRoot = path.join(rootPath, "common");
     testWithJest(commonRoot);
 
     // run language server tests
+    log.info("Running tests on 'language-server'... ");
     var lsRoot = path.join(rootPath, "language-server");
     testWithJest(lsRoot);
 
     // run extension tests
+    log.info("Running tests on 'extension'... ");
     var extRoot = path.join(rootPath, "extension");
     testWithJest(extRoot);
 
@@ -171,7 +177,7 @@ function testWithJest(root) {
 
 function exec(cmd, args, cwd, stdio = "inherit") {
     var cmdString = `${cmd} ${args.join(" ")}`
-    console.log(cmdString);
+    log(cmdString);
     var result = cp.spawnSync(cmd, args, { stdio, cwd });
     if (result.status != 0) {
         throw new Error(`Command "${cmdString}" exited with code ` + result.status);

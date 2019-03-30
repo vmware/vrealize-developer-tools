@@ -1,7 +1,6 @@
 {
   "extends": [
-    "tslint:recommended",
-    "tslint-no-unused-expression-chai"
+    "tslint:recommended"
   ],
   "rules": {
     "file-header": {
