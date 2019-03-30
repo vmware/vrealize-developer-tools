@@ -114,21 +114,20 @@ gulp.task("lint", (done) => {
 });
 
 gulp.task("test", ["compile"], (done) => {
-    // run common tests
-    log.info("Running tests on 'common'... ");
     var commonRoot = path.join(rootPath, "common");
-    testWithJest(commonRoot);
-
-    // run language server tests
-    log.info("Running tests on 'language-server'... ");
     var lsRoot = path.join(rootPath, "language-server");
-    testWithJest(lsRoot);
-
-    // run extension tests
-    log.info("Running tests on 'extension'... ");
     var extRoot = path.join(rootPath, "extension");
-    testWithJest(extRoot);
 
+    const args = [
+        "--verbose",
+        "--projects", commonRoot, lsRoot, extRoot
+    ];
+
+    if (cmdLineOptions.tests) {
+        args.push("-t", `"${cmdLineOptions.tests}"`);
+    }
+
+    exec(jest, args, rootPath);
     done();
 });
 
@@ -161,20 +160,6 @@ gulp.task("publish-release", (done) => {
 gulp.task("release", ["publish-release"]);
 
 gulp.task("default", ["watch"]);
-
-function testWithJest(root) {
-    const args = [
-        "--verbose",
-        "--rootDir", root,
-        "--config", "./jest.config.js"
-    ];
-
-    if (cmdLineOptions.tests) {
-        args.push("-t", `"${cmdLineOptions.tests}"`);
-    }
-
-    exec(jest, args, rootPath);
-}
 
 function exec(cmd, args, cwd, stdio = "inherit") {
     var cmdString = `${cmd} ${args.join(" ")}`

@@ -51,7 +51,7 @@ describe("Core", () => {
             expect(listener2).toHaveBeenCalled()
             expect(listener3).toHaveBeenCalled()
 
-            createConnectionStub["restore"]()
+            createConnectionStub.mockRestore()
         })
     })
 })
