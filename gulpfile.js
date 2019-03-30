@@ -164,6 +164,7 @@ gulp.task("default", ["watch"]);
 
 function testWithJest(root) {
     const args = [
+        "--verbose",
         "--rootDir", root,
         "--config", "./jest.config.js"
     ];
