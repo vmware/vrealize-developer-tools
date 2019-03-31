@@ -5,7 +5,7 @@
 
 import { Container } from "../di/Container"
 
-import * as Mocks from "./Mocks"
+import * as Mocks from "./container.mocks"
 
 describe("Container", () => {
 

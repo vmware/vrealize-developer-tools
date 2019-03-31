@@ -36,7 +36,7 @@ export default class Logger {
     }
 
     private readonly format = (level: string, message: string, data?: any) => {
-        return `[${new Date().toISOString()} ${level} - ${this.className}]` +
+        return `[${new Date().toISOString()} ${level} - ${this.className}] ` +
             `${message} ${data ? this.metaToString(data) : ""}`
     }
 
@@ -61,9 +61,8 @@ export default class Logger {
     }
 
     public error(message: string, data?: any): void {
-        const loggerInstance = this.channel
-        if (loggerInstance) {
-            loggerInstance.error(this.format("ERROR", message, data))
+        if (this.channel) {
+            this.channel.error(this.format("ERROR", message, data))
         }
     }
 
