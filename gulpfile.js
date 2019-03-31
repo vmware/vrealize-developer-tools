@@ -114,18 +114,26 @@ gulp.task("lint", (done) => {
 });
 
 gulp.task("test", ["compile"], (done) => {
-    var commonRoot = path.join(rootPath, "common");
-    var lsRoot = path.join(rootPath, "language-server");
-    var extRoot = path.join(rootPath, "extension");
-
+    const projectRoots = projects.map(name => path.join(rootPath, name))
     const args = [
         "--verbose",
-        "--projects", commonRoot, lsRoot, extRoot
+        "--projects", ...projectRoots
     ];
 
     if (cmdLineOptions.tests) {
         args.push("-t", `"${cmdLineOptions.tests}"`);
     }
+
+    exec(jest, args, rootPath);
+    done();
+});
+
+gulp.task("test:watch", (done) => {
+    const projectRoots = projects.map(name => path.join(rootPath, name))
+    const args = [
+        "--verbose", "--watch",
+        "--projects", ...projectRoots
+    ];
 
     exec(jest, args, rootPath);
     done();
