@@ -8,7 +8,7 @@ import { default as Logger, LogChannel } from "../logger"
 describe("utility", () => {
     describe("logger", () => {
         // fixate the date
-        const constantDate = new Date("2019-03-31T12:13:14")
+        const constantDate = new Date("2019-03-31T12:13:14.000Z")
         Date = jest.fn(() => constantDate) as any
 
         const mockedDebug = jest.fn()
@@ -69,22 +69,22 @@ describe("utility", () => {
         describe("format", () => {
             it.each(["debug", "info", "warn", "error"])(".%s() should format logged messages", (level) => {
                 logger[level]("message:", "data")
-                let formattedMessage = `[2019-03-31T09:13:14.000Z ${level.toUpperCase()} - TestLog] message: data`
+                let formattedMessage = `[2019-03-31T12:13:14.000Z ${level.toUpperCase()} - TestLog] message: data`
                 expect(logChannel[level]).toHaveBeenCalledWith(formattedMessage)
 
                 logger[level]("message:", { data: 1 })
-                formattedMessage = `[2019-03-31T09:13:14.000Z ${level.toUpperCase()} - TestLog] message: {\"data\":1}`
+                formattedMessage = `[2019-03-31T12:13:14.000Z ${level.toUpperCase()} - TestLog] message: {\"data\":1}`
                 expect(logChannel[level]).toHaveBeenCalledWith(formattedMessage)
 
                 const error = new Error("error")
                 error.stack = "stack trace"
                 logger[level]("message:", error)
-                formattedMessage = `[2019-03-31T09:13:14.000Z ${level.toUpperCase()} - TestLog] message: stack trace`
+                formattedMessage = `[2019-03-31T12:13:14.000Z ${level.toUpperCase()} - TestLog] message: stack trace`
                 expect(logChannel[level]).toHaveBeenCalledWith(formattedMessage)
 
                 error.stack = undefined
                 logger[level]("message:", error)
-                formattedMessage = `[2019-03-31T09:13:14.000Z ${level.toUpperCase()} - TestLog] message: error`
+                formattedMessage = `[2019-03-31T12:13:14.000Z ${level.toUpperCase()} - TestLog] message: error`
                 expect(logChannel[level]).toHaveBeenCalledWith(formattedMessage)
             })
         })
