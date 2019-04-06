@@ -17,7 +17,8 @@ export enum Commands {
     NewProject = "vrdev.new.project",
     OpenAction = "vrdev.open.action",
     OpenConfiguration = "vrdev.open.configElement",
-    RunAction = "vrdev.run.action"
+    RunAction = "vrdev.run.action",
+    ToggleTypeScript = "vrdev.toggle.typescript"
 }
 
 export enum FixCommands {
