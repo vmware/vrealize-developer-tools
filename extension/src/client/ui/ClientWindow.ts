@@ -22,11 +22,10 @@ export class ClientWindow implements vscode.Disposable {
         this.collectionStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10101)
         this.collectionButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10100)
 
-        this.collectionStatus.text = "$(plug) Initializing..."
+        this.collectionStatus.text = "$(plug) $(kebab-horizontal)"
         this.profileName = initialProfileName
 
         this.collectionStatus.show()
-        this.collectionButton.show()
     }
 
     public dispose() {
@@ -51,7 +50,6 @@ export class ClientWindow implements vscode.Disposable {
             this.collectionStatus.text = `$(server) ${this.profileName} (${hostname})`
             this.collectionStatus.tooltip = "Change active profile"
             this.collectionStatus.command = Commands.ChangeProfile
-            this.collectionStatus.color = undefined
 
             return true
         } else {
@@ -60,10 +58,9 @@ export class ClientWindow implements vscode.Disposable {
 
             this.collectionButton.hide()
 
-            this.collectionStatus.text = "$(server) (no profile)"
+            this.collectionStatus.text = "$(server) $(x)"
             this.collectionStatus.tooltip = warnMessage
             this.collectionStatus.command = Commands.ChangeProfile
-            this.collectionStatus.color = new vscode.ThemeColor("errorForeground")
 
             return false
         }
