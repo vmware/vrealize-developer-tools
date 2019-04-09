@@ -33,38 +33,6 @@
     "sourceMaps": true
   },
   {
-    "name": "Test Extension",
-    "type": "extensionHost",
-    "request": "launch",
-    "runtimeExecutable": "${execPath}",
-    "args": [
-      "--extensionDevelopmentPath=${workspaceRoot}",
-      "--extensionTestsPath=${workspaceRoot}/extension/out/test"
-    ],
-    "stopOnEntry": false,
-    "sourceMaps": true,
-    "outFiles": [
-      "${workspaceRoot}/extension/out/test/**/*.test.js"
-    ],
-    "preLaunchTask": "gulp: compile"
-  },
-  {
-    "name": "Test Language Server",
-    "type": "node",
-    "request": "launch",
-    "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-    "args": ["test:language-server"],
-    "internalConsoleOptions": "openOnSessionStart"
-  },
-  {
-    "name": "Test Common Lib",
-    "type": "node",
-    "request": "launch",
-    "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-    "args": ["test:common"],
-    "internalConsoleOptions": "openOnSessionStart"
-  },
-  {
     "name": "Gulpfile",
     "type": "node",
     "request": "launch",

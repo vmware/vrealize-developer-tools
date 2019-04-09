@@ -6,20 +6,18 @@ const path = require("path");
 const cp = require("child_process");
 const fs = require("fs-extra");
 const minimist = require("minimist");
-const chmod = require("gulp-chmod");
 const log = require("fancy-log");
 const publishRelease = require("gulp-github-release");
 
 const rootPath = __dirname;
 const nodeModulesPathPrefix = path.resolve("./node_modules");
 const isWin = /^win/.test(process.platform);
-const mocha = path.join(nodeModulesPathPrefix, ".bin", "mocha") + (isWin ? ".cmd" : "");
+const jest = path.join(nodeModulesPathPrefix, ".bin", "jest") + (isWin ? ".cmd" : "");
 const pbjs = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbjs");
 const pbts = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbts");
 const vsce = path.join(nodeModulesPathPrefix, ".bin", "vsce");
 const tsc = path.join(nodeModulesPathPrefix, ".bin", "tsc");
 const tslint = path.join(nodeModulesPathPrefix, ".bin", "tslint");
-const vsctest = path.join(nodeModulesPathPrefix, "vscode", "bin", "test");
 
 const cmdLineOptions = minimist(process.argv.slice(2), {
     boolean: ["debug", "inspect"],
@@ -34,12 +32,6 @@ const cmdLineOptions = minimist(process.argv.slice(2), {
         timeout: process.env.timeout || 40000,
         tests: process.env.test || process.env.tests || process.env.t
     }
-});
-
-gulp.task("chmod-vsc-test", () => {
-    return gulp.src(vsctest)
-        .pipe(chmod(0o755))
-        .pipe(gulp.dest(path.dirname(vsctest)));
 });
 
 gulp.task("generate-proto", (done) => {
@@ -95,12 +87,15 @@ gulp.task("clean", (done) => {
     projects.forEach(name => {
         var outPath = path.join(rootPath, name, "out");
         fs.removeSync(outPath);
+
+        var tsBuildInfo = path.join(rootPath, name, "tsconfig.tsbuildinfo");
+        fs.removeSync(tsBuildInfo);
     });
 
     done();
 });
 
-gulp.task("compile", ["clean", "generate-proto", "copy-proto"], (done) => {
+gulp.task("compile", ["generate-proto", "copy-proto"], (done) => {
     // TODO: Evaluate using gulp-typescript and gulp-sourcemaps
     // once they fully support project references
     exec(tsc, ["-b"], rootPath);
@@ -118,25 +113,29 @@ gulp.task("lint", (done) => {
     done();
 });
 
-gulp.task("test", ["compile", "chmod-vsc-test"], (done) => {
-    // run common tests
-    var commonRoot = path.join(rootPath, "common");
-    var commonTests = path.join(commonRoot, "src", "test", "**", "*.ts");
-    testWithMocha(commonRoot, commonTests);
+gulp.task("test", ["compile"], (done) => {
+    const projectRoots = projects.map(name => path.join(rootPath, name))
+    const args = [
+        "--verbose",
+        "--projects", ...projectRoots
+    ];
 
-    // run language server tests
-    var lsRoot = path.join(rootPath, "language-server");
-    var lsTests = path.join(lsRoot, "src", "test", "**", "*.ts");
-    testWithMocha(rootPath, lsTests);
+    if (cmdLineOptions.tests) {
+        args.push("-t", `"${cmdLineOptions.tests}"`);
+    }
 
-    // run extension tests
-    process.env["CODE_TESTS_PATH"] = path.join(rootPath, "extension", "out", "test");
-    cp.execSync("node " + vsctest, {
-        cwd: rootPath,
-        stdio: "inherit",
-        env: process.env
-    });
+    exec(jest, args, rootPath);
+    done();
+});
 
+gulp.task("test:watch", (done) => {
+    const projectRoots = projects.map(name => path.join(rootPath, name))
+    const args = [
+        "--verbose", "--watch",
+        "--projects", ...projectRoots
+    ];
+
+    exec(jest, args, rootPath);
     done();
 });
 
@@ -170,34 +169,9 @@ gulp.task("release", ["publish-release"]);
 
 gulp.task("default", ["watch"]);
 
-function testWithMocha(root, testSrc) {
-    const args = [
-        "--colors", "-u", "bdd",
-        "-r", "ts-node/register",
-        "-r", "tsconfig-paths/register",
-        "-r", "module-alias/register"
-    ];
-
-    if (cmdLineOptions.tests) {
-        args.push("-g", `"${cmdLineOptions.tests}"`);
-    }
-
-    if (cmdLineOptions.inspect) {
-        args.unshift("--inspect-brk");
-    } else if (cmdLineOptions.debug) {
-        args.unshift("--debug-brk");
-    } else {
-        args.push("-t", cmdLineOptions.timeout || 40000);
-    }
-
-    args.push(path.resolve(testSrc));
-
-    exec(mocha, args, root);
-}
-
 function exec(cmd, args, cwd, stdio = "inherit") {
     var cmdString = `${cmd} ${args.join(" ")}`
-    console.log(cmdString);
+    log(cmdString);
     var result = cp.spawnSync(cmd, args, { stdio, cwd });
     if (result.status != 0) {
         throw new Error(`Command "${cmdString}" exited with code ` + result.status);

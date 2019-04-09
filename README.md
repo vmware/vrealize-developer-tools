@@ -1,5 +1,6 @@
 
 [![Build Status](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_apis/build/status/CI%20Pipeline?branchName=master)](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_build/latest?definitionId=1&branchName=master)
+[![Dependencies Status](https://david-dm.org/vmware/vrealize-developer-tools/status.svg)](https://david-dm.org/vmware/vrealize-developer-tools)
 
 # vRealize Developer Tools
 
