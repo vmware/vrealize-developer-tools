@@ -17,7 +17,8 @@ export enum Commands {
     NewProject = "vrdev.new.project",
     OpenAction = "vrdev.open.action",
     OpenConfiguration = "vrdev.open.configElement",
-    RunAction = "vrdev.run.action"
+    RunAction = "vrdev.run.action",
+    ToggleTypeScript = "vrdev.toggle.typescript"
 }
 
 export enum FixCommands {
@@ -33,6 +34,15 @@ export enum OutputChannels {
     LanguageServerLogs = "vRO - Language Server",
     RunActionLogs = "vRO - Execution Log"
 }
+
+export enum ProjectArchetypes {
+    TypeScript = "com.vmware.pscoe.o11n:typescript-project",
+    Base = "com.vmware.pscoe.o11n:base-package",
+    Actions = "com.vmware.pscoe.o11n:actions-package",
+    Xml = "com.vmware.pscoe.o11n:xml-package",
+    Vra = "com.vmware.pscoe.vra:vra-package"
+}
+
 export class MavenPom {
     static readonly ParentPattern = /<parent>[\s\S]*<\/parent>/i
     static readonly ArtifactIdPattern = /^[A-Za-z0-9_\-]+$/

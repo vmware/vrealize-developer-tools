@@ -15,7 +15,8 @@ export class EnvironmentManager extends BaseEnvironment {
     protected readonly logger = Logger.get("EnvironmentManager")
 
     public get workspaceFolders(): WorkspaceFolder[] {
-        return vscode.workspace.workspaceFolders || []
+        return (vscode.workspace.workspaceFolders || [])
+            .map(folder => WorkspaceFolder.fromVscode(folder))
     }
 
     constructor(protected config: ConfigurationManager) {

@@ -3,11 +3,25 @@
  * SPDX-License-Identifier: MIT
  */
 
+import * as path from "path"
 import URI, { UriComponents } from "vscode-uri"
 
-export class WorkspaceFolder {
-    constructor(readonly uri: URI, readonly name: string) {
+import { default as Logger } from "../logger"
+import { PomFile } from "../maven/"
 
+export class WorkspaceFolder {
+    private readonly logger = Logger.get("WorkspaceFolder")
+
+    constructor(readonly uri: URI, readonly name: string) { }
+
+    get projectType(): string | undefined {
+        try {
+            const pomFile = new PomFile(path.join(this.uri.fsPath, "pom.xml"))
+            return pomFile.parentId
+        } catch (e) {
+            this.logger.warn(`Could not find project type of workspace folder ${this.uri.fsPath}`, e)
+            return undefined
+        }
     }
 
     static fromProtocol(source: {uri: string, name: string}): WorkspaceFolder {

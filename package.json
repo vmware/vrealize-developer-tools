@@ -34,7 +34,8 @@
     "onCommand:vrdev.change.profile",
     "onCommand:vrdev.open.action",
     "onCommand:vrdev.open.configElement",
-    "onCommand:vrdev.run.action"
+    "onCommand:vrdev.run.action",
+    "onCommand:vrdev.toggle.typescript"
   ],
   "main": "./extension/out/extension",
   "contributes": {
@@ -67,12 +68,17 @@
           "light": "assets/icons/light/zap.svg",
           "dark": "assets/icons/dark/zap.svg"
         }
+      },
+      {
+        "command": "vrdev.toggle.typescript",
+        "title": "Toggle TypeScript Support (Experimental)",
+        "category": "vRealize"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "when": "resourceLangId == javascript",
+          "when": "resourceLangId == javascript || resourceLangId == typescript",
           "command": "vrdev.run.action",
           "group": "navigation"
         }
