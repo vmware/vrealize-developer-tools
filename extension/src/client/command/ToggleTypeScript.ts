@@ -28,5 +28,6 @@ export class ToggleTypeScript extends Command {
         const value = this.config.vrdev.experimental.typescript
         await vscode.workspace.getConfiguration("vrdev").update(
             "experimental.typescript", !value, vscode.ConfigurationTarget.Global)
+        vscode.window.showInformationMessage(`${!value ? "Enabled" : "Disabled"} vRealize TypeScript support`)
     }
 }
