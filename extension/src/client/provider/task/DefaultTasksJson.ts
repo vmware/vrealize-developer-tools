@@ -5,8 +5,10 @@
 
 // tslint:disable:max-line-length
 
+import { ProjectArchetypes } from "../../constants"
+
 export const TASKS_BY_TOOLCHAIN_PARENT = {
-    "com.vmware.pscoe.o11n:typescript-project": [{
+    [ProjectArchetypes.TypeScript]: [{
         label: "Push",
         windows: {
             command: "mvn clean package vrealize:push -DincludeDependencies=true -DskipTests -P${config:vrdev.maven.profile} -D\"vro.packageImportConfigurationAttributeValues=false\""
@@ -17,7 +19,7 @@ export const TASKS_BY_TOOLCHAIN_PARENT = {
         command: "mvn clean package"
     }],
 
-    "com.vmware.pscoe.o11n:base-package": [{
+    [ProjectArchetypes.Base]: [{
         label: "Push",
         windows: {
             command: "mvn clean package vrealize:push -DincludeDependencies=true -DskipTests -P${config:vrdev.maven.profile} -D\"vro.packageImportConfigurationAttributeValues=false\""
@@ -37,7 +39,7 @@ export const TASKS_BY_TOOLCHAIN_PARENT = {
         command: "mvn clean package vrealize:push -P${config:vrdev.maven.profile} -DincludeDependencies=false -DskipTests -DpackageSuffix=patch -Dactions=\"$(git diff --name-only origin/master | tr '\\n' ',' | sed 's/,$ //')\""
     }],
 
-    "com.vmware.pscoe.o11n:actions-package": [{
+    [ProjectArchetypes.Actions]: [{
         label: "Push",
         command: "mvn clean package vrealize:push -DincludeDependencies=false -DskipTests -P${config:vrdev.maven.profile}"
     }, {
@@ -45,7 +47,7 @@ export const TASKS_BY_TOOLCHAIN_PARENT = {
         command: "mvn vro:pull -P${config:vrdev.maven.profile}"
     }],
 
-    "com.vmware.pscoe.o11n:xml-package": [{
+    [ProjectArchetypes.Xml]: [{
         label: "Push",
         windows: {
             command: "mvn clean package vrealize:push -DincludeDependencies=false -DskipTests -P${config:vrdev.maven.profile} -D\"vro.packageImportConfigurationAttributeValues=false\""
@@ -59,7 +61,7 @@ export const TASKS_BY_TOOLCHAIN_PARENT = {
         command: "mvn vro:pull -P${config:vrdev.maven.profile} -Dvro.packageExportConfigurationAttributeValues=false"
     }],
 
-    "com.vmware.pscoe.vra:vra-package": [{
+    [ProjectArchetypes.Vra]: [{
         label: "Push",
         command: "mvn clean package vrealize:push -DincludeDependencies=false -DskipTests -P${config:vrdev.maven.profile}"
     }, {
