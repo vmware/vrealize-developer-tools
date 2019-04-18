@@ -81,8 +81,9 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         try {
             this.includeDefaultTasks(folder, undefined, tasks, excludePatterns)
         } catch (e) {
-            this.logger.warn(
-                `Couldn't generate task list for workspace folder '${folder.uri.fsPath}'. Cause: `, e.message)
+            const msg = `Couldn't generate task list for workspace folder '${folder.uri.fsPath}'. Cause: ${e.message}`
+            this.logger.warn(msg)
+            vscode.window.showErrorMessage(msg)
         }
 
         return tasks.map(taskDef => this.newShellTask(taskDef, folder))
