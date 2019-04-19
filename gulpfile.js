@@ -152,7 +152,7 @@ gulp.task("publish-release", (done) => {
     const releaseVersion = require("./package.json").version;
     log.info(`Creating GitHub release v${releaseVersion}`)
     gulp.src("./*.vsix").pipe(publishRelease({
-        token: process.env.GITHUB_TOKEN,
+        token: process.env.GITHUB_SECRET,
         owner: "vmware",
         repo: "vrealize-developer-tools",
         name: releaseVersion,
