@@ -27,6 +27,7 @@ interface VrealizeTaskDefinition extends vscode.TaskDefinition {
 
 export class TaskProvider implements vscode.TaskProvider, Registrable {
     private readonly logger = Logger.get("TaskProvider")
+    private context: vscode.ExtensionContext
 
     dispose() {
         // empty
@@ -56,9 +57,10 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
     register(context: vscode.ExtensionContext,
              clientWindow: ClientWindow): void {
         this.logger.debug("Registering the task provider")
+        this.context = context
 
         const providerRegistration = vscode.tasks.registerTaskProvider(extensionShortName, this)
-        context.subscriptions.push(this, providerRegistration)
+        this.context.subscriptions.push(this, providerRegistration)
     }
 
     private tasksForWorkspace(folder: vscode.WorkspaceFolder, excludePatterns: string[]) {
@@ -81,8 +83,9 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         try {
             this.includeDefaultTasks(folder, undefined, tasks, excludePatterns)
         } catch (e) {
-            this.logger.warn(
-                `Couldn't generate task list for workspace folder '${folder.uri.fsPath}'. Cause: `, e.message)
+            const msg = `Couldn't generate task list for workspace folder '${folder.uri.fsPath}'. Cause: ${e.message}`
+            this.logger.warn(msg)
+            this.showWarning(msg, folder.uri.fsPath)
         }
 
         return tasks.map(taskDef => this.newShellTask(taskDef, folder))
@@ -137,5 +140,21 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         task.group = vscode.TaskGroup.Build
 
         return task
+    }
+
+    private showWarning(message: string, workspaceFolderPath: string): void {
+        const state = this.context.globalState.get("ignoredTaskWarnings", {})
+
+        if (state[workspaceFolderPath] !== true) {
+            vscode.window.showWarningMessage(message, "Ignore for Project").then(
+                selected => {
+                    if (selected === "Ignore for Project") {
+                        // TODO: Wrap this into a more pleasant API that will be used across the extenion
+                        state[workspaceFolderPath] = true
+                        this.context.globalState.update("ignoredTaskWarnings", state)
+                    }
+                }
+            )
+        }
     }
 }
