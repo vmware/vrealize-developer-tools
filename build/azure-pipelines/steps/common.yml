@@ -14,15 +14,15 @@ steps:
     condition: eq(variables['Agent.OS'], 'Linux')
 
   - script: yarn install --frozen-lockfile
-    displayName: yarn install
+    displayName: Install dependencies
 
   - script: 'node node_modules/gulp/bin/gulp.js package'
-    displayName: 'gulp package'
+    displayName: Build VSIX package
     env:
       DISPLAY: :10
 
   - script: './node_modules/.bin/codecov -f **/coverage/*.json'
-    displayName: 'Upload coverage to codecov.io'
+    displayName: Upload coverage to codecov.io
 
   - task: CopyFiles@2
     displayName: Stage VSIX for publishing
@@ -33,7 +33,7 @@ steps:
       targetFolder: $(Build.ArtifactStagingDirectory)
 
   - task: PublishBuildArtifacts@1
-    displayName: Publish VSIX
+    displayName: Publish VSIX artifact
     condition: eq(variables['Agent.OS'], 'Linux')
     inputs:
       pathToPublish: $(Build.ArtifactStagingDirectory)

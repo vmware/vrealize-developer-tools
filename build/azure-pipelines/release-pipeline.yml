@@ -11,12 +11,24 @@ pool:
 steps:
 - bash: |
     PACKAGE_VERSION=$(node -p "require('./package.json').version")
+    echo "##vso[task.setvariable variable=PrevVersion]${PACKAGE_VERSION}"
+  displayName: Store current version
+
+- script: 'node node_modules/gulp/bin/gulp.js bump-version'
+  displayName: Bump version in package.json
+  env:
+    GITHUB_SECRET: $(GitHubSecret)
+    RELEASE_VERSION: $(ReleaseVersion)
+
+- bash: |
+    PACKAGE_VERSION=$(node -p "require('./package.json').version")
     echo "##vso[build.updatebuildnumber]${PACKAGE_VERSION}-release+${BUILD_BUILDID}"
   displayName: Set version number of build
 
 - template: steps/common.yml
 
 - script: 'node node_modules/gulp/bin/gulp.js release'
-  displayName: 'gulp release'
+  displayName: Publish release in GitHub
   env:
     GITHUB_SECRET: $(GitHubSecret)
+    PREV_RELEASE_VERSION: $(PrevVersion)
