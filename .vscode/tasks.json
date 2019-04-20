@@ -10,12 +10,21 @@
     {
       "type": "gulp",
       "task": "watch",
-      "problemMatcher": ["$tsc-watch", "$tslint5"],
+      "problemMatcher": ["$tsc-watch"],
       "isBackground": true,
       "group": {
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "type": "gulp",
+      "task": "lint",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$eslint-stylish"]
     },
     {
       "type": "gulp",

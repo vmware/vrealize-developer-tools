@@ -17,6 +17,9 @@ protocol/**
 .gitignore
 .gitattributes
 .yarnrc
+.eslintignore
+.eslintrc*
+.prettierrc*
 
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
@@ -24,8 +27,6 @@ CONTRIBUTING.md
 *.vsix
 **/tsconfig.json
 gulpfile.js
-tsfmt.json
-tslint.json
 yarn.lock
 yarn-debug.log
 yarn-error.log

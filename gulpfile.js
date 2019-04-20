@@ -2,11 +2,13 @@
  * SPDX-License-Identifier: MIT */
 
 const gulp = require("gulp");
+const gulpIf = require("gulp-if")
 const path = require("path");
 const cp = require("child_process");
 const fs = require("fs-extra");
 const minimist = require("minimist");
 const log = require("fancy-log");
+const eslint = require("gulp-eslint");
 const release = require("./build/release");
 const bumpVersion = require("./build/bump-version");
 
@@ -18,10 +20,9 @@ const pbjs = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbjs");
 const pbts = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbts");
 const vsce = path.join(nodeModulesPathPrefix, ".bin", "vsce");
 const tsc = path.join(nodeModulesPathPrefix, ".bin", "tsc");
-const tslint = path.join(nodeModulesPathPrefix, ".bin", "tslint");
 
 const cmdLineOptions = minimist(process.argv.slice(2), {
-    boolean: ["debug", "inspect"],
+    boolean: ["debug", "inspect", "fix"],
     string: ["tests", "timeout", "value"],
     alias: {
         "d": "debug",
@@ -108,10 +109,13 @@ gulp.task("watch", (done) => {
     done();
 });
 
-gulp.task("lint", (done) => {
-    const tsconfigFile = path.resolve(rootPath, "tsconfig.lint.json");
-    exec(tslint, ["-p", tsconfigFile, "-t", "verbose", "--fix"], rootPath);
-    done();
+gulp.task("lint", () => {
+    return gulp
+        .src(["**/src/**/*.ts", "!node_modules/**"], { cwd: rootPath })
+        .pipe(eslint({ fix: !!cmdLineOptions.fix }))
+        .pipe(eslint.format())
+        .pipe(gulpIf(file => file.eslint && file.eslint.fixed, gulp.dest("./")))
+        .pipe(eslint.failAfterError())
 });
 
 gulp.task("test", gulp.series("compile", (done) => {

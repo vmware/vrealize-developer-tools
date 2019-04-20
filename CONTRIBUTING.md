@@ -20,11 +20,11 @@ git clone https://github.com/vmware/vrealize-developer-tools.git
 
 #### Prerequisites
 
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/en/), `>= 9.0.0`
-- [yarn](https://yarnpkg.com/en/), `>= 1.10.1`
-- [gulp CLI](https://gulpjs.com/), `>= 2.0.1`
-- [Visual Studio Code](https://code.visualstudio.com/), `>= 1.30.0`
+-   [Git](https://git-scm.com/)
+-   [Node.js](https://nodejs.org/en/), `>= 9.0.0`
+-   [yarn](https://yarnpkg.com/en/), `>= 1.10.1`
+-   [gulp CLI](https://gulpjs.com/), `>= 2.0.1`
+-   [Visual Studio Code](https://code.visualstudio.com/), `>= 1.30.0`
 
 ### Dependencies
 
@@ -56,14 +56,16 @@ gulp compile
 
 ### Linting
 
-This project uses [tslint](https://palantir.github.io/tslint/) for code linting. You can run tslint across the code by calling `gulp lint` from a terminal. Warnings from tslint show up in the `Errors and Warnings` panel and you can navigate to them from inside VS Code.
+This project uses [eslint](https://eslint.org/) for code linting. You can run eslint across the code by calling `gulp lint` from a terminal. Warnings from eslint show up in the `Errors and Warnings` panel and you can navigate to them from inside VS Code.
 
-To lint the code as you make changes you can install the [TSLint](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-tslint-plugin) extension.
+To lint the code as you make changes you can install the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension.
 
 :scroll:**NOTE!** Linting rules that have auto-fixes available will be automatically applied on file save and during compilation.
 
 ### Testing
+
 To run the tests execute the following from a terminal:
+
 ```
 gulp test
 ```
@@ -85,12 +87,13 @@ gulp package
 3. Start the [`watch`](#building) task
 4. Choose the `Launch Extension` launch configuration from the launch dropdown in the Debug viewlet and press `F5`.
 
-:scroll:**NOTE!** In the *[Extension Development Host]* instance, the extension will be activated when any folder with vRO JavaScript code is opened __AND__ one of the following events occurs.
-- a `.o11n/` folder is located at the root of the opened project
-- a JavaScript file is opened in the editor
-- a `vRealize: ...` action is executed from the command palette
+:scroll:**NOTE!** In the _[Extension Development Host]_ instance, the extension will be activated when any folder with vRO JavaScript code is opened **AND** one of the following events occurs.
 
-> Make sure the `window.openFoldersInNewWindow` setting is not `"on"`, otherwise a new, *non-[Extension Development Host]*, window may be opened.
+-   a `.o11n/` folder is located at the root of the opened project
+-   a JavaScript file is opened in the editor
+-   a `vRealize: ...` action is executed from the command palette
+
+> Make sure the `window.openFoldersInNewWindow` setting is not `"on"`, otherwise a new, _non-[Extension Development Host]_, window may be opened.
 
 :bulb:**Tip!** If you make edits to the code, just execute `Reload Window` from the command palette and the debugger will reattach.
 

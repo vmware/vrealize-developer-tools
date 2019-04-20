@@ -14,11 +14,27 @@
   "files.associations": {
     "**/build/azure-pipelines/**/*.yml": "azure-pipelines"
   },
-  "editor.codeActionsOnSave": {
-    "source.fixAll.tslint": true
+
+  "prettier.eslintIntegration": true,
+  "eslint.autoFixOnSave": true,
+  "eslint.validate": [
+    "javascript",
+    {
+      "language": "typescript",
+      "autoFix": true
+    }
+  ],
+
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  //uncomment the following if tslint's formatting is overwritten
-  //"editor.formatOnSave": false,
-  //"javascript.format.enable": false,
-  //"typescript.format.enable": false,
+  "[typescript]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
