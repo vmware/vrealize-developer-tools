@@ -12,7 +12,7 @@ const Capabilities: server.ServerCapabilities = {
     // },
     completionProvider: {
         resolveProvider: false,
-        triggerCharacters: [".", "\""]
+        triggerCharacters: [".", '"']
     },
     // signatureHelpProvider: {
     //     triggerCharacters: ["(", ","]

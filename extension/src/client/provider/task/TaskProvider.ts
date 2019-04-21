@@ -3,25 +3,25 @@
  * SPDX-License-Identifier: MIT
  */
 
+import * as path from "path"
+
 import * as fs from "fs-extra"
 import * as jsonParser from "jsonc-parser"
 import * as _ from "lodash"
 import * as micromatch from "micromatch"
-import * as path from "path"
 import { Logger, PomFile, TasksInfo } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { extensionShortName } from "../../constants"
 import { ClientWindow } from "../../ui"
 import { Registrable } from "../../Registrable"
-
 import { TASKS_BY_TOOLCHAIN_PARENT } from "./DefaultTasksJson"
 
 interface VrealizeTaskDefinition extends vscode.TaskDefinition {
     command: string
     label: string
-    windows?: { command: string },
-    linux?: { command: string },
+    windows?: { command: string }
+    linux?: { command: string }
     osx?: { command: string }
 }
 
@@ -43,7 +43,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         const workspaceFolders = vscode.workspace.workspaceFolders || []
         const excludePatterns = tasksConf ? tasksConf.exclude : []
 
-        return _.flatMap(workspaceFolders, (folder) => {
+        return _.flatMap(workspaceFolders, folder => {
             return this.tasksForWorkspace(folder, excludePatterns)
         })
     }
@@ -54,8 +54,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         return undefined
     }
 
-    register(context: vscode.ExtensionContext,
-             clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
         this.logger.debug("Registering the task provider")
         this.context = context
 
@@ -70,8 +69,9 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         if (fs.existsSync(tasksFile)) {
             const tasksContent = fs.readFileSync(tasksFile, { encoding: "utf8" })
             if (tasksContent) {
-                jsonParser.parse(tasksContent).tasks
-                    .filter((t: VrealizeTaskDefinition) => {
+                jsonParser
+                    .parse(tasksContent)
+                    .tasks.filter((t: VrealizeTaskDefinition) => {
                         return t.type === extensionShortName
                     })
                     .forEach((t: VrealizeTaskDefinition) => {
@@ -91,14 +91,16 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         return tasks.map(taskDef => this.newShellTask(taskDef, folder))
     }
 
-    private includeDefaultTasks(folder: vscode.WorkspaceFolder,
-                                subfolder: string | undefined,
-                                tasks: VrealizeTaskDefinition[],
-                                excludePatterns: string[]) {
+    private includeDefaultTasks(
+        folder: vscode.WorkspaceFolder,
+        subfolder: string | undefined,
+        tasks: VrealizeTaskDefinition[],
+        excludePatterns: string[]
+    ) {
         const pomFilePath = path.join(folder.uri.fsPath, subfolder || "", "pom.xml")
 
         if (!fs.existsSync(pomFilePath)) {
-            throw new Error(`Missing pom.xml in workspace ${folder.name}${subfolder ? "/" + subfolder : ""}`)
+            throw new Error(`Missing pom.xml in workspace ${folder.name}${subfolder ? `/${subfolder}` : ""}`)
         }
 
         const pomFile = new PomFile(pomFilePath)
@@ -111,7 +113,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
                 clone.type = extensionShortName
                 clone.label = `${clone.label} ${subfolder ? subfolder : pomFile.artifactId}`
                 clone.command = subfolder ? `${clone.command} -pl ${subfolder}` : clone.command
-                if (tasks.find((elem) => elem.label === clone.label) === undefined) {
+                if (tasks.find(elem => elem.label === clone.label) === undefined) {
                     tasks.push(clone)
                 }
             }
@@ -146,15 +148,13 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         const state = this.context.globalState.get("ignoredTaskWarnings", {})
 
         if (state[workspaceFolderPath] !== true) {
-            vscode.window.showWarningMessage(message, "Ignore for Project").then(
-                selected => {
-                    if (selected === "Ignore for Project") {
-                        // TODO: Wrap this into a more pleasant API that will be used across the extenion
-                        state[workspaceFolderPath] = true
-                        this.context.globalState.update("ignoredTaskWarnings", state)
-                    }
+            vscode.window.showWarningMessage(message, "Ignore for Project").then(selected => {
+                if (selected === "Ignore for Project") {
+                    // TODO: Wrap this into a more pleasant API that will be used across the extenion
+                    state[workspaceFolderPath] = true
+                    this.context.globalState.update("ignoredTaskWarnings", state)
                 }
-            )
+            })
         }
     }
 }

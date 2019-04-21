@@ -1,0 +1,9 @@
+out/
+build/
+coverage/
+node_modules/
+
+language-server/src/proto/**
+
+gulpfile.js
+jest.config.js

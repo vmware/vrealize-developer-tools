@@ -19,7 +19,7 @@ class SomeWatcher extends AbstractWatcher<string> {
         this.notifyListeners("someEvent")
     }
 
-    addListener(listener: (event: string) => void): { dispose(): any }  {
+    addListener(listener: (event: string) => void): { dispose(): any } {
         return this.registerListener(listener)
     }
 }

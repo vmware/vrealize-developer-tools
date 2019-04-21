@@ -27,8 +27,7 @@ export function ofModule(module: vmw.pscoe.hints.IModule): VroElementPickInfo {
     }
 }
 
-export function ofActionInModule(action: vmw.pscoe.hints.IAction,
-                                 module: vmw.pscoe.hints.IModule): VroElementPickInfo {
+export function ofActionInModule(action: vmw.pscoe.hints.IAction, module: vmw.pscoe.hints.IModule): VroElementPickInfo {
     return {
         kind: "action",
         label: `$(file-code) ${module.name}/${action.name}`,
@@ -59,8 +58,10 @@ export function ofCategory(category: vmw.pscoe.hints.IConfigCategory): VroElemen
     }
 }
 
-export function ofConfigInCategory(config: vmw.pscoe.hints.IConfig,
-                                   category: vmw.pscoe.hints.IConfigCategory): VroElementPickInfo {
+export function ofConfigInCategory(
+    config: vmw.pscoe.hints.IConfig,
+    category: vmw.pscoe.hints.IConfigCategory
+): VroElementPickInfo {
     return {
         kind: "configuration",
         label: `$(gear) ${category.path}/${config.name}`,

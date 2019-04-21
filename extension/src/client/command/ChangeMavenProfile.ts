@@ -8,14 +8,18 @@ import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { ConfigurationManager } from "../manager"
-
 import { Command } from "./Command"
 
 class EditProfilesItem implements vscode.QuickPickItem {
-    constructor(private settingsXmlPath: string) { }
+    constructor(private settingsXmlPath: string) {}
 
-    get label(): string { return "$(pencil)  Edit profiles" }
-    get description(): string { return "" }
+    get label(): string {
+        return "$(pencil)  Edit profiles"
+    }
+
+    get description(): string {
+        return ""
+    }
 
     async run(): Promise<void> {
         await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(this.settingsXmlPath))
@@ -26,8 +30,13 @@ class MavenProfileItem implements vscode.QuickPickItem {
     readonly name: string
     readonly profile: MavenProfile
 
-    get label(): string { return `$(server)  ${this.name}` || "" }
-    get description(): string { return `(${this.profile["vro.host"]})` || "" }
+    get label(): string {
+        return `$(server)  ${this.name}` || ""
+    }
+
+    get description(): string {
+        return `(${this.profile["vro.host"]})` || ""
+    }
 
     constructor(entry: [string, MavenProfile]) {
         this.name = entry[0]
@@ -35,8 +44,9 @@ class MavenProfileItem implements vscode.QuickPickItem {
     }
 
     async run(): Promise<void> {
-        await vscode.workspace.getConfiguration("vrdev").update(
-            "maven.profile", this.name, vscode.ConfigurationTarget.Workspace)
+        await vscode.workspace
+            .getConfiguration("vrdev")
+            .update("maven.profile", this.name, vscode.ConfigurationTarget.Workspace)
     }
 }
 
@@ -59,7 +69,7 @@ export class ChangeMavenProfile extends Command {
         let profiles: MavenProfileItem[] = []
 
         if (this.config.allProfiles) {
-            profiles = Object.entries(this.config.allProfiles).map((entry) => new MavenProfileItem(entry))
+            profiles = Object.entries(this.config.allProfiles).map(entry => new MavenProfileItem(entry))
         }
 
         const picks = [editProfiles, ...profiles]

@@ -7,7 +7,7 @@
 
 require("module-alias/register")
 
-import { di, Logger, LogChannel } from "vrealize-common"
+import { di, LogChannel, Logger } from "vrealize-common"
 import { IConnection } from "vscode-languageserver"
 
 import { ConnectionLocator } from "./core"
@@ -23,9 +23,9 @@ function registerModule(mod: any) {
                 logger.debug(`Registering class ${i}`)
                 container.get(mod[i])
             } catch (e) {
-                logger.debug("Caught error: " + e + " for class: " + i)
+                logger.debug(`Caught error: ${e} for class: ${i}`)
                 if (e.message.indexOf("__autowire") < 0) {
-                    logger.debug("Visited classes: " + e.visited)
+                    logger.debug(`Visited classes: ${e.visited}`)
                     logger.error(e.stack)
                     throw e
                 }

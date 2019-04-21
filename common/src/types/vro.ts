@@ -11,6 +11,6 @@ export interface VroElementPickInfo {
     path?: string | null
     label: string
     description: string
-    detail?: string,
+    detail?: string
     id?: string | null
 }

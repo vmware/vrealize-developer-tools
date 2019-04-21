@@ -17,25 +17,29 @@ export class QuickPick {
         connectionLocator.connection.onRequest(remote.server.giveActionsForModule, this.giveActionsForModule.bind(this))
         connectionLocator.connection.onRequest(remote.server.giveAllActions, this.giveAllActions.bind(this))
         connectionLocator.connection.onRequest(remote.server.giveConfigCategories, this.giveConfigCategories.bind(this))
-        connectionLocator.connection.onRequest(remote.server.giveConfigsForCategory,
-            this.giveConfigsForCategory.bind(this))
-        connectionLocator.connection.onRequest(remote.server.giveAllConfigElements,
-            this.giveAllConfigElements.bind(this))
+        connectionLocator.connection.onRequest(
+            remote.server.giveConfigsForCategory,
+            this.giveConfigsForCategory.bind(this)
+        )
+        connectionLocator.connection.onRequest(
+            remote.server.giveAllConfigElements,
+            this.giveAllConfigElements.bind(this)
+        )
     }
 
-    public async giveActionModules() {
+    async giveActionModules() {
         this.logger.debug("Retrieving all action modules")
         const allModules = this.hints.getActionModules()
         return allModules.map(module => util.quickPick.ofModule(module))
     }
 
-    public async giveActionsForModule(moduleName: string) {
+    async giveActionsForModule(moduleName: string) {
         this.logger.debug(`Retrieving all actions for module ${moduleName}`)
         const allActions = this.hints.getActionsIn(moduleName)
         return allActions.map(action => util.quickPick.ofActionInPath(action, moduleName))
     }
 
-    public async giveAllActions() {
+    async giveAllActions() {
         this.logger.debug("Retrieving all actions")
         const result: VroElementPickInfo[] = []
         const modules = this.hints.getActionModules()
@@ -57,19 +61,19 @@ export class QuickPick {
         return result
     }
 
-    public async giveConfigCategories() {
+    async giveConfigCategories() {
         this.logger.debug("Retrieving all configuration categories")
         const allCategories = this.hints.getConfigCategories()
         return allCategories.map(category => util.quickPick.ofCategory(category))
     }
 
-    public async giveConfigsForCategory(categoryPath: string) {
+    async giveConfigsForCategory(categoryPath: string) {
         this.logger.debug(`Retrieving all configuration elements in category ${categoryPath}`)
         const allConfigurations = this.hints.getConfigElementsIn(categoryPath)
         return allConfigurations.map(action => util.quickPick.ofConfigInPath(action, categoryPath))
     }
 
-    public async giveAllConfigElements() {
+    async giveAllConfigElements() {
         this.logger.debug("Retrieving all configuration elements")
         const result: VroElementPickInfo[] = []
         const categories = this.hints.getConfigCategories()

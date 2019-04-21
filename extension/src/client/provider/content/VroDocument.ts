@@ -30,31 +30,39 @@ export class VroDocument {
     }
 
     private fetch(): Thenable<string> {
-        return vscode.window.withProgress({
-            location: vscode.ProgressLocation.Window
-        }, progress => {
-            return new Promise(async (resolve, reject) => {
-                const languageClient = this.languageServices.client
+        return vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Window
+            },
+            progress => {
+                return new Promise(async (resolve, reject) => {
+                    const languageClient = this.languageServices.client
 
-                if (!languageClient) {
-                    reject("The vRO language server is not running")
-                    return
-                }
-                const location = this.uri.toString()
-                this.logger.info(`Fetching resource: ${location}`)
-                const name = this.uri.path.substring(this.uri.path.lastIndexOf("/") + 1, this.uri.path.lastIndexOf("."))
-                progress.report({ message: `Fetching ${name}...` })
-                try {
-                    const source = await languageClient.sendRequest(remote.server.giveEntitySource, location)
-                    this.logger.info(`Successfully fetched resource: ${location}`)
-                    resolve(source)
-                } catch (err) {
-                    this.logger.error(`Failed fetching resource: ${location}`)
-                    reject(err)
-                    // tslint:disable-next-line:max-line-length
-                    vscode.window.showErrorMessage(`Failed fetching resource (${err.code}). See logs for more information.`)
-                }
-            })
-        })
+                    if (!languageClient) {
+                        reject("The vRO language server is not running")
+                        return
+                    }
+                    const location = this.uri.toString()
+                    this.logger.info(`Fetching resource: ${location}`)
+                    const name = this.uri.path.substring(
+                        this.uri.path.lastIndexOf("/") + 1,
+                        this.uri.path.lastIndexOf(".")
+                    )
+                    progress.report({ message: `Fetching ${name}...` })
+                    try {
+                        const source = await languageClient.sendRequest(remote.server.giveEntitySource, location)
+                        this.logger.info(`Successfully fetched resource: ${location}`)
+                        resolve(source)
+                    } catch (err) {
+                        this.logger.error(`Failed fetching resource: ${location}`)
+                        reject(err)
+
+                        vscode.window.showErrorMessage(
+                            `Failed fetching resource (${err.code}). See logs for more information.`
+                        )
+                    }
+                })
+            }
+        )
     }
 }

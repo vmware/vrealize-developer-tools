@@ -21,9 +21,4 @@ export * from "./platform"
 export * from "./types"
 export * from "./rest"
 
-export {
-    di,
-    proc,
-    promise,
-    uri
-}
+export { di, proc, promise, uri }

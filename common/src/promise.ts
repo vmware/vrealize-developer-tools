@@ -5,6 +5,7 @@
 
 import * as fs from "fs"
 import * as http from "http"
+
 import * as request from "request"
 import * as rp from "request-promise-native"
 
@@ -47,8 +48,7 @@ export function streamPromise(stream: fs.WriteStream) {
 }
 
 export function streamPromisePipe(...streams: fs.WriteStream[]) {
-    const allStreams = streams
-        .reduce((current, next) => current.concat(next), [] as fs.WriteStream[])
+    const allStreams = streams.reduce((current, next) => current.concat(next), [] as fs.WriteStream[])
 
     allStreams.reduce((current, next) => current.pipe(next))
     return Promise.all(allStreams.map(streamPromise))
@@ -58,7 +58,7 @@ export function timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
     const timeout = new Promise<T>((resolve, reject) => {
         const id = setTimeout(() => {
             clearTimeout(id)
-            reject("Operation timed out in " + ms + "ms.")
+            reject(`Operation timed out in ${ms}ms.`)
         }, ms)
     })
 

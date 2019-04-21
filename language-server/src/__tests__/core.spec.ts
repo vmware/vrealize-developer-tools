@@ -4,26 +4,23 @@
  */
 
 import * as server from "vscode-languageserver"
-import { CancellationToken } from "vscode-languageserver"
 
 import { ConnectionLocator, Initializer } from "../server/core"
 
-type EventHandler = server.RequestHandler<
-    server.InitializeParams, server.InitializeResult, server.InitializeError>
+type EventHandler = server.RequestHandler<server.InitializeParams, server.InitializeResult, server.InitializeError>
 
 describe("Core", () => {
     describe("Initializer", () => {
         it("should notify all listeners once the initialize event is triggered", () => {
             let callback: EventHandler | undefined
-            const createConnectionStub = jest.spyOn(server, "createConnection")
-                .mockReturnValue({
-                    onInitialize: (cb: EventHandler) => {
-                        callback = cb
-                    },
-                    onInitialized: () => {
-                        // empty
-                    }
-                } as any)
+            const createConnectionStub = jest.spyOn(server, "createConnection").mockReturnValue({
+                onInitialize: (cb: EventHandler) => {
+                    callback = cb
+                },
+                onInitialized: () => {
+                    // empty
+                }
+            } as any)
 
             const initializer = new Initializer(new ConnectionLocator())
 
@@ -39,12 +36,15 @@ describe("Core", () => {
             initializer.onInitialize(listener3)
 
             if (callback) {
-                callback({
-                    processId: 0,
-                    rootUri: null,
-                    workspaceFolders: null,
-                    capabilities: {}
-                }, CancellationToken.None) // simulate the onInitialize event
+                callback(
+                    {
+                        processId: 0,
+                        rootUri: null,
+                        workspaceFolders: null,
+                        capabilities: {}
+                    },
+                    server.CancellationToken.None
+                ) // simulate the onInitialize event
             }
 
             expect(listener1).toHaveBeenCalled()

@@ -9,14 +9,13 @@ import * as vscode from "vscode"
 import { ClientWindow } from "./ui"
 import { Registrable } from "./Registrable"
 
-type Constructable<T> = new() => T
+type Constructable<T> = new () => T
 
 export class ModuleRegistry {
     private readonly container: di.Container
     private readonly logger = Logger.get("ModuleRegistry")
 
-    constructor(private context: vscode.ExtensionContext,
-                private clientWindow: ClientWindow) {
+    constructor(private context: vscode.ExtensionContext, private clientWindow: ClientWindow) {
         this.container = new di.Container()
     }
 
@@ -50,13 +49,13 @@ export class ModuleRegistry {
         }
     }
 
-    public registerModules(...modules: any[]) {
+    registerModules(...modules: any[]) {
         for (const module of modules) {
             this.registerModule(module)
         }
     }
 
-    public get<T>(clazz: di.ClassConstructor<T>): T {
+    get<T>(clazz: di.ClassConstructor<T>): T {
         return this.container.get(clazz)
     }
 

@@ -8,6 +8,5 @@ import * as vscode from "vscode"
 import { ClientWindow } from "./ui"
 
 export interface Registrable {
-    register(context: vscode.ExtensionContext,
-             clientWindow: ClientWindow): void
+    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void
 }

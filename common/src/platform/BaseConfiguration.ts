@@ -7,10 +7,10 @@ import { MavenProfile, MavenProfilesMap } from "../maven"
 import { VrealizeSettings } from "../types"
 
 export abstract class BaseConfiguration {
-    public vrdev: VrealizeSettings
-    public allProfiles: MavenProfilesMap | undefined
+    vrdev: VrealizeSettings
+    allProfiles: MavenProfilesMap | undefined
 
-    public hasActiveProfile(): boolean {
+    hasActiveProfile(): boolean {
         try {
             return !!this.getActiveProfileImpl()
         } catch (e) {
@@ -18,7 +18,7 @@ export abstract class BaseConfiguration {
         }
     }
 
-    public get activeProfile(): MavenProfileWrapper {
+    get activeProfile(): MavenProfileWrapper {
         return this.getActiveProfileImpl()
     }
 
@@ -46,7 +46,7 @@ export abstract class BaseConfiguration {
 export class MavenProfileWrapper {
     constructor(private profile: MavenProfile) {}
 
-    public get(key: keyof MavenProfile): string {
+    get(key: keyof MavenProfile): string {
         const value = this.profile[key]
         if (!value) {
             throw new Error(`Missing '${key}' property in the configured maven profile.`)
@@ -55,7 +55,7 @@ export class MavenProfileWrapper {
         return value
     }
 
-    public getOptional(key: keyof MavenProfile, defaultValue: string): string {
+    getOptional(key: keyof MavenProfile, defaultValue: string): string {
         if (!this.profile) {
             return defaultValue
         }

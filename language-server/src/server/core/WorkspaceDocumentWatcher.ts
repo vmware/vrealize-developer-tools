@@ -11,7 +11,7 @@ import { ConnectionLocator } from "./ConnectionLocator"
 import { Environment } from "./Environment"
 
 export interface FileSavedEvent extends FileEvent {
-    workspaceFolder: WorkspaceFolder | undefined,
+    workspaceFolder: WorkspaceFolder | undefined
     text: string | undefined
 }
 
@@ -31,6 +31,10 @@ export class WorkspaceDocumentWatcher extends AbstractWatcher<FileSavedEventPara
         connectionLocator.connection.onDidSaveTextDocument(this.watchedFilesSaved.bind(this))
     }
 
+    onDidSaveWatchedFiles(listener: ChangeListener<FileSavedEventParams>): Disposable {
+        return this.registerListener(listener)
+    }
+
     private watchedFilesSaved(event: DidSaveTextDocumentParams): void {
         this.logger.info("Watched workspace files were saved.")
         const newEvent: FileSavedEventParams = {
@@ -47,9 +51,5 @@ export class WorkspaceDocumentWatcher extends AbstractWatcher<FileSavedEventPara
             text: event.text,
             workspaceFolder: this.environment.getWorkspaceFolderOf(URI.parse(event.textDocument.uri).fsPath)
         }
-    }
-
-    public onDidSaveWatchedFiles(listener: ChangeListener<FileSavedEventParams>): Disposable {
-        return this.registerListener(listener)
     }
 }

@@ -9,17 +9,20 @@ import { Location, TextDocumentIdentifier, TextDocumentPositionParams } from "vs
 
 import * as types from "../types"
 
-export const givePrefix =
-    new RequestType<TextDocumentPositionParams, null | string, void, void>("vrdev.client.givePrefix")
+export const givePrefix = new RequestType<TextDocumentPositionParams, null | string, void, void>(
+    "vrdev.client.givePrefix"
+)
 
-export const giveText =
-    new RequestType<Location, string, void, void>("vrdev.client.giveText")
+export const giveText = new RequestType<Location, string, void, void>("vrdev.client.giveText")
 
-export const giveTextDocument =
-    new RequestType<TextDocumentIdentifier, types.TextDocumentData, void, void>("vrdev.client.giveTextDocument")
+export const giveTextDocument = new RequestType<TextDocumentIdentifier, types.TextDocumentData, void, void>(
+    "vrdev.client.giveTextDocument"
+)
 
-export const giveWordAtPosition =
-    new RequestType<types.LocatedPosition, string, void, void>("vrdev.client.giveWordAtPosition")
+export const giveWordAtPosition = new RequestType<types.LocatedPosition, string, void, void>(
+    "vrdev.client.giveWordAtPosition"
+)
 
-export const didChangeMavenProfiles =
-    new NotificationType<MavenProfilesMap, void>("vrdev.client.didChangeMavenProfiles")
+export const didChangeMavenProfiles = new NotificationType<MavenProfilesMap, void>(
+    "vrdev.client.didChangeMavenProfiles"
+)

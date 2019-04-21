@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: MIT
  */
 
- import { Logger } from "vrealize-common"
- import * as vscode from "vscode"
+import { Logger } from "vrealize-common"
+import * as vscode from "vscode"
 
- import { ClientWindow } from "../ui"
- import { Registrable } from "../Registrable"
+import { ClientWindow } from "../ui"
+import { Registrable } from "../Registrable"
 
- export abstract class EditorCommand implements Registrable {
-    register(context: vscode.ExtensionContext,
-             clientWindow: ClientWindow): void {
+export abstract class EditorCommand implements Registrable {
+    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
         Logger.get("EditorCommand").debug(`Registering editor command '${this.commandId}'`)
 
-        const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(this.commandId,
+        const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
+            this.commandId,
             (editor, edit) => this.execute(context, clientWindow, editor, edit)
         )
 
@@ -23,8 +23,10 @@
 
     abstract get commandId(): string
 
-    abstract execute(context: vscode.ExtensionContext,
-                     clientWindow: ClientWindow,
-                     editor: vscode.TextEditor,
-                     edit: vscode.TextEditorEdit): Promise<void> | void
+    abstract execute(
+        context: vscode.ExtensionContext,
+        clientWindow: ClientWindow,
+        editor: vscode.TextEditor,
+        edit: vscode.TextEditorEdit
+    ): Promise<void> | void
 }

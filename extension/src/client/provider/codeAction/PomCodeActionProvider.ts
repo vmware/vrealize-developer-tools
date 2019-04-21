@@ -9,7 +9,6 @@ import * as vscode from "vscode"
 import { FixCommands } from "../../constants"
 import { Linter } from "../../lint"
 import { EnvironmentManager } from "../../manager"
-
 import { LintCodeActionProvider } from "./LintCodeActionProvider"
 
 @AutoWire

@@ -5,7 +5,7 @@
 
 require("module-alias/register")
 
-import { Logger, LogChannel, LogLevel } from "vrealize-common"
+import { LogChannel, Logger, LogLevel } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { ModuleRegistry } from "./client"

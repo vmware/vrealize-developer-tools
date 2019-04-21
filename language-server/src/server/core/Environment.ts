@@ -12,10 +12,10 @@ import { Settings } from "./Settings"
 @AutoWire
 export class Environment extends BaseEnvironment {
     protected readonly logger = Logger.get("Environment")
-    public workspaceFolders: WorkspaceFolder[] = []
 
-    constructor(protected config: Settings,
-                initializer: Initializer) {
+    workspaceFolders: WorkspaceFolder[] = []
+
+    constructor(protected config: Settings, initializer: Initializer) {
         super()
 
         initializer.onInitialize(this.initialize.bind(this))

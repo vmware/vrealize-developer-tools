@@ -11,7 +11,7 @@ import { ConnectionLocator } from "./ConnectionLocator"
 import { Environment } from "./Environment"
 
 export interface FileChangeEvent extends FileEvent {
-    workspaceFolder: WorkspaceFolder|undefined
+    workspaceFolder: WorkspaceFolder | undefined
 }
 
 export interface FileChangeEventParams {
@@ -30,6 +30,10 @@ export class WorkspaceFilesWatcher extends AbstractWatcher<FileChangeEventParams
         connectionLocator.connection.onDidChangeWatchedFiles(this.watchedFilesChanged.bind(this))
     }
 
+    onDidChangeWatchedFiles(listener: FileChangeListener): Disposable {
+        return this.registerListener(listener)
+    }
+
     private watchedFilesChanged(event: DidChangeWatchedFilesParams): void {
         this.logger.info("Watched workspace files were changed.")
         const newEvent: FileChangeEventParams = {
@@ -46,9 +50,5 @@ export class WorkspaceFilesWatcher extends AbstractWatcher<FileChangeEventParams
             uri: event.uri,
             workspaceFolder: this.environment.getWorkspaceFolderOf(URI.parse(event.uri).fsPath)
         }
-    }
-
-    public onDidChangeWatchedFiles(listener: FileChangeListener): Disposable {
-        return this.registerListener(listener)
     }
 }

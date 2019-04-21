@@ -31,8 +31,10 @@ export class ToolchainVersionRule extends PomLintRule {
         }
 
         if (semver.gte(version, this.lintContext.environment.buildToolsVersion)) {
-            this.logger.info(`Project parent version (${version}) is higher or ` +
-                `equal to vRealize Build Tools's version (${this.lintContext.environment.buildToolsVersion})`)
+            this.logger.info(
+                `Project parent version (${version}) is higher or ` +
+                    `equal to vRealize Build Tools's version (${this.lintContext.environment.buildToolsVersion})`
+            )
             return []
         }
 
@@ -42,7 +44,8 @@ export class ToolchainVersionRule extends PomLintRule {
             return []
         }
 
-        const message = `Outdated version: Parent version (${version}) is lower than ` +
+        const message =
+            `Outdated version: Parent version (${version}) is lower than ` +
             `the vRealize Build Tools version (${this.lintContext.environment.buildToolsVersion})`
         const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
         diagnostic.code = "toolchain-version"
@@ -80,9 +83,11 @@ export class ToolchainVersionRule extends PomLintRule {
         return version
     }
 
-    private calculateVersionRange(pomXmlContent: string,
-                                  pomParentVersion: string,
-                                  document: vscode.TextDocument): vscode.Range | null {
+    private calculateVersionRange(
+        pomXmlContent: string,
+        pomParentVersion: string,
+        document: vscode.TextDocument
+    ): vscode.Range | null {
         let versionAbsolutePosition = 0
 
         const parentTagSearchResults = MavenPom.ParentPattern.exec(pomXmlContent)

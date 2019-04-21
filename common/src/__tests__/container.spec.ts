@@ -4,11 +4,9 @@
  */
 
 import { Container } from "../di/Container"
-
 import * as Mocks from "./container.mocks"
 
 describe("Container", () => {
-
     it("Can load class without constructor", () => {
         const container = new Container()
         const obj = container.get(Mocks.NoConstructor)

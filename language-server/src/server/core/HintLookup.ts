@@ -4,12 +4,12 @@
  */
 
 import * as fs from "fs"
+
 import * as _ from "lodash"
 import { AutoWire, Logger, WorkspaceFolder } from "vrealize-common"
 import { Disposable, WorkspaceFoldersChangeEvent } from "vscode-languageserver"
 
 import { vmw } from "../../proto"
-
 import { ConfigurationWatcher } from "./ConfigurationWatcher"
 import { Environment } from "./Environment"
 import { Initializer } from "./Initializer"
@@ -24,11 +24,11 @@ interface HintFileDecoder<T> {
 }
 
 class HintStore<T> {
-    public local: Map<string, T[]> = new Map()
+    local: Map<string, T[]> = new Map()
 
     constructor(public global: T[] = []) {}
 
-    public isEmpty(): boolean {
+    isEmpty(): boolean {
         return this.local.size === 0 && this.global.length === 0
     }
 }
@@ -43,10 +43,12 @@ export class HintLookup implements Disposable {
 
     private subscriptions: Disposable[] = []
 
-    constructor(private environment: Environment,
-                configWatcher: ConfigurationWatcher,
-                workspaceWatcher: WorkspaceFoldersWatcher,
-                initializer: Initializer) {
+    constructor(
+        private environment: Environment,
+        configWatcher: ConfigurationWatcher,
+        workspaceWatcher: WorkspaceFoldersWatcher,
+        initializer: Initializer
+    ) {
         this.subscriptions.push(
             configWatcher.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this)),
             workspaceWatcher.onDidChangeWorkspaceFolders(this.onDidChangeWorkspaceFolders.bind(this)),
@@ -54,23 +56,24 @@ export class HintLookup implements Disposable {
         )
     }
 
-    public dispose(): void {
+    dispose(): void {
         this.logger.debug("Disposing HintLookup")
         this.subscriptions.forEach(s => s && s.dispose())
     }
 
-    public getActionModules(workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IModule[] {
+    getActionModules(workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IModule[] {
         if (this.actions.isEmpty()) {
             return []
         }
 
-        const localModules = workspaceFolder ?
-            _.flatMap(this.actions.local.get(workspaceFolder.uri.fsPath), pack => pack.modules) : []
+        const localModules = workspaceFolder
+            ? _.flatMap(this.actions.local.get(workspaceFolder.uri.fsPath), pack => pack.modules)
+            : []
         const globalModules = _.flatMap(this.actions.global, pack => pack.modules)
         return _.unionWith(localModules, globalModules, (x, y) => x.name === y.name)
     }
 
-    public getActionsIn(moduleName: string, workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IAction[] {
+    getActionsIn(moduleName: string, workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IAction[] {
         const module = this.getActionModules(workspaceFolder).find(module => module.name === moduleName)
 
         if (module && module.actions) {
@@ -80,18 +83,19 @@ export class HintLookup implements Disposable {
         return []
     }
 
-    public getConfigCategories(workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IConfigCategory[] {
+    getConfigCategories(workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IConfigCategory[] {
         if (this.configs.isEmpty()) {
             return []
         }
 
-        const localCategories = workspaceFolder ?
-            _.flatMap(this.configs.local.get(workspaceFolder.uri.fsPath), pack => pack.categories) : []
+        const localCategories = workspaceFolder
+            ? _.flatMap(this.configs.local.get(workspaceFolder.uri.fsPath), pack => pack.categories)
+            : []
         const globalCategories = _.flatMap(this.configs.global, pack => pack.categories)
         return _.unionWith(localCategories, globalCategories, (x, y) => x.path === y.path)
     }
 
-    public getConfigElementsIn(categoryPath: string, workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IConfig[] {
+    getConfigElementsIn(categoryPath: string, workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IConfig[] {
         const module = this.getConfigCategories(workspaceFolder).find(category => category.path === categoryPath)
 
         if (module && module.configurations) {
@@ -101,7 +105,7 @@ export class HintLookup implements Disposable {
         return []
     }
 
-    public getClasses(filter: ClassFilter): vmw.pscoe.hints.IClass[] {
+    getClasses(filter: ClassFilter): vmw.pscoe.hints.IClass[] {
         const result: vmw.pscoe.hints.IClass[] = []
 
         for (const api of this.scriptingApi.global) {
@@ -118,7 +122,7 @@ export class HintLookup implements Disposable {
         return result
     }
 
-    public getFunctionSets(): vmw.pscoe.hints.IFunctionSet[] {
+    getFunctionSets(): vmw.pscoe.hints.IFunctionSet[] {
         const result: vmw.pscoe.hints.IFunctionSet[] = []
 
         for (const api of this.scriptingApi.global) {
@@ -134,7 +138,7 @@ export class HintLookup implements Disposable {
     // Event Handlers
     //
 
-    public initialize(): void {
+    initialize(): void {
         this.logger.debug("HintLookup.initialize()")
         this.environment.workspaceFolders.forEach(this.load, this)
         this.load()
@@ -156,7 +160,7 @@ export class HintLookup implements Disposable {
         }
     }
 
-    public refreshForWorkspace(workspaceFolder: WorkspaceFolder): void {
+    refreshForWorkspace(workspaceFolder: WorkspaceFolder): void {
         this.load(workspaceFolder)
     }
 
@@ -173,8 +177,12 @@ export class HintLookup implements Disposable {
         if (workspaceFolder) {
             const dependenciesHintsFiles = this.environment.resolveDependenciesHintFiles(workspaceFolder)
             if (dependenciesHintsFiles) {
-                this.loadProtoInScope(dependenciesHintsFiles, workspaceFolder,
-                    this.actions, vmw.pscoe.hints.ActionsPack)
+                this.loadProtoInScope(
+                    dependenciesHintsFiles,
+                    workspaceFolder,
+                    this.actions,
+                    vmw.pscoe.hints.ActionsPack
+                )
             }
         }
 
@@ -183,7 +191,8 @@ export class HintLookup implements Disposable {
             this.loadProtoInScope([configsFile], workspaceFolder, this.configs, vmw.pscoe.hints.ConfigurationsPack)
         }
 
-        if (!workspaceFolder) { // plugins aren't located in workspace folder
+        if (!workspaceFolder) {
+            // plugins aren't located in workspace folder
             const coreApiFile = this.environment.resolveHintFile("core-api.pb", undefined)
             const pluginFiles = this.environment.resolvePluginHintFiles()
 
@@ -195,10 +204,12 @@ export class HintLookup implements Disposable {
         }
     }
 
-    private loadProtoInScope<T>(filenames: string[],
-                                scope: WorkspaceFolder|undefined,
-                                target: HintStore<T>,
-                                decoder: HintFileDecoder<T>): void {
+    private loadProtoInScope<T>(
+        filenames: string[],
+        scope: WorkspaceFolder | undefined,
+        target: HintStore<T>,
+        decoder: HintFileDecoder<T>
+    ): void {
         if (filenames.length === 0) {
             return
         }
@@ -224,7 +235,7 @@ export class HintLookup implements Disposable {
         this.configs.local.delete(workspaceFolder.uri.fsPath)
     }
 
-    private decodeProtoFile<T>(filePath: string, decoder: HintFileDecoder<T>): T|null {
+    private decodeProtoFile<T>(filePath: string, decoder: HintFileDecoder<T>): T | null {
         this.logger.info(`Loading hint file '${filePath}'`)
 
         if (!fs.existsSync(filePath)) {

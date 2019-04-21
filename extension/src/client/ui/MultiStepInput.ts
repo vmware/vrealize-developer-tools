@@ -6,7 +6,7 @@
 import * as vscode from "vscode"
 
 class InputFlowAction {
-    private constructor() { }
+    private constructor() {}
     static back = new InputFlowAction()
     static cancel = new InputFlowAction()
     static resume = new InputFlowAction()
@@ -29,8 +29,8 @@ export interface InputBoxParameters {
     totalSteps: number
     value: string
     prompt: string
-    validate(value: string): Promise<string | undefined>
     buttons?: vscode.QuickInputButton[]
+    validate(value: string): Promise<string | undefined>
 }
 
 export class MultiStepInput {
@@ -71,7 +71,13 @@ export class MultiStepInput {
     }
 
     async showQuickPick<T extends vscode.QuickPickItem, P extends QuickPickParameters<T>>({
-        title, step, totalSteps, items, placeholder, buttons }: P) {
+        title,
+        step,
+        totalSteps,
+        items,
+        placeholder,
+        buttons
+    }: P) {
         const disposables: vscode.Disposable[] = []
         try {
             return await new Promise<T | (P extends { buttons: (infer I)[] } ? I : never)>((resolve, reject) => {
@@ -81,10 +87,7 @@ export class MultiStepInput {
                 input.totalSteps = totalSteps
                 input.placeholder = placeholder
                 input.items = items
-                input.buttons = [
-                    ...(this.steps.length > 1 ? [vscode.QuickInputButtons.Back] : []),
-                    ...(buttons || [])
-                ]
+                input.buttons = [...(this.steps.length > 1 ? [vscode.QuickInputButtons.Back] : []), ...(buttons || [])]
                 disposables.push(
                     input.onDidTriggerButton(item => {
                         if (item === vscode.QuickInputButtons.Back) {
@@ -109,8 +112,7 @@ export class MultiStepInput {
         }
     }
 
-    async showInputBox<P extends InputBoxParameters>({
-        title, step, totalSteps, value, prompt, validate, buttons }: P) {
+    async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt, validate, buttons }: P) {
         const disposables: vscode.Disposable[] = []
         try {
             return await new Promise<string | (P extends { buttons: (infer I)[] } ? I : never)>((resolve, reject) => {
@@ -120,10 +122,7 @@ export class MultiStepInput {
                 input.totalSteps = totalSteps
                 input.value = value || ""
                 input.prompt = prompt
-                input.buttons = [
-                    ...(this.steps.length > 1 ? [vscode.QuickInputButtons.Back] : []),
-                    ...(buttons || [])
-                ]
+                input.buttons = [...(this.steps.length > 1 ? [vscode.QuickInputButtons.Back] : []), ...(buttons || [])]
                 let validating = validate("")
                 disposables.push(
                     input.onDidTriggerButton(item => {

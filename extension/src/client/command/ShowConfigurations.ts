@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { uri, AutoWire, Logger, VroElementPickInfo } from "vrealize-common"
+import { AutoWire, Logger, uri, VroElementPickInfo } from "vrealize-common"
 import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { LanguageServices } from "../lang"
-
 import { Command } from "./Command"
 
 @AutoWire
@@ -41,10 +40,13 @@ export class ShowConfigurations extends Command {
         if (useFullyQualifiedNames) {
             configs = await languageClient.sendRequest(remote.server.giveAllConfigElements)
         } else {
-            const categories: VroElementPickInfo[] =
-                await languageClient.sendRequest(remote.server.giveConfigCategories)
-            const selectedCategory: VroElementPickInfo | undefined =
-                await vscode.window.showQuickPick(categories, { placeHolder: "Pick a category path" })
+            const categories: VroElementPickInfo[] = await languageClient.sendRequest(
+                remote.server.giveConfigCategories
+            )
+
+            const selectedCategory: VroElementPickInfo | undefined = await vscode.window.showQuickPick(categories, {
+                placeHolder: "Pick a category path"
+            })
 
             this.logger.debug("Selected category: ", selectedCategory)
 
@@ -55,8 +57,9 @@ export class ShowConfigurations extends Command {
             configs = await languageClient.sendRequest(remote.server.giveConfigsForCategory, selectedCategory.name)
         }
 
-        const selectedConfig: VroElementPickInfo | undefined =
-            await vscode.window.showQuickPick(configs, { placeHolder: "Pick a configuration element" })
+        const selectedConfig: VroElementPickInfo | undefined = await vscode.window.showQuickPick(configs, {
+            placeHolder: "Pick a configuration element"
+        })
 
         this.logger.debug("Selected configuration element: ", selectedConfig)
 

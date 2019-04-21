@@ -22,14 +22,14 @@ export class WorkspaceFoldersWatcher extends AbstractWatcher<WorkspaceFoldersCha
         })
     }
 
+    onDidChangeWorkspaceFolders(listener: WorkspaceChangeListener): Disposable {
+        return this.registerListener(listener)
+    }
+
     private watchedFilesChanged(event: WorkspaceFoldersChangeEvent): void {
         this.logger.info("The number of opened workspace folders has changed.")
         this.logger.debug("Full list of changes: ", event)
 
         this.notifyListeners(event)
-    }
-
-    public onDidChangeWorkspaceFolders(listener: WorkspaceChangeListener): Disposable {
-        return this.registerListener(listener)
     }
 }
