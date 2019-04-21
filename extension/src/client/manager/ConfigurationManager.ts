@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: MIT
  */
 
+import * as path from "path"
+
 import * as chokidar from "chokidar"
 import * as xmlParser from "fast-xml-parser"
 import * as fs from "fs-extra"
-import * as path from "path"
 import {
     AutoWire,
     BaseConfiguration,
@@ -28,17 +29,17 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
     private clientWindow: ClientWindow
     private languageServices: LanguageServices
 
-    private homeDir = process.env[(process.platform === "win32") ? "USERPROFILE" : "HOME"] || "~"
+    private homeDir = process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"] || "~"
     private readonly logger = Logger.get("ConfigurationManager")
-    public readonly settingsXmlPath: string = path.resolve(this.homeDir, ".m2", "settings.xml")
+
+    readonly settingsXmlPath: string = path.resolve(this.homeDir, ".m2", "settings.xml")
 
     constructor(languageServices: LanguageServices) {
         super()
         this.languageServices = languageServices
     }
 
-    register(context: vscode.ExtensionContext,
-             clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
         this.logger.debug("Registering the configuration manager")
         this.clientWindow = clientWindow
         this.vrdev = vscode.workspace.getConfiguration().get<VrealizeSettings>("vrdev") as VrealizeSettings
@@ -48,7 +49,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         this.subscribeToSettingsXmlChanges(context)
     }
 
-    public get activeProfile(): MavenProfileWrapper {
+    get activeProfile(): MavenProfileWrapper {
         try {
             return super.activeProfile
         } catch (e) {
@@ -97,7 +98,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         const settingsXmlContent = fs.readFileSync(this.settingsXmlPath)
 
         if (settingsXmlContent.length < 1) {
-            this.logger.warn("Got no content from " + this.settingsXmlPath)
+            this.logger.warn(`Got no content from ${this.settingsXmlPath}`)
             return undefined
         }
 
@@ -106,7 +107,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         const vroProfiles: MavenProfilesMap = {}
 
         if (!allProfiles) {
-            this.logger.warn("No profiles found in " + this.settingsXmlPath)
+            this.logger.warn(`No profiles found in ${this.settingsXmlPath}`)
             return undefined
         }
 

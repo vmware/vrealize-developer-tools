@@ -3,6 +3,4 @@
  * SPDX-License-Identifier: MIT
  */
 
-export class NotAutoWiredError extends Error {
-
-}
+export class NotAutoWiredError extends Error {}

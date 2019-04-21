@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { sleep, AutoWire, Logger } from "vrealize-common"
+import { AutoWire, Logger, sleep } from "vrealize-common"
 import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { LanguageServices } from "../lang"
 import { ClientWindow } from "../ui"
-
 import { Command } from "./Command"
 
 @AutoWire
@@ -38,36 +37,40 @@ export class TriggerCollection extends Command {
 
         clientWindow.onCollectionStart()
 
-        vscode.window.withProgress({
-            location: vscode.ProgressLocation.Window,
-            title: "vRO hint collection"
-        }, progress => {
-            return new Promise(async (resolve, reject) => {
-                await languageClient.sendRequest(remote.server.triggerVroCollection, false)
-                let status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
+        vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Window,
+                title: "vRO hint collection"
+            },
+            progress => {
+                return new Promise(async (resolve, reject) => {
+                    await languageClient.sendRequest(remote.server.triggerVroCollection, false)
+                    let status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
 
-                while (status && !status.finished) {
-                    this.logger.debug("Collection status:", status)
-                    progress.report(status)
-                    await sleep(500)
-                    status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
-                }
-
-                this.logger.debug("Collection finished:", status)
-
-                if (status.error !== undefined) {
-                    clientWindow.onCollectionError(status.error)
-
-                    if (status.data.hintsPluginBuild === 0) {
-                        vscode.window.showErrorMessage(
-                            "The vRO Hint plug-in is not installed on the configured vRO server")
+                    while (status && !status.finished) {
+                        this.logger.debug("Collection status:", status)
+                        progress.report(status)
+                        await sleep(500)
+                        status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
                     }
-                } else {
-                    clientWindow.onCollectionSuccess()
-                }
 
-                resolve()
-            })
-        })
+                    this.logger.debug("Collection finished:", status)
+
+                    if (status.error !== undefined) {
+                        clientWindow.onCollectionError(status.error)
+
+                        if (status.data.hintsPluginBuild === 0) {
+                            vscode.window.showErrorMessage(
+                                "The vRO Hint plug-in is not installed on the configured vRO server"
+                            )
+                        }
+                    } else {
+                        clientWindow.onCollectionSuccess()
+                    }
+
+                    resolve()
+                })
+            }
+        )
     }
 }

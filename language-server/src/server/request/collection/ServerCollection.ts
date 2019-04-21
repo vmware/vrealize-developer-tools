@@ -5,7 +5,7 @@
 
 import * as AdmZip from "adm-zip"
 import * as fs from "fs-extra"
-import { promise, AutoWire, Logger, VroRestClient } from "vrealize-common"
+import { AutoWire, Logger, promise, VroRestClient } from "vrealize-common"
 import { CancellationToken } from "vscode"
 
 import { remote } from "../../../public"
@@ -30,25 +30,28 @@ export class ServerCollection {
     private currentStatus: CollectionStatus = new CollectionStatus()
     private restClient: VroRestClient
 
-    constructor(private environment: Environment,
-                private hints: HintLookup,
-                settings: Settings,
-                connectionLocator: ConnectionLocator) {
-        connectionLocator.connection.onRequest(remote.server.giveVroCollectionStatus,
-            this.giveCollectionStatus.bind(this))
+    constructor(
+        private environment: Environment,
+        private hints: HintLookup,
+        settings: Settings,
+        connectionLocator: ConnectionLocator
+    ) {
+        connectionLocator.connection.onRequest(
+            remote.server.giveVroCollectionStatus,
+            this.giveCollectionStatus.bind(this)
+        )
 
-        connectionLocator.connection.onRequest(remote.server.triggerVroCollection,
-            this.triggerCollection.bind(this))
+        connectionLocator.connection.onRequest(remote.server.triggerVroCollection, this.triggerCollection.bind(this))
 
         this.restClient = new VroRestClient(settings, environment)
     }
 
-    public giveCollectionStatus(): CollectionStatus {
+    giveCollectionStatus(): CollectionStatus {
         this.logger.info("Data collection status was requested by the client:", this.currentStatus)
         return this.currentStatus
     }
 
-    public triggerCollection(offline: boolean, event: CancellationToken) {
+    triggerCollection(offline: boolean, event: CancellationToken) {
         if (offline) {
             // Load any locally available hint files
             this.hints.initialize()
@@ -76,8 +79,6 @@ export class ServerCollection {
                     } else if (!this.currentStatus.finished) {
                         return op.apply(this)
                     }
-
-                    return
                 })
                 .catch(errorMessage => {
                     this.setError(errorMessage)
@@ -85,7 +86,7 @@ export class ServerCollection {
         }
     }
 
-    public async verifyVroConnection() {
+    async verifyVroConnection() {
         this.currentStatus.message = "Authenticating..."
         this.logger.info(this.currentStatus.message)
 
@@ -107,22 +108,22 @@ export class ServerCollection {
         }
     }
 
-    public async downloadLatestPlugin() {
+    async downloadLatestPlugin() {
         this.currentStatus.message = "Downloading latest plugin..."
         this.logger.info(this.currentStatus.message)
     }
 
-    public async installHintingPlugin() {
+    async installHintingPlugin() {
         this.currentStatus.message = "Installing the plugin..."
         this.logger.info(this.currentStatus.message)
     }
 
-    public async waitVroServices() {
+    async waitVroServices() {
         this.currentStatus.message = "Waiting vRO services to start..."
         this.logger.info(this.currentStatus.message)
     }
 
-    public async startCollecting() {
+    async startCollecting() {
         this.currentStatus.message = "Collecting..."
         this.logger.info(this.currentStatus.message)
 
@@ -130,8 +131,13 @@ export class ServerCollection {
             const outParams = await this.restClient.executeWorkflow("548056f3-7dad-49d8-93a4-ba4cff675b72")
             const vpkResourceIdParam = !!outParams && outParams.length > 0 ? outParams[0] : undefined
 
-            if (!vpkResourceIdParam || vpkResourceIdParam.name !== "vpkResourceId" || !vpkResourceIdParam.value ||
-                !vpkResourceIdParam.value.string || !vpkResourceIdParam.value.string.value) {
+            if (
+                !vpkResourceIdParam ||
+                vpkResourceIdParam.name !== "vpkResourceId" ||
+                !vpkResourceIdParam.value ||
+                !vpkResourceIdParam.value.string ||
+                !vpkResourceIdParam.value.string.value
+            ) {
                 throw new Error("Missing vpkResourceId output parameter")
             }
 
@@ -141,7 +147,7 @@ export class ServerCollection {
         }
     }
 
-    public async downloadHintsPack() {
+    async downloadHintsPack() {
         this.currentStatus.message = "Downloading hints package..."
         this.logger.info(this.currentStatus.message)
 
@@ -167,7 +173,10 @@ export class ServerCollection {
             }
 
             const response = await this.restClient.getResource(this.currentStatus.data.vpkResourceId)
-            const stream = response.pipe(fs.createWriteStream(vpkFilePath), { end: true })
+            const stream = response.pipe(
+                fs.createWriteStream(vpkFilePath),
+                { end: true }
+            )
             await promise.streamPromise(stream)
 
             this.currentStatus.message = "Unpacking hints..."
@@ -178,7 +187,7 @@ export class ServerCollection {
         }
     }
 
-    public async done() {
+    async done() {
         this.logger.info("Hint collection has finished.")
         this.currentStatus.message = "Done"
         this.currentStatus.finished = true
@@ -186,7 +195,7 @@ export class ServerCollection {
         this.hints.initialize()
     }
 
-    public setError(message: string): void {
+    setError(message: string): void {
         this.logger.error(`An error occurred during hint collection: ${message}`)
         this.currentStatus.message = "An error occurred"
         this.currentStatus.error = message

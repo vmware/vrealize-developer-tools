@@ -14,15 +14,16 @@ export class Container {
     private instances: Map<string, any> = new Map()
     private visited: Set<string> = new Set()
 
-    public set<T>(clazz: ClassConstructor<T>, obj: T): void {
+    set<T>(clazz: ClassConstructor<T>, obj: T): void {
         this.instances.set(clazz.name, obj)
     }
 
-    public get<T>(clazz: ClassConstructor<T>): T {
+    get<T>(clazz: ClassConstructor<T>): T {
         if (!this.instances.has(clazz.name)) {
             if (!clazz.hasOwnProperty("__autowire")) {
                 throw new NotAutoWiredError(
-                    "Class doesn't have property __autowire. Make sure classes are annotated with @AutoWire.")
+                    "Class doesn't have property __autowire. Make sure classes are annotated with @AutoWire."
+                )
             }
 
             if (this.visited.has(clazz.name)) {

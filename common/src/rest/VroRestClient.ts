@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as fs from "fs-extra"
 import * as http from "http"
+
+import * as fs from "fs-extra"
 import * as request from "request-promise-native"
 
-import { promise, sleep, Logger, MavenCliProxy } from ".."
-import { BaseConfiguration, BaseEnvironment } from "../platform"
+import { Logger, MavenCliProxy, promise, sleep } from ".."
 
+import { BaseConfiguration, BaseEnvironment } from "../platform"
 import { Auth, BasicAuth, VraSsoAuth } from "./auth"
 
 export interface WorkflowParam {
@@ -32,16 +33,22 @@ export interface Version {
 }
 
 export type WorkflowState =
-    "canceled" | "completed" | "running" | "suspended" |
-    "waiting" | "waiting-signal" | "failed" | "initializing"
+    | "canceled"
+    | "completed"
+    | "running"
+    | "suspended"
+    | "waiting"
+    | "waiting-signal"
+    | "failed"
+    | "initializing"
 
 interface WorkflowLogsResponse {
     logs: {
         entry: {
-            "origin": string,
-            "severity": string,
-            "time-stamp": string,
-            "short-description": string,
+            origin: string
+            severity: string
+            "time-stamp": string
+            "short-description": string
             "long-description": string
         }
     }[]
@@ -74,11 +81,13 @@ export class VroRestClient {
                 auth = new VraSsoAuth(await maven.getToken())
                 break
             case "basic":
-                auth = new BasicAuth(this.settings.activeProfile.get("vro.username"),
-                    this.settings.activeProfile.get("vro.password"))
+                auth = new BasicAuth(
+                    this.settings.activeProfile.get("vro.username"),
+                    this.settings.activeProfile.get("vro.password")
+                )
                 break
             default:
-                throw new Error("Unsupported authentication mechanism: " + this.authMethod)
+                throw new Error(`Unsupported authentication mechanism: ${this.authMethod}`)
         }
 
         return auth.toRequestJson()
@@ -89,7 +98,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "GET",
             uri: `https://${this.hostname}:${this.port}/vco/api/about`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             resolveWithFullResponse: false
         }
 
@@ -102,7 +111,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "GET",
             uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}`,
-            auth: { ... await this.getAuth() }
+            auth: { ...(await this.getAuth()) }
         }
 
         const execResponse = await request(executeOptions)
@@ -126,7 +135,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "GET",
             uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/executions/${token}`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             resolveWithFullResponse: false
         }
 
@@ -139,7 +148,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "GET",
             uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/executions/${token}`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             resolveWithFullResponse: false
         }
 
@@ -152,7 +161,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "POST",
             uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/executions`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             body: {} as any
         }
 
@@ -169,12 +178,12 @@ export class VroRestClient {
         const execResponse = await request(executeOptions)
 
         if (execResponse.statusCode !== 202) {
-            throw new Error("Expected status code 202, but got " + execResponse.statusCode)
+            throw new Error(`Expected status code 202, but got ${execResponse.statusCode}`)
         }
 
         let location: string | undefined = execResponse.headers.location
         if (!location) {
-            throw new Error("Missing location header in the response of " + executeOptions.uri)
+            throw new Error(`Missing location header in the response of ${executeOptions.uri}`)
         }
 
         location = location.replace(/\/$/, "") // remove trailing slash
@@ -182,16 +191,17 @@ export class VroRestClient {
         return execToken
     }
 
-    async getWorkflowLogs(workflowId: string,
-                          executionId: string,
-                          severity: string,
-                          timestamp: number): Promise<LogMessage[]> {
+    async getWorkflowLogs(
+        workflowId: string,
+        executionId: string,
+        severity: string,
+        timestamp: number
+    ): Promise<LogMessage[]> {
         const executeOptions = {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "POST",
-            // tslint:disable-next-line:max-line-length
             uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${workflowId}/executions/${executionId}/syslogs`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             body: {
                 "severity": severity,
                 "older-than": timestamp
@@ -206,9 +216,11 @@ export class VroRestClient {
             const e = log.entry
             const description = e["long-description"] ? e["long-description"] : e["short-description"]
 
-            if (e.origin === "server" // skip server messages, as they are always included in the result
-                || description.indexOf("*** End of execution stack.") > 0
-                || description.startsWith("__item_stack:/")) {
+            if (
+                e.origin === "server" || // skip server messages, as they are always included in the result
+                description.indexOf("*** End of execution stack.") > 0 ||
+                description.startsWith("__item_stack:/")
+            ) {
                 continue
             }
 
@@ -227,7 +239,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "POST",
             uri: `https://${this.hostname}:${this.port}/vco/api/content/packages?overwrite=true`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             formData: {
                 file: [fs.createReadStream(path)]
             }
@@ -241,7 +253,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "GET",
             uri: `https://${this.hostname}:${this.port}/vco/api/plugins`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             resolveWithFullResponse: false
         }
 
@@ -253,7 +265,7 @@ export class VroRestClient {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "GET",
             uri: `https://${this.hostname}:${this.port}/vco/api/resources/${id}`,
-            auth: { ... await this.getAuth() },
+            auth: { ...(await this.getAuth()) },
             json: false,
             headers: {
                 Accept: "application/octet-stream"

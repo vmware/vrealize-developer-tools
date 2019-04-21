@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: MIT
  */
 
+import * as path from "path"
+
 import * as fs from "fs-extra"
 import * as _ from "lodash"
-import * as path from "path"
-import { proc, AutoWire, Logger, PomFile, WorkspaceFolder } from "vrealize-common"
+import { AutoWire, Logger, PomFile, proc, WorkspaceFolder } from "vrealize-common"
 import { FileChangeType } from "vscode-languageserver"
 
 import { Environment, FileChangeEventParams, HintLookup, WorkspaceFilesWatcher } from "../../core"
@@ -17,10 +18,12 @@ export class WorkspaceCollection {
     private readonly logger = Logger.get("WorkspaceCollection")
     private readonly debounceTriggerCollection = _.debounce(this.triggerCollectionAndRefresh, 10000)
 
-    constructor(private environment: Environment,
-                private hints: HintLookup,
-                workspaceFilesWatcher: WorkspaceFilesWatcher,
-                workspaceDidSaveDocumentWatcher: WorkspaceDocumentWatcher) {
+    constructor(
+        private environment: Environment,
+        private hints: HintLookup,
+        workspaceFilesWatcher: WorkspaceFilesWatcher,
+        workspaceDidSaveDocumentWatcher: WorkspaceDocumentWatcher
+    ) {
         workspaceFilesWatcher.onDidChangeWatchedFiles(this.onWorkspaceFilesChanged.bind(this))
         workspaceDidSaveDocumentWatcher.onDidSaveWatchedFiles(this.onWorkspaceFilesSave.bind(this))
     }
@@ -75,7 +78,7 @@ export class WorkspaceCollection {
         const pomFilePath = path.join(folder.uri.fsPath, subfolder || "", "pom.xml")
 
         if (!fs.existsSync(pomFilePath)) {
-            throw new Error(`Missing pom.xml in workspace ${folder.name}${subfolder ? "/" + subfolder : ""}`)
+            throw new Error(`Missing pom.xml in workspace ${folder.name}${subfolder ? `/${subfolder}` : ""}`)
         }
 
         const pomFile = new PomFile(pomFilePath)

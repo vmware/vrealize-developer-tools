@@ -6,17 +6,13 @@
 import { AutoWire, BaseConfiguration, Logger, MavenProfilesMap } from "vrealize-common"
 import * as server from "vscode-languageserver"
 
-import { InitializeParams } from "../../public/types"
 import { MavenProfileWatcher } from "../maven"
-
 import { ConfigurationWatcher } from "./ConfigurationWatcher"
 import { Initializer } from "./Initializer"
 
 @AutoWire
 export class Settings extends BaseConfiguration {
-    constructor(configWatcher: ConfigurationWatcher,
-                profilesWatcher: MavenProfileWatcher,
-                initializer: Initializer) {
+    constructor(configWatcher: ConfigurationWatcher, profilesWatcher: MavenProfileWatcher, initializer: Initializer) {
         super()
 
         configWatcher.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this))
@@ -24,7 +20,7 @@ export class Settings extends BaseConfiguration {
         initializer.onInitialize(this.initialize.bind(this))
     }
 
-    private initialize(event: InitializeParams): void {
+    private initialize(event: server.InitializeParams): void {
         this.vrdev = event.initializationOptions ? event.initializationOptions : {}
         Logger.setup(undefined, this.vrdev.log)
     }

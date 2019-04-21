@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { uri, AutoWire, Logger, VroElementPickInfo } from "vrealize-common"
+import { AutoWire, Logger, uri, VroElementPickInfo } from "vrealize-common"
 import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { LanguageServices } from "../lang"
-
 import { Command } from "./Command"
 
 @AutoWire
@@ -41,10 +40,10 @@ export class ShowActions extends Command {
         if (useFullyQualifiedNames) {
             actions = await languageClient.sendRequest(remote.server.giveAllActions)
         } else {
-            const modules: VroElementPickInfo[] =
-                await languageClient.sendRequest(remote.server.giveActionModules)
-            const selectedModule: VroElementPickInfo | undefined =
-                await vscode.window.showQuickPick(modules, { placeHolder: "Pick a module" })
+            const modules: VroElementPickInfo[] = await languageClient.sendRequest(remote.server.giveActionModules)
+            const selectedModule: VroElementPickInfo | undefined = await vscode.window.showQuickPick(modules, {
+                placeHolder: "Pick a module"
+            })
 
             this.logger.debug("Selected module: ", selectedModule)
 
@@ -55,8 +54,9 @@ export class ShowActions extends Command {
             actions = await languageClient.sendRequest(remote.server.giveActionsForModule, selectedModule.name)
         }
 
-        const selectedAction: VroElementPickInfo | undefined =
-            await vscode.window.showQuickPick(actions, { placeHolder: "Pick an action" })
+        const selectedAction: VroElementPickInfo | undefined = await vscode.window.showQuickPick(actions, {
+            placeHolder: "Pick an action"
+        })
 
         this.logger.debug("Selected action: ", selectedAction)
 

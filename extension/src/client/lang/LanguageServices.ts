@@ -4,6 +4,7 @@
  */
 
 import * as path from "path"
+
 import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 import * as client from "vscode-languageclient"
@@ -13,11 +14,11 @@ import { ClientWindow } from "../ui"
 import { Registrable } from "../Registrable"
 
 class ErrorHandler {
-    public closed(): client.CloseAction {
+    closed(): client.CloseAction {
         return client.CloseAction.DoNotRestart
     }
 
-    public error(): client.ErrorAction {
+    error(): client.ErrorAction {
         return client.ErrorAction.Shutdown
     }
 }
@@ -45,8 +46,7 @@ export class LanguageServices implements Registrable, vscode.Disposable {
         return Promise.resolve()
     }
 
-    register(context: vscode.ExtensionContext,
-             clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
         this.extensionContext = context
     }
 
@@ -79,10 +79,12 @@ export class LanguageServices implements Registrable, vscode.Disposable {
         }
 
         const clientOptions: client.LanguageClientOptions = {
-            documentSelector: [{
-                language: "javascript",
-                scheme: "file"
-            }],
+            documentSelector: [
+                {
+                    language: "javascript",
+                    scheme: "file"
+                }
+            ],
             errorHandler: new ErrorHandler(),
             initializationOptions: config,
             outputChannel: this.outputChannel,

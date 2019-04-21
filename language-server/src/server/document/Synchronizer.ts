@@ -4,11 +4,11 @@
  */
 
 import { AutoWire, Logger } from "vrealize-common"
+import { TextDocument, TextDocumentContentChangeEvent, VersionedTextDocumentIdentifier } from "vscode-languageserver"
 
-import { types } from "../../public"
 import { ConnectionLocator } from "../core"
-
 import { TextDocumentWrapper } from "./TextDocumentWrapper"
+
 
 @AutoWire
 export class Synchronizer {
@@ -22,36 +22,39 @@ export class Synchronizer {
             this.textDocuments.delete(event.textDocument.uri)
         })
 
-        connectionLocator.connection.onDidOpenTextDocument(async (event): Promise<void> => {
-            this.logger.debug(`Document ${event.textDocument.uri} was openend. Adding it from the store.`)
-            await this.doFullSync(event.textDocument, event.textDocument.languageId, event.textDocument.text)
-        })
-
-        connectionLocator.connection.onDidChangeTextDocument(async (event): Promise<void> => {
-            this.logger.debug(`Document ${event.textDocument.uri} was changed. Refreshing its entry in the store.`)
-
-            for (const change of event.contentChanges) {
-                if (!change) {
-                    continue
-                }
-
-                const oldRichDoc = this.textDocuments.get(event.textDocument.uri)
-
-                if (!oldRichDoc) {
-                    continue
-                }
-
-                if (!change.range) {
-                    await this.doFullSync(event.textDocument, oldRichDoc.textDocument.languageId, change.text)
-                } else {
-                    await this.doIncrementalSync(oldRichDoc.textDocument, event.textDocument, change)
-                }
-
+        connectionLocator.connection.onDidOpenTextDocument(
+            async (event): Promise<void> => {
+                this.logger.debug(`Document ${event.textDocument.uri} was openend. Adding it from the store.`)
+                await this.doFullSync(event.textDocument, event.textDocument.languageId, event.textDocument.text)
             }
-        })
+        )
+
+        connectionLocator.connection.onDidChangeTextDocument(
+            async (event): Promise<void> => {
+                this.logger.debug(`Document ${event.textDocument.uri} was changed. Refreshing its entry in the store.`)
+
+                for (const change of event.contentChanges) {
+                    if (!change) {
+                        continue
+                    }
+
+                    const oldRichDoc = this.textDocuments.get(event.textDocument.uri)
+
+                    if (!oldRichDoc) {
+                        continue
+                    }
+
+                    if (!change.range) {
+                        await this.doFullSync(event.textDocument, oldRichDoc.textDocument.languageId, change.text)
+                    } else {
+                        await this.doIncrementalSync(oldRichDoc.textDocument, event.textDocument, change)
+                    }
+                }
+            }
+        )
     }
 
-    public getTextDocument(uri: string): TextDocumentWrapper | null {
+    getTextDocument(uri: string): TextDocumentWrapper | null {
         const document = this.textDocuments.get(uri)
         if (null == document) {
             return null
@@ -60,8 +63,10 @@ export class Synchronizer {
         return document
     }
 
-    private applyChangesToTextDocumentContent(oldDocument: types.TextDocument,
-                                              change: types.TextDocumentContentChangeEvent): null | string {
+    private applyChangesToTextDocumentContent(
+        oldDocument: TextDocument,
+        change: TextDocumentContentChangeEvent
+    ): null | string {
         if (null == change.range) {
             return null
         }
@@ -73,27 +78,23 @@ export class Synchronizer {
         return `${before}${change.text}${after}`
     }
 
-    private async doFullSync(textDocument: types.VersionedTextDocumentIdentifier,
-                             languageId: string,
-                             content: string): Promise<void> {
+    private async doFullSync(
+        textDocument: VersionedTextDocumentIdentifier,
+        languageId: string,
+        content: string
+    ): Promise<void> {
         this.logger.debug(`Performing full sync of ${languageId} document '${textDocument.uri}'`)
 
-        const newDocument = types.TextDocument.create(
-            textDocument.uri,
-            languageId,
-            textDocument.version || -1,
-            content
-        )
+        const newDocument = TextDocument.create(textDocument.uri, languageId, textDocument.version || -1, content)
 
-        this.textDocuments.set(
-            textDocument.uri,
-            new TextDocumentWrapper(newDocument)
-        )
+        this.textDocuments.set(textDocument.uri, new TextDocumentWrapper(newDocument))
     }
 
-    private async doIncrementalSync(oldDocument: types.TextDocument,
-                                    newDocument: types.VersionedTextDocumentIdentifier,
-                                    change: types.TextDocumentContentChangeEvent): Promise<void> {
+    private async doIncrementalSync(
+        oldDocument: TextDocument,
+        newDocument: VersionedTextDocumentIdentifier,
+        change: TextDocumentContentChangeEvent
+    ): Promise<void> {
         if (!change || !change.range) {
             return
         }
@@ -105,16 +106,13 @@ export class Synchronizer {
 
         this.logger.debug(`Performing incremental sync of ${oldDocument.languageId} document '${oldDocument.uri}'`)
 
-        const newTextDocument = types.TextDocument.create(
+        const newTextDocument = TextDocument.create(
             oldDocument.uri,
             oldDocument.languageId,
             newDocument.version || -1,
             newContent
         )
 
-        this.textDocuments.set(
-            newDocument.uri,
-            new TextDocumentWrapper(newTextDocument)
-        )
+        this.textDocuments.set(newDocument.uri, new TextDocumentWrapper(newTextDocument))
     }
 }

@@ -4,9 +4,10 @@
  */
 
 import * as path from "path"
+
 import * as tmp from "tmp"
 
-import { proc, Logger } from ".."
+import { Logger, proc } from ".."
 
 export class VrotscCliProxy {
     constructor(private logger: Logger) {

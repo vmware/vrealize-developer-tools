@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { types } from "../../public"
+import { Position, TextDocument } from "vscode-languageserver";
 
 export class TextDocumentWrapper {
-    constructor(readonly textDocument: types.TextDocument) { }
+    constructor(readonly textDocument: TextDocument) {}
 
-    public getWordAt(position: types.Position): string {
+    getWordAt(position: Position): string {
         const text = this.textDocument.getText()
         const offset = this.textDocument.offsetAt(position)
         let start = offset
@@ -25,7 +25,7 @@ export class TextDocumentWrapper {
         return text.substring(start, end)
     }
 
-    public getLineContentUntil(position: types.Position): string {
+    getLineContentUntil(position: Position): string {
         const startPosition = {
             character: 0,
             line: position.line

@@ -4,6 +4,7 @@
  */
 
 import * as URL from "url"
+
 import URI from "vscode-uri"
 
 const fileSchemeLength = "file://".length - 1
@@ -12,14 +13,15 @@ export const O11N_URI_SCHEME = "o11n"
 export interface O11nContentLocation {
     type: string
     path: string
-    name: string,
-    id?: string | null,
+    name: string
+    id?: string | null
     extension: string
 }
 
 export function locationToUri(location: O11nContentLocation): URI {
     return URI.parse(
-        `${O11N_URI_SCHEME}://${location.type}/${location.path}/${location.name}.${location.extension}#${location.id}`)
+        `${O11N_URI_SCHEME}://${location.type}/${location.path}/${location.name}.${location.extension}#${location.id}`
+    )
 }
 
 export function uriToLocation(uri: URI): O11nContentLocation {

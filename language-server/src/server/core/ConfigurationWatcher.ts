@@ -19,12 +19,12 @@ export class ConfigurationWatcher extends AbstractWatcher<DidChangeConfiguration
         connectionLocator.connection.onDidChangeConfiguration(this.configurationChanged.bind(this))
     }
 
+    onDidChangeConfiguration(listener: ConfigChangeListener): Disposable {
+        return this.registerListener(listener)
+    }
+
     private configurationChanged(event: DidChangeConfigurationParams): void {
         this.logger.info("The configuration has changed. New configuration:", event.settings)
         this.notifyListeners(event)
-    }
-
-    public onDidChangeConfiguration(listener: ConfigChangeListener): Disposable {
-        return this.registerListener(listener)
     }
 }

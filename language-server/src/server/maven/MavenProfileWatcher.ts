@@ -21,8 +21,18 @@ export class MavenProfileWatcher extends AbstractWatcher<MavenProfilesMap> imple
 
         // Note: there can be only one notification handler per type
         // https://github.com/Microsoft/vscode-languageserver-node/issues/299
-        connectionLocator.connection.onNotification(remote.client.didChangeMavenProfiles,
-            (profiles: MavenProfilesMap) => this.mavenProfilesChanged(profiles))
+        connectionLocator.connection.onNotification(
+            remote.client.didChangeMavenProfiles,
+            (profiles: MavenProfilesMap) => this.mavenProfilesChanged(profiles)
+        )
+    }
+    onDidChangeMavenProfiles(listener: ProfilesChangeListener): Disposable {
+        return this.registerListener(listener)
+    }
+
+    dispose(): void {
+        this.logger.debug("Disposing MavenProfileWatcher")
+        this.subscriptions.forEach(s => s && s.dispose())
     }
 
     private mavenProfilesChanged(profiles: MavenProfilesMap): void {
@@ -30,14 +40,5 @@ export class MavenProfileWatcher extends AbstractWatcher<MavenProfilesMap> imple
         if (profiles) {
             this.notifyListeners(profiles)
         }
-    }
-
-    public onDidChangeMavenProfiles(listener: ProfilesChangeListener): Disposable {
-        return this.registerListener(listener)
-    }
-
-    public dispose(): void {
-        this.logger.debug("Disposing MavenProfileWatcher")
-        this.subscriptions.forEach(s => s && s.dispose())
     }
 }

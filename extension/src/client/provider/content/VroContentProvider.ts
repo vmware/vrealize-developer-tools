@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { uri, AutoWire, Logger } from "vrealize-common"
+import { AutoWire, Logger, uri } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { LanguageServices } from "../../lang"
 import { ClientWindow } from "../../ui"
 import { Registrable } from "../../Registrable"
-
 import { VroDocument } from "./VroDocument"
 
 @AutoWire
@@ -43,14 +42,12 @@ export class VroContentProvider implements vscode.TextDocumentContentProvider, R
         return document.value
     }
 
-    register(context: vscode.ExtensionContext,
-             clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
         this.logger.debug(`Registering content provider for URI scheme ${uri.O11N_URI_SCHEME}`)
 
         this.subscriptions = vscode.workspace.onDidCloseTextDocument(doc => this.documents.delete(doc.uri.toString()))
 
-        const providerRegistration =
-            vscode.workspace.registerTextDocumentContentProvider(uri.O11N_URI_SCHEME, this)
+        const providerRegistration = vscode.workspace.registerTextDocumentContentProvider(uri.O11N_URI_SCHEME, this)
         context.subscriptions.push(this, providerRegistration)
     }
 }

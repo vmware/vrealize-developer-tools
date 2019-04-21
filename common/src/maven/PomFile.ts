@@ -7,7 +7,6 @@ import * as xmlParser from "fast-xml-parser"
 import * as fs from "fs-extra"
 
 export class PomFile {
-
     static readonly ParentGroupByArtifact = {
         "base-package": "com.vmware.pscoe.o11n",
         "actions-package": "com.vmware.pscoe.o11n",
@@ -71,5 +70,4 @@ export class PomFile {
             throw new Error(`Not a valid vRealize project parent ID - ${groupId}:${artifactId} [file = ${filePath}]`)
         }
     }
-
 }

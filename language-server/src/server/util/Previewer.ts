@@ -6,9 +6,10 @@
 import { vmw } from "../../proto"
 
 export default class Previewer {
-
-    static extendDescriptionWithParams(description?: string | null,
-                                       params?: vmw.pscoe.hints.IParameter[] | null): string | undefined {
+    static extendDescriptionWithParams(
+        description?: string | null,
+        params?: vmw.pscoe.hints.IParameter[] | null
+    ): string | undefined {
         if (!description) {
             return undefined
         }
@@ -35,7 +36,7 @@ export default class Previewer {
         if (action.parameters) {
             action.parameters.forEach((param, i, list) => {
                 result += `\n　　${param.name}: ${Previewer.normalizeType(param.type)}`
-                result += (i < list.length - 1) ? ", " : "\n"
+                result += i < list.length - 1 ? ", " : "\n"
             })
         }
 
@@ -51,7 +52,7 @@ export default class Previewer {
         if (method.parameters) {
             method.parameters.forEach((param, i, list) => {
                 result += `\n　　${param.name}: ${Previewer.normalizeType(param.type)}`
-                result += (i < list.length - 1) ? ", " : "\n"
+                result += i < list.length - 1 ? ", " : "\n"
             })
         }
 
@@ -68,15 +69,14 @@ export default class Previewer {
         return result
     }
 
-    static computeDetailsForConstructor(cls: vmw.pscoe.hints.IClass,
-                                        constr: vmw.pscoe.hints.IConstructor): string {
+    static computeDetailsForConstructor(cls: vmw.pscoe.hints.IClass, constr: vmw.pscoe.hints.IConstructor): string {
         const name = cls.name || ""
         let result = `class ${name}(`
 
         if (constr.parameters) {
             constr.parameters.forEach((param, i, list) => {
                 result += `\n　　${param.name}: ${Previewer.normalizeType(param.type)}`
-                result += (i < list.length - 1) ? ", " : "\n"
+                result += i < list.length - 1 ? ", " : "\n"
             })
         }
 
@@ -89,7 +89,7 @@ export default class Previewer {
         return `static class ${name}`
     }
 
-    private static normalizeType(returnType?: string|null, defaultVal: string = "Any"): string {
+    private static normalizeType(returnType?: string | null, defaultVal: string = "Any"): string {
         let result = returnType || defaultVal
 
         if (result[0] === "[") {

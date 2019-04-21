@@ -15,7 +15,7 @@ export interface MavenInfo {
 }
 
 export interface TasksInfo {
-    disable: boolean,
+    disable: boolean
     exclude: string[]
 }
 

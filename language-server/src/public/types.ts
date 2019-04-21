@@ -20,6 +20,3 @@ export interface TextDocumentRange {
     range: Range
     textDocument: TextDocumentIdentifier
 }
-
-export * from "vscode-languageserver-protocol"
-export * from "vscode-languageserver-types"

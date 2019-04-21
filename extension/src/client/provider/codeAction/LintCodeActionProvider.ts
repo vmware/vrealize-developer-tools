@@ -14,7 +14,7 @@ import { Registrable } from "../../Registrable"
 export abstract class LintCodeActionProvider implements vscode.CodeActionProvider, Registrable {
     protected abstract readonly logger: Logger
 
-    constructor(protected linter: Linter, protected environment: EnvironmentManager) { }
+    constructor(protected linter: Linter, protected environment: EnvironmentManager) {}
 
     protected abstract get documentSelector(): vscode.DocumentSelector
     protected abstract get fixCommandId(): string
@@ -28,28 +28,27 @@ export abstract class LintCodeActionProvider implements vscode.CodeActionProvide
         )
     }
 
-    provideCodeActions(document: vscode.TextDocument,
-                       range: vscode.Range,
-                       codeActionContext: vscode.CodeActionContext): vscode.CodeAction[] {
+    provideCodeActions(
+        document: vscode.TextDocument,
+        range: vscode.Range,
+        codeActionContext: vscode.CodeActionContext
+    ): vscode.CodeAction[] {
         const codeActions: vscode.CodeAction[] = []
         const diagnostics = codeActionContext.diagnostics || []
 
         diagnostics
-            .filter((diagnostic) => diagnostic.source === this.environment.displayName)
-            .forEach((diagnostic) => {
+            .filter(diagnostic => diagnostic.source === this.environment.displayName)
+            .forEach(diagnostic => {
                 const ruleName = diagnostic.message.split(":")[0]
                 const ruleCode = diagnostic.code || "unknown-code"
 
                 if (diagnostic.range.isSingleLine && this.linter.rules[ruleCode]) {
-                    const fixTitle = "Fix: " + ruleName
+                    const fixTitle = `Fix: ${ruleName}`
                     const fixAction = new vscode.CodeAction(fixTitle, vscode.CodeActionKind.QuickFix)
                     fixAction.command = {
                         title: fixTitle,
                         command: this.fixCommandId,
-                        arguments: [
-                            diagnostic.range,
-                            ruleCode
-                        ]
+                        arguments: [diagnostic.range, ruleCode]
                     }
 
                     fixAction.diagnostics = [diagnostic]
@@ -68,10 +67,12 @@ export abstract class LintCodeActionProvider implements vscode.CodeActionProvide
             const rule = this.linter.rules[ruleCode]
             const fixedText = rule && rule.fix(text || "")
 
-            if (editor && (typeof fixedText === "string")) {
-                editor.edit((editBuilder) => {
-                    editBuilder.replace(range, fixedText)
-                }).then(resolve, reject)
+            if (editor && typeof fixedText === "string") {
+                editor
+                    .edit(editBuilder => {
+                        editBuilder.replace(range, fixedText)
+                    })
+                    .then(resolve, reject)
             } else {
                 reject()
             }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { default as Logger, LogChannel } from "../logger"
+import { LogChannel, default as Logger } from "../logger"
 
 describe("utility", () => {
     describe("logger", () => {
@@ -37,7 +37,7 @@ describe("utility", () => {
         })
 
         describe("level: off", () => {
-            it.each(["debug", "info", "warn", "error"])(".%s() can't log messages", (level) => {
+            it.each(["debug", "info", "warn", "error"])(".%s() can't log messages", level => {
                 Logger.setup(undefined, "off")
                 logger[level]("some message")
                 expect(logChannel[level]).not.toHaveBeenCalled()
@@ -45,7 +45,7 @@ describe("utility", () => {
         })
 
         describe("level: debug", () => {
-            it.each(["debug", "info", "warn", "error"])(".%s() can log messages", (level) => {
+            it.each(["debug", "info", "warn", "error"])(".%s() can log messages", level => {
                 Logger.setup(undefined, "debug")
                 logger[level]("some message")
                 expect(logChannel[level]).toHaveBeenCalled()
@@ -59,7 +59,7 @@ describe("utility", () => {
                 expect(logChannel.debug).not.toHaveBeenCalled()
             })
 
-            it.each(["info", "warn", "error"])(".%s() can log messages", (level) => {
+            it.each(["info", "warn", "error"])(".%s() can log messages", level => {
                 Logger.setup(undefined, "info")
                 logger[level]("some message")
                 expect(logChannel[level]).toHaveBeenCalled()
@@ -67,7 +67,7 @@ describe("utility", () => {
         })
 
         describe("format", () => {
-            it.each(["debug", "info", "warn", "error"])(".%s() should format logged messages", (level) => {
+            it.each(["debug", "info", "warn", "error"])(".%s() should format logged messages", level => {
                 logger[level]("message:", "data")
                 let formattedMessage = `[2019-03-31T12:13:14.000Z ${level.toUpperCase()} - TestLog] message: data`
                 expect(logChannel[level]).toHaveBeenCalledWith(formattedMessage)

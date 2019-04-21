@@ -8,10 +8,6 @@ import * as server from "vscode-languageserver"
 
 @AutoWire
 export class ConnectionLocator {
-    constructor() {
-        // empty
-    }
-
     /**
      * Note that you can register only one handler per type of notification.
      * Any subsequent handler registrations for the same notification type
@@ -22,5 +18,7 @@ export class ConnectionLocator {
      *
      * @see https://github.com/Microsoft/vscode-languageserver-node/issues/299
      */
-    public readonly connection: server.IConnection = server.createConnection()
+    readonly connection: server.IConnection = server.createConnection()
+
+    constructor() {}
 }

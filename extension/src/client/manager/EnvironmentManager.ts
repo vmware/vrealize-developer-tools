@@ -7,16 +7,14 @@ import { AutoWire, BaseEnvironment, Logger, WorkspaceFolder } from "vrealize-com
 import * as vscode from "vscode"
 
 import { extensionShortName } from "../constants"
-
 import { ConfigurationManager } from "./ConfigurationManager"
 
 @AutoWire
 export class EnvironmentManager extends BaseEnvironment {
     protected readonly logger = Logger.get("EnvironmentManager")
 
-    public get workspaceFolders(): WorkspaceFolder[] {
-        return (vscode.workspace.workspaceFolders || [])
-            .map(folder => WorkspaceFolder.fromVscode(folder))
+    get workspaceFolders(): WorkspaceFolder[] {
+        return (vscode.workspace.workspaceFolders || []).map(folder => WorkspaceFolder.fromVscode(folder))
     }
 
     constructor(protected config: ConfigurationManager) {
@@ -25,7 +23,7 @@ export class EnvironmentManager extends BaseEnvironment {
         this.logger.debug("Registering the environment manager...")
     }
 
-    public get displayName(): string {
+    get displayName(): string {
         return extensionShortName
     }
 }

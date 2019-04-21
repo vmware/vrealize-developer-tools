@@ -5,6 +5,4 @@
 
 import * as quickPick from "./quickPick"
 
-export {
-    quickPick
-}
+export { quickPick }

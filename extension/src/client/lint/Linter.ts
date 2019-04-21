@@ -10,7 +10,6 @@ import * as vscode from "vscode"
 import { Diagnostics } from "../constants"
 import { EnvironmentManager } from "../manager"
 import { Registrable } from "../Registrable"
-
 import * as ruleDefs from "./rule"
 import { LintRule } from "./LintRule"
 
@@ -22,7 +21,7 @@ export interface LintRulesMap {
     [key: string]: LintRule
 }
 
-type Constructable<T> = new(arg: any) => T
+type Constructable<T> = new (arg: any) => T
 
 @AutoWire
 export class Linter implements Registrable, vscode.Disposable {
@@ -32,7 +31,7 @@ export class Linter implements Registrable, vscode.Disposable {
     private readonly throttledDiagnostics = _.throttle(this.lintTextDocument, 500)
     private readonly lintContext: LintContext = {} as LintContext
 
-    public readonly rules: LintRulesMap
+    readonly rules: LintRulesMap
 
     constructor(environment: EnvironmentManager) {
         this.lintContext.environment = environment
@@ -62,10 +61,10 @@ export class Linter implements Registrable, vscode.Disposable {
         vscode.workspace.onDidSaveTextDocument(this.didSaveTextDocument, this, context.subscriptions)
 
         this.diagnosticCollection = vscode.languages.createDiagnosticCollection(Diagnostics.LintingResults)
-        context.subscriptions.push(this.diagnosticCollection);
+        context.subscriptions.push(this.diagnosticCollection)
 
         // lint already opened files
-        (vscode.workspace.textDocuments || []).forEach(this.lintTextDocument, this)
+        ;(vscode.workspace.textDocuments || []).forEach(this.lintTextDocument, this)
     }
 
     private didChangeTextDocument(change: vscode.TextDocumentChangeEvent) {
@@ -77,8 +76,7 @@ export class Linter implements Registrable, vscode.Disposable {
     }
 
     private lintTextDocument(document: vscode.TextDocument) {
-        const relevantRules = Object.values(this.rules)
-            .filter(rule => rule.isRelevant(document))
+        const relevantRules = Object.values(this.rules).filter(rule => rule.isRelevant(document))
 
         if (relevantRules.length <= 0) {
             return

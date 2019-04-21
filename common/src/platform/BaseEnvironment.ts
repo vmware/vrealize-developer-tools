@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as fs from "fs-extra"
-import * as glob from "glob"
 import * as path from "path"
 
-import { default as Logger } from "../logger"
+import * as fs from "fs-extra"
+import * as glob from "glob"
 
+import { default as Logger } from "../logger"
 import { BaseConfiguration } from "./BaseConfiguration"
 import { WorkspaceFolder } from "./WorkspaceFolder"
 
@@ -17,24 +17,35 @@ export abstract class BaseEnvironment {
     protected abstract config: BaseConfiguration
     public abstract workspaceFolders: WorkspaceFolder[]
 
-    public get version(): string {
+    get version(): string {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const packageJson = require("../../../package.json")
         return packageJson.version.trim()
     }
 
-    public get buildToolsVersion(): string {
+    get buildToolsVersion(): string {
         return this.config.vrdev.buildTools.defaultVersion
     }
 
-    public getWorkspaceFolderOf(resourcePath: string): WorkspaceFolder | undefined {
+    get homeDir(): string {
+        const homeEnvVar = process.platform === "win32" ? "USERPROFILE" : "HOME"
+        const value = process.env[homeEnvVar]
+
+        if (!value) {
+            throw new Error(`Missing '${homeEnvVar}' environment variable`)
+        }
+
+        return value
+    }
+
+    getWorkspaceFolderOf(resourcePath: string): WorkspaceFolder | undefined {
         if (!this.workspaceFolders || this.workspaceFolders.length === 0) {
             return undefined
         }
 
-        const descSorted = this.workspaceFolders
-            .sort((a, b) => {
-                return b.uri.fsPath.length - a.uri.fsPath.length
-            })
+        const descSorted = this.workspaceFolders.sort((a, b) => {
+            return b.uri.fsPath.length - a.uri.fsPath.length
+        })
 
         for (const element of descSorted) {
             if (resourcePath.startsWith(`${element.uri.fsPath}${path.sep}`)) {
@@ -45,39 +56,28 @@ export abstract class BaseEnvironment {
         return undefined
     }
 
-    public getGlobalHintsDir(): string {
+    getGlobalHintsDir(): string {
         return this.createAndResolveDir(this.homeDir, ".o11n", "hints")
     }
 
-    public getGlobalTokenFile(): string {
+    getGlobalTokenFile(): string {
         const tokensFolder = this.createAndResolveDir(this.homeDir, ".o11n", "tokens")
         return path.join(tokensFolder, this.getHostname())
     }
 
-    public getLocalHintsDir(workspaceFolder: WorkspaceFolder): string {
+    getLocalHintsDir(workspaceFolder: WorkspaceFolder): string {
         return this.createAndResolveDir(workspaceFolder.uri.fsPath, ".o11n", "hints")
     }
 
-    public getGlobalO11nDir(): string {
+    getGlobalO11nDir(): string {
         return this.createAndResolveDir(this.homeDir, ".o11n")
     }
 
-    public getLocalO11nDir(workspaceFolder: WorkspaceFolder): string {
+    getLocalO11nDir(workspaceFolder: WorkspaceFolder): string {
         return this.createAndResolveDir(workspaceFolder.uri.fsPath, ".o11n")
     }
 
-    public get homeDir(): string {
-        const homeEnvVar = (process.platform === "win32") ? "USERPROFILE" : "HOME"
-        const value = process.env[homeEnvVar]
-
-        if (!value) {
-            throw new Error(`Missing '${homeEnvVar}' environment variable`)
-        }
-
-        return value
-    }
-
-    public resolveHintFile(name: string, workspaceFolder?: WorkspaceFolder): string {
+    resolveHintFile(name: string, workspaceFolder?: WorkspaceFolder): string {
         if (workspaceFolder) {
             return path.join(this.getLocalHintsDir(workspaceFolder), name)
         }
@@ -85,11 +85,11 @@ export abstract class BaseEnvironment {
         return path.join(this.getGlobalHintsDir(), this.getHostname(), name)
     }
 
-    public resolveVpkFile(): string {
-        return path.join(this.getGlobalHintsDir(), this.getHostname() + ".vpk")
+    resolveVpkFile(): string {
+        return path.join(this.getGlobalHintsDir(), `${this.getHostname()}.vpk`)
     }
 
-    public resolveHintsDir(workspaceFolder?: WorkspaceFolder): string {
+    resolveHintsDir(workspaceFolder?: WorkspaceFolder): string {
         if (workspaceFolder) {
             return this.getLocalHintsDir(workspaceFolder)
         }
@@ -97,16 +97,16 @@ export abstract class BaseEnvironment {
         return path.join(this.getGlobalHintsDir(), this.getHostname())
     }
 
-    public resolveOutputFile(name: string, workspaceFolder: WorkspaceFolder): string {
+    resolveOutputFile(name: string, workspaceFolder: WorkspaceFolder): string {
         return path.join(this.getLocalHintsDir(workspaceFolder), "..", name)
     }
 
-    public resolvePluginHintFiles(): string[] {
+    resolvePluginHintFiles(): string[] {
         const workingDir = path.join(this.getGlobalHintsDir(), this.getHostname(), "plugins")
         return glob.sync("./*.pb", { cwd: workingDir, absolute: true })
     }
 
-    public resolveDependenciesHintFiles(workspaceFolder: WorkspaceFolder): string[] {
+    resolveDependenciesHintFiles(workspaceFolder: WorkspaceFolder): string[] {
         const dependenciesHintsDir = path.join(this.getLocalHintsDir(workspaceFolder), "dependencies")
         const dependenciesHintFiles = glob.sync("./*.pb", { cwd: dependenciesHintsDir, absolute: true })
         return dependenciesHintFiles
@@ -125,5 +125,4 @@ export abstract class BaseEnvironment {
 
         return this.config.activeProfile.getOptional("vro.host", "")
     }
-
 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-// tslint:disable:ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function AutoWire(constructor: Function) {
     Object.defineProperty(constructor, "__autowire", {
         enumerable: false,

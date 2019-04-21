@@ -16,16 +16,18 @@ export default class Logger {
     private static logLevel: LogLevel = "info"
     private static logChannel: LogChannel
 
+    constructor(private className: string) { }
+
     /**
      * Get a logger instance.
      *
      * @param className
      */
-    public static get(className: string): Logger {
+    static get(className: string): Logger {
         return new Logger(className)
     }
 
-    public static setup(channel?: LogChannel, logLevel?: LogLevel) {
+    static setup(channel?: LogChannel, logLevel?: LogLevel) {
         if (channel) {
             Logger.logChannel = channel
         }
@@ -35,38 +37,38 @@ export default class Logger {
         }
     }
 
-    private readonly format = (level: string, message: string, data?: any) => {
-        return `[${new Date().toISOString()} ${level} - ${this.className}] ` +
-            `${message} ${data ? this.metaToString(data) : ""}`
-    }
-
-    constructor(private className: string) {}
-
-    public debug(message: string, data?: any): void {
+    debug(message: string, data?: any): void {
         if (this.channel && Logger.logLevel === "debug") {
             this.channel.debug(this.format("DEBUG", message, data))
         }
     }
 
-    public info(message: string, data?: any): void {
+    info(message: string, data?: any): void {
         if (this.channel) {
             this.channel.info(this.format("INFO", message, data))
         }
     }
 
-    public warn(message: string, data ?: any): void {
+    warn(message: string, data?: any): void {
         if (this.channel) {
             this.channel.warn(this.format("WARN", message, data))
         }
     }
 
-    public error(message: string, data?: any): void {
+    error(message: string, data?: any): void {
         if (this.channel) {
             this.channel.error(this.format("ERROR", message, data))
         }
     }
 
-    private get channel(): LogChannel|undefined {
+    private readonly format = (level: string, message: string, data?: any) => {
+        return (
+            `[${new Date().toISOString()} ${level} - ${this.className}] ` +
+            `${message} ${data ? this.metaToString(data) : ""}`
+        )
+    }
+
+    private get channel(): LogChannel | undefined {
         return Logger.logLevel !== "off" && Logger.logChannel ? Logger.logChannel : undefined
     }
 

@@ -8,7 +8,6 @@ import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { ConfigurationManager } from "../manager"
-
 import { Command } from "./Command"
 
 @AutoWire
@@ -26,8 +25,9 @@ export class ToggleTypeScript extends Command {
     async execute(context: vscode.ExtensionContext): Promise<void> {
         this.logger.info("Executing command Toggle TypeScript Support")
         const value = this.config.vrdev.experimental.typescript
-        await vscode.workspace.getConfiguration("vrdev").update(
-            "experimental.typescript", !value, vscode.ConfigurationTarget.Global)
+        await vscode.workspace
+            .getConfiguration("vrdev")
+            .update("experimental.typescript", !value, vscode.ConfigurationTarget.Global)
         vscode.window.showInformationMessage(`${!value ? "Enabled" : "Disabled"} vRealize TypeScript support`)
     }
 }
