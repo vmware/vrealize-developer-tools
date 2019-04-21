@@ -110,6 +110,8 @@ module.exports = {
             }
         ],
 
+        "import/export": "off",
+        "import/named": "off",
         "import/no-unresolved": ["warn", { ignore: ["vscode", "vrealize-common", "vro-language-server"] }],
         "import/namespace": "off",
         "import/newline-after-import": "warn",
