@@ -7,7 +7,8 @@ const cp = require("child_process");
 const fs = require("fs-extra");
 const minimist = require("minimist");
 const log = require("fancy-log");
-const publishRelease = require("gulp-github-release");
+const release = require("./build/release");
+const bumpVersion = require("./build/bump-version");
 
 const rootPath = __dirname;
 const nodeModulesPathPrefix = path.resolve("./node_modules");
@@ -95,12 +96,12 @@ gulp.task("clean", (done) => {
     done();
 });
 
-gulp.task("compile", ["generate-proto", "copy-proto"], (done) => {
+gulp.task("compile", gulp.series("generate-proto", "copy-proto", (done) => {
     // TODO: Evaluate using gulp-typescript and gulp-sourcemaps
     // once they fully support project references
     exec(tsc, ["-b"], rootPath);
     done();
-});
+}));
 
 gulp.task("watch", (done) => {
     exec(tsc, ["-b", "-w"], rootPath);
@@ -113,7 +114,7 @@ gulp.task("lint", (done) => {
     done();
 });
 
-gulp.task("test", ["compile"], (done) => {
+gulp.task("test", gulp.series("compile", (done) => {
     const projectRoots = projects.map(name => path.join(rootPath, name))
     const args = [
         "--verbose",
@@ -126,7 +127,7 @@ gulp.task("test", ["compile"], (done) => {
 
     exec(jest, args, rootPath);
     done();
-});
+}));
 
 gulp.task("test:watch", (done) => {
     const projectRoots = projects.map(name => path.join(rootPath, name))
@@ -139,35 +140,20 @@ gulp.task("test:watch", (done) => {
     done();
 });
 
-gulp.task("package", ["lint", "test", "copy-changelog"], (done) => {
+gulp.task("package", gulp.series("lint", "test", (done) => {
     exec(vsce, [
         "package", "--yarn",
         "--baseContentUrl", "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/",
         "--baseImagesUrl", "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/"
     ], rootPath);
     done();
-});
+}));
 
-gulp.task("publish-release", (done) => {
-    const releaseVersion = require("./package.json").version;
-    log.info(`Creating GitHub release v${releaseVersion}`)
-    gulp.src("./*.vsix").pipe(publishRelease({
-        token: process.env.GITHUB_SECRET,
-        owner: "vmware",
-        repo: "vrealize-developer-tools",
-        name: releaseVersion,
-        notes: "Pending changelog",
-        tag: `v${releaseVersion}`,
-        draft: false,
-        prerelease: true,
-        reuseDraftOnly: true,
-        skipIfPublished: true
-    }))
-});
+gulp.task("release", () => release());
 
-gulp.task("release", ["publish-release"]);
+gulp.task("bump-version", () => bumpVersion());
 
-gulp.task("default", ["watch"]);
+gulp.task("default", gulp.series("watch"));
 
 function exec(cmd, args, cwd, stdio = "inherit") {
     var cmdString = `${cmd} ${args.join(" ")}`
