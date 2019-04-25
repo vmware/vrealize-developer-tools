@@ -5,4 +5,5 @@
 
 export * from "./content/VroContentProvider"
 export * from "./task/TaskProvider"
+export * from "./explorer/ExplorerProvider"
 export * from "./codeAction/PomCodeActionProvider"

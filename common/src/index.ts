@@ -20,5 +20,6 @@ export * from "./ts"
 export * from "./platform"
 export * from "./types"
 export * from "./rest"
+export * from "./hierarchy"
 
 export { di, proc, promise, uri }

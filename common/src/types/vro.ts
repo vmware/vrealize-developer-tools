@@ -3,10 +3,16 @@
  * SPDX-License-Identifier: MIT
  */
 
-export type VroElementKind = "workflow" | "action" | "resource" | "configuration" | "category" | "module"
+export type ApiCategoryType =
+    | "WorkflowCategory"
+    | "ScriptModuleCategory"
+    | "ResourceElementCategory"
+    | "ConfigurationElementCategory"
+
+export type ApiElementType = "Workflow" | "ScriptModule" | "ResourceElement" | "ConfigurationElement"
 
 export interface VroElementPickInfo {
-    kind: VroElementKind
+    kind: "workflow" | "action" | "resource" | "configuration" | "category" | "module"
     name: string
     path?: string | null
     label: string

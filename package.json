@@ -30,6 +30,7 @@
     "onLanguage:javascript",
     "onLanguage:typescript",
     "workspaceContains:.o11n/",
+    "onView:vrdev.views.explorer",
     "onCommand:vrdev.new.project",
     "onCommand:vrdev.change.profile",
     "onCommand:vrdev.open.action",
@@ -39,7 +40,32 @@
   ],
   "main": "./extension/out/extension",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vro-explorer",
+          "title": "vRO",
+          "icon": "assets/icons/explorer.svg"
+        }
+      ]
+    },
+    "views": {
+      "vro-explorer": [
+        {
+          "id": "vrdev.views.explorer",
+          "name": "Explorer"
+        }
+      ]
+    },
     "commands": [
+      {
+        "command": "vrdev.views.explorer.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "assets/icons/light/refresh.svg",
+          "dark": "assets/icons/dark/refresh.svg"
+        }
+      },
       {
         "command": "vrdev.change.profile",
         "title": "Change Active Profile",
@@ -76,6 +102,13 @@
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "when": "view =~ /^vrdev\\.views\\.explorer/",
+          "command": "vrdev.views.explorer.refresh",
+          "group": "navigation@1"
+        }
+      ],
       "editor/title": [
         {
           "when": "resourceLangId == javascript || resourceLangId == typescript",
@@ -167,6 +200,22 @@
           "default": "1.5.9",
           "description": "The version of vRealize Build Tools to be used outside the context of a project (e.g. when onboarding project and running untitled actions).",
           "scope": "application"
+        },
+        "vrdev.views.explorer.actions.layout": {
+          "type": "string",
+          "default": "compact",
+          "enum": [
+            "tree",
+            "compact",
+            "flat"
+          ],
+          "enumDescriptions": [
+            "Displays action packages as a tree",
+            "Displays action packages as a tree, but flattens any folders that have no children",
+            "Displays action packages as a list"
+          ],
+          "markdownDescription": "Specifies how the _Explorer_ view will display vRO action packages",
+          "scope": "window"
         }
       }
     },

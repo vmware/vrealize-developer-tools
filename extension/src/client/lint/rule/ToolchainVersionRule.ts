@@ -8,7 +8,7 @@ import * as semver from "semver"
 import { Logger, PomFile } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { MavenPom } from "../../constants"
+import { Patterns } from "../../constants"
 import { PomLintRule } from "../PomLintRule"
 
 export class ToolchainVersionRule extends PomLintRule {
@@ -90,7 +90,7 @@ export class ToolchainVersionRule extends PomLintRule {
     ): vscode.Range | null {
         let versionAbsolutePosition = 0
 
-        const parentTagSearchResults = MavenPom.ParentPattern.exec(pomXmlContent)
+        const parentTagSearchResults = Patterns.PomParent.exec(pomXmlContent)
         if (!parentTagSearchResults) {
             this.logger.error("Could not find parent tag contents")
             return null

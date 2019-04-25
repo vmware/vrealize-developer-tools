@@ -18,7 +18,8 @@ export enum Commands {
     OpenAction = "vrdev.open.action",
     OpenConfiguration = "vrdev.open.configElement",
     RunAction = "vrdev.run.action",
-    ToggleTypeScript = "vrdev.toggle.typescript"
+    ToggleTypeScript = "vrdev.toggle.typescript",
+    RefreshExplorer = "vrdev.views.explorer.refresh"
 }
 
 export enum FixCommands {
@@ -27,6 +28,18 @@ export enum FixCommands {
 
 export enum Diagnostics {
     LintingResults = "vRealize diagnostics"
+}
+export enum Views {
+    Explorer = "vrdev.views.explorer"
+}
+
+export class Patterns {
+    static readonly PomParent = /<parent>[\s\S]*<\/parent>/i
+    static readonly PomArtifactId = /^[A-Za-z0-9_\-]+$/
+    static readonly PomGroupId = /^[A-Za-z0-9_\-.]+$/
+
+    // https://regex101.com/r/gxlA8L/1
+    static readonly PackageSplit = /^(.+?)(?:-(\d+\.\d+.\d+(?:-SNAPSHOT)?))?$/
 }
 
 export enum OutputChannels {
@@ -41,10 +54,4 @@ export enum ProjectArchetypes {
     Actions = "com.vmware.pscoe.o11n:actions-package",
     Xml = "com.vmware.pscoe.o11n:xml-package",
     Vra = "com.vmware.pscoe.vra:vra-package"
-}
-
-export class MavenPom {
-    static readonly ParentPattern = /<parent>[\s\S]*<\/parent>/i
-    static readonly ArtifactIdPattern = /^[A-Za-z0-9_\-]+$/
-    static readonly GroupIdPattern = /^[A-Za-z0-9_\-.]+$/
 }

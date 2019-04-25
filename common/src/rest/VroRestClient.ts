@@ -10,6 +10,7 @@ import * as request from "request-promise-native"
 
 import { Logger, MavenCliProxy, promise, sleep } from ".."
 
+import { ApiCategoryType, ApiElementType } from "../types"
 import { BaseConfiguration, BaseEnvironment } from "../platform"
 import { Auth, BasicAuth, VraSsoAuth } from "./auth"
 
@@ -45,13 +46,41 @@ export type WorkflowState =
 interface WorkflowLogsResponse {
     logs: {
         entry: {
-            origin: string
-            severity: string
+            "origin": string
+            "severity": string
             "time-stamp": string
             "short-description": string
             "long-description": string
         }
     }[]
+}
+
+interface ApiElement {
+    name: string
+    id: string
+    type: ApiCategoryType | ApiElementType
+    rel: string
+}
+
+interface InventoryElement {
+    name: string
+    id: string
+    type: string
+    rel: string
+    href: string
+}
+
+interface ContentLinksResponse {
+    link: {
+        attributes: { name: string; value: string; type: string }[]
+        rel: string
+        href: string
+    }[]
+}
+
+interface ContentChildrenResponse {
+    href: string
+    relations: ContentLinksResponse
 }
 
 export class VroRestClient {
@@ -200,7 +229,9 @@ export class VroRestClient {
         const executeOptions = {
             ...DEFAULT_REQUEST_OPTIONS,
             method: "POST",
-            uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${workflowId}/executions/${executionId}/syslogs`,
+            uri:
+                `https://${this.hostname}:${this.port}/vco/api` +
+                `/workflows/${workflowId}/executions/${executionId}/syslogs`,
             auth: { ...(await this.getAuth()) },
             body: {
                 "severity": severity,
@@ -260,6 +291,90 @@ export class VroRestClient {
         return request(options)
     }
 
+    async getPackages(): Promise<string[]> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/packages`,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentLinksResponse = await request(options)
+        const packages: string[] = responseJson.link
+            .map(pkg => {
+                const name = pkg.attributes.find(att => att.name === "name")
+                return name ? name.value : undefined
+            })
+            .filter(val => val !== undefined) as string[]
+
+        return packages.sort()
+    }
+
+    async getRootCategories(categoryType: ApiCategoryType): Promise<ApiElement[]> {
+        const uri = `https://${this.hostname}:${this.port}/vco/api/categories?isRoot=true&categoryType=${categoryType}`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentLinksResponse = await request(options)
+        const categories = responseJson.link
+            .map(child => {
+                const name = child.attributes.find(att => att.name === "name")
+                const id = child.attributes.find(att => att.name === "id")
+                return {
+                    name: name ? name.value : undefined,
+                    id: id ? id.value : undefined,
+                    type: categoryType,
+                    rel: child.rel
+                }
+            })
+            .filter(val => {
+                return val.name !== undefined && val.id !== undefined
+            }) as ApiElement[]
+
+        return categories.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
+    async getChildrenOfCategory(categoryId: string): Promise<ApiElement[]> {
+        const uri = `https://${this.hostname}:${this.port}/vco/api/categories/${categoryId}`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentChildrenResponse = await request(options)
+        const children = responseJson.relations.link
+            .map(child => {
+                if (!child.attributes) {
+                    return undefined
+                }
+
+                const name = child.attributes.find(att => att.name === "name")
+                const id = child.attributes.find(att => att.name === "id")
+                const type = child.attributes.find(att => att.name === "type")
+
+                return {
+                    name: name ? name.value : undefined,
+                    id: id ? id.value : undefined,
+                    type: type ? type.value : undefined,
+                    rel: child.rel
+                }
+            })
+            .filter(val => {
+                return !!val && val.name !== undefined && val.id !== undefined && val.type !== undefined
+            }) as ApiElement[]
+
+        return children.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
     async getResource(id: string): Promise<http.IncomingMessage> {
         const options = {
             ...DEFAULT_REQUEST_OPTIONS,
@@ -273,6 +388,69 @@ export class VroRestClient {
         }
 
         return promise.requestPromiseStream(options)
+    }
+
+    async getInventoryItems(href?: string): Promise<InventoryElement[]> {
+        const uri = href || `https://${this.hostname}:${this.port}/vco/api/inventory`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentChildrenResponse = await request(options)
+        const children = responseJson.relations.link
+            .map(child => {
+                if (!child.attributes) {
+                    return undefined
+                }
+
+                const id =
+                    child.attributes.find(att => att.name === "id") ||
+                    child.attributes.find(att => att.name === "dunesId")
+
+                const name =
+                    child.attributes.find(att => att.name === "displayName") ||
+                    child.attributes.find(att => att.name === "name")
+
+                const type =
+                    child.attributes.find(att => att.name === "type") ||
+                    child.attributes.find(att => att.name === "@type")
+
+                return {
+                    name: name ? name.value : undefined,
+                    id: id ? id.value : undefined,
+                    type: type ? type.value : undefined,
+                    rel: child.rel,
+                    href: child.href
+                }
+            })
+            .filter(val => {
+                return !!val && val.name !== undefined && val.href !== undefined
+            }) as InventoryElement[]
+
+        return children.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
+    async fetchIcon(namespace: string, type: string, targetPath: string): Promise<void> {
+        type = type || ""
+        const uri = `https://${this.hostname}:${this.port}/vco/api/catalog/${namespace}/${type}/metadata/icon`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            json: false,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const stream = request(options).pipe(fs.createWriteStream(targetPath))
+        return new Promise((resolve, reject) => {
+            stream.on("finish", () => resolve())
+            stream.on("error", (e) => reject(e))
+        })
     }
 }
 

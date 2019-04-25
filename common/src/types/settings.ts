@@ -27,6 +27,18 @@ export interface BuildTools {
     defaultVersion: string
 }
 
+export interface Views {
+    explorer: ExplorerView
+}
+
+export interface ExplorerView {
+    actions: ActionsView
+}
+
+export interface ActionsView {
+    layout: "tree" | "compact" | "flat"
+}
+
 export interface VrealizeSettings {
     log: LogLevel
     trace: TraceLevel
@@ -34,5 +46,6 @@ export interface VrealizeSettings {
     tasks: TasksInfo
     maven: MavenInfo
     experimental: ExperimentalFlags
-    buildTools: BuildTools
+    buildTools: BuildTools,
+    views: Views
 }
