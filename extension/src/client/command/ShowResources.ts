@@ -12,12 +12,12 @@ import { ContentLocation } from "../provider/content/ContentLocation"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
 
 @AutoWire
-export class ShowConfigurations extends Command {
-    private readonly logger = Logger.get("ShowConfigurations")
+export class ShowResources extends Command {
+    private readonly logger = Logger.get("ShowResources")
     private restClient: VroRestClient
 
     get commandId(): string {
-        return Commands.OpenConfiguration
+        return Commands.OpenResource
     }
 
     constructor(environment: EnvironmentManager, config: ConfigurationManager) {
@@ -26,38 +26,38 @@ export class ShowConfigurations extends Command {
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
-        this.logger.info("Executing command Show Configurations")
+        this.logger.info("Executing command Show Resources")
 
-        const configs: Thenable<VroElementPickInfo[]> = this.restClient.getConfigurations().then(result =>
-            result.map(conf => {
+        const resources: Thenable<VroElementPickInfo[]> = this.restClient.getResources().then(result =>
+            result.map(res => {
                 return {
-                    id: conf.id,
-                    name: conf.name,
-                    label: `$(file-code) ${conf.name}`,
-                    description: conf.version ? `v${conf.version}` : undefined
+                    id: res.id,
+                    name: res.name,
+                    label: `$(file-code) ${res.name}`
                 }
             })
         )
 
-        const selected: VroElementPickInfo | undefined = await vscode.window.showQuickPick(configs, {
-            placeHolder: "Pick a configuration"
+        const selected: VroElementPickInfo | undefined = await vscode.window.showQuickPick(resources, {
+            placeHolder: "Pick a resource"
         })
 
-        this.logger.debug("Selected configuration: ", selected)
+        this.logger.debug("Selected resource: ", selected)
 
         if (!selected) {
             return
         }
 
+        const [name, extension] = selected.name.split(".")
         const url = ContentLocation.with({
             scheme: "vro",
-            type: "config",
-            name: selected.name,
-            extension: "xml",
-            id: selected.id
+            type: "resource",
+            id: selected.id,
+            name,
+            extension
         })
 
-        this.logger.debug(`Opening the selected configuration: ${url.toString()}`)
+        this.logger.debug(`Opening the selected resource: ${url.toString()}`)
 
         const textDocument = await vscode.workspace.openTextDocument(vscode.Uri.parse(url.toString()))
         await vscode.window.showTextDocument(textDocument, { preview: true })

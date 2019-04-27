@@ -12,12 +12,12 @@ import { ContentLocation } from "../provider/content/ContentLocation"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
 
 @AutoWire
-export class ShowConfigurations extends Command {
-    private readonly logger = Logger.get("ShowConfigurations")
+export class ShowWorkflows extends Command {
+    private readonly logger = Logger.get("ShowWorkflows")
     private restClient: VroRestClient
 
     get commandId(): string {
-        return Commands.OpenConfiguration
+        return Commands.OpenWorkflow
     }
 
     constructor(environment: EnvironmentManager, config: ConfigurationManager) {
@@ -26,24 +26,24 @@ export class ShowConfigurations extends Command {
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
-        this.logger.info("Executing command Show Configurations")
+        this.logger.info("Executing command Show Workflows")
 
-        const configs: Thenable<VroElementPickInfo[]> = this.restClient.getConfigurations().then(result =>
-            result.map(conf => {
+        const workflows: Thenable<VroElementPickInfo[]> = this.restClient.getWorkflows().then(result =>
+            result.map(wf => {
                 return {
-                    id: conf.id,
-                    name: conf.name,
-                    label: `$(file-code) ${conf.name}`,
-                    description: conf.version ? `v${conf.version}` : undefined
+                    id: wf.id,
+                    name: wf.name,
+                    label: `$(file-code) ${wf.name}`,
+                    description: `v${wf.version}`
                 }
             })
         )
 
-        const selected: VroElementPickInfo | undefined = await vscode.window.showQuickPick(configs, {
-            placeHolder: "Pick a configuration"
+        const selected: VroElementPickInfo | undefined = await vscode.window.showQuickPick(workflows, {
+            placeHolder: "Pick a workflow"
         })
 
-        this.logger.debug("Selected configuration: ", selected)
+        this.logger.debug("Selected workflow: ", selected)
 
         if (!selected) {
             return
@@ -51,13 +51,13 @@ export class ShowConfigurations extends Command {
 
         const url = ContentLocation.with({
             scheme: "vro",
-            type: "config",
+            type: "workflow",
             name: selected.name,
             extension: "xml",
             id: selected.id
         })
 
-        this.logger.debug(`Opening the selected configuration: ${url.toString()}`)
+        this.logger.debug(`Opening the selected workflow: ${url.toString()}`)
 
         const textDocument = await vscode.workspace.openTextDocument(vscode.Uri.parse(url.toString()))
         await vscode.window.showTextDocument(textDocument, { preview: true })

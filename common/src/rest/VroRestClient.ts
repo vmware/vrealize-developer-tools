@@ -311,6 +311,136 @@ export class VroRestClient {
         return packages.sort()
     }
 
+    async getActions(): Promise<{ fqn: string; id: string; version: string }[]> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/actions`,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentLinksResponse = await request(options)
+        const actions: { fqn: string; id: string; version: string }[] = responseJson.link
+            .map(action => {
+                if (!action.attributes) {
+                    return undefined
+                }
+
+                const fqn = action.attributes.find(att => att.name === "fqn")
+                const id = action.attributes.find(att => att.name === "id")
+                const version = action.attributes.find(att => att.name === "version")
+
+                return {
+                    fqn: fqn ? fqn.value : undefined,
+                    id: id ? id.value : undefined,
+                    version: version ? version.value : undefined
+                }
+            })
+            .filter(val => {
+                return !!val && val.fqn !== undefined && val.id !== undefined
+            }) as { fqn: string; id: string; version: string }[]
+
+        return actions.sort((x, y) => x.fqn.localeCompare(y.fqn))
+    }
+
+    async getWorkflows(): Promise<{ name: string; id: string; version: string }[]> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/workflows`,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentLinksResponse = await request(options)
+        const workflows: { name: string; id: string; version: string }[] = responseJson.link
+            .map(wf => {
+                if (!wf.attributes) {
+                    return undefined
+                }
+
+                const name = wf.attributes.find(att => att.name === "name")
+                const id = wf.attributes.find(att => att.name === "id")
+                const version = wf.attributes.find(att => att.name === "version")
+
+                return {
+                    name: name ? name.value : undefined,
+                    id: id ? id.value : undefined,
+                    version: version ? version.value : undefined
+                }
+            })
+            .filter(val => {
+                return !!val && val.name !== undefined && val.id !== undefined
+            }) as { name: string; id: string; version: string }[]
+
+        return workflows.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
+    async getConfigurations(): Promise<{ name: string; id: string; version: string }[]> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/configurations`,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentLinksResponse = await request(options)
+        const configs: { name: string; id: string; version: string }[] = responseJson.link
+            .map(conf => {
+                if (!conf.attributes) {
+                    return undefined
+                }
+
+                const name = conf.attributes.find(att => att.name === "name")
+                const id = conf.attributes.find(att => att.name === "id")
+                const version = conf.attributes.find(att => att.name === "version")
+
+                return {
+                    name: name ? name.value : undefined,
+                    id: id ? id.value : undefined,
+                    version: version ? version.value : undefined
+                }
+            })
+            .filter(val => {
+                return !!val && val.name !== undefined && val.id !== undefined
+            }) as { name: string; id: string; version: string }[]
+
+        return configs.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
+    async getResources(): Promise<{ name: string; id: string }[]> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/resources`,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const responseJson: ContentLinksResponse = await request(options)
+        const resources: { name: string; id: string }[] = responseJson.link
+            .map(res => {
+                if (!res.attributes) {
+                    return undefined
+                }
+
+                const name = res.attributes.find(att => att.name === "name")
+                const id = res.attributes.find(att => att.name === "id")
+
+                return {
+                    name: name ? name.value : undefined,
+                    id: id ? id.value : undefined
+                }
+            })
+            .filter(val => {
+                return !!val && val.name !== undefined && val.id !== undefined
+            }) as { name: string; id: string }[]
+
+        return resources.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
     async getRootCategories(categoryType: ApiCategoryType): Promise<ApiElement[]> {
         const uri = `https://${this.hostname}:${this.port}/vco/api/categories?isRoot=true&categoryType=${categoryType}`
         const options = {

@@ -84,12 +84,38 @@
       {
         "command": "vrdev.open.action",
         "title": "Open Action",
-        "category": "vRealize"
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
       },
       {
-        "command": "vrdev.open.configElement",
-        "title": "Open Configuration Element",
-        "category": "vRealize"
+        "command": "vrdev.open.workflow",
+        "title": "Open Workflow",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.open.config",
+        "title": "Open Configuration",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.open.resource",
+        "title": "Open Resource",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
       },
       {
         "command": "vrdev.new.project",
@@ -128,6 +154,46 @@
         {
           "command": "vrdev.fetchRemoteElement",
           "when": "viewItem =~ /vrdev:element:kind:(action|workflow|config|resource)\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.action",
+          "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.action",
+          "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.workflow",
+          "when": "viewItem =~ /vrdev:element:kind:workflows\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.workflow",
+          "when": "viewItem =~ /vrdev:element:kind:workflows\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.config",
+          "when": "viewItem =~ /vrdev:element:kind:configs\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.config",
+          "when": "viewItem =~ /vrdev:element:kind:configs\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.resource",
+          "when": "viewItem =~ /vrdev:element:kind:resources\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.resource",
+          "when": "viewItem =~ /vrdev:element:kind:resources\\b/",
           "group": "1_vrdevs@1"
         }
       ],

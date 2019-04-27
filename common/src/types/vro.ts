@@ -12,11 +12,9 @@ export type ApiCategoryType =
 export type ApiElementType = "Workflow" | "ScriptModule" | "ResourceElement" | "ConfigurationElement"
 
 export interface VroElementPickInfo {
-    kind: "workflow" | "action" | "resource" | "configuration" | "category" | "module"
+    id: string
     name: string
-    path?: string | null
     label: string
-    description: string
+    description?: string
     detail?: string
-    id?: string | null
 }
