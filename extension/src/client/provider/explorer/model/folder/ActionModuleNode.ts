@@ -11,7 +11,7 @@ import { CategoryNode } from "./CategoryNode"
 import { ElementKinds } from "../../../../constants";
 
 export class ActionModuleNode extends CategoryNode<ActionNode> {
-    protected readonly kind: string = ElementKinds.Module
+    readonly kind: string = ElementKinds.Module
 
     constructor(
         id: string,

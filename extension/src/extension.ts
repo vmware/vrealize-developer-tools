@@ -38,7 +38,7 @@ export async function activate(context: vscode.ExtensionContext) {
     registry.registerModules(manager, command, lint, provider)
 
     if (window.verifyConfiguration(registry.get(manager.ConfigurationManager))) {
-        vscode.commands.executeCommand(Commands.TriggerServerCollection)
+        vscode.commands.executeCommand(Commands.TriggerServerCollection, window)
     }
 }
 

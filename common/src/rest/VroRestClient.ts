@@ -449,8 +449,86 @@ export class VroRestClient {
         const stream = request(options).pipe(fs.createWriteStream(targetPath))
         return new Promise((resolve, reject) => {
             stream.on("finish", () => resolve())
-            stream.on("error", (e) => reject(e))
+            stream.on("error", e => reject(e))
         })
+    }
+
+    async fetchAction(id: string, targetPath: string): Promise<void> {
+        const uri = `https://${this.hostname}:${this.port}/vco/api/actions/${id}/`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            headers: {
+                Accept: "application/zip"
+            },
+            json: false,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const stream = request(options).pipe(fs.createWriteStream(targetPath))
+        return new Promise((resolve, reject) => {
+            stream.on("finish", () => resolve())
+            stream.on("error", e => reject(e))
+        })
+    }
+
+    async fetchWorkflow(id: string, targetPath: string): Promise<void> {
+        const uri = `https://${this.hostname}:${this.port}/vco/api/content/workflows/${id}/`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            headers: {},
+            json: false,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const stream = request(options).pipe(fs.createWriteStream(targetPath))
+        return new Promise((resolve, reject) => {
+            stream.on("finish", () => resolve())
+            stream.on("error", e => reject(e))
+        })
+    }
+
+    async fetchResource(id: string, targetPath: string): Promise<void> {
+        const uri = `https://${this.hostname}:${this.port}/vco/api/resources/${id}/`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            headers: {
+                Accept: "application/octet-stream"
+            },
+            json: false,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        const stream = request(options).pipe(fs.createWriteStream(targetPath))
+        return new Promise((resolve, reject) => {
+            stream.on("finish", () => resolve())
+            stream.on("error", e => reject(e))
+        })
+    }
+
+    async getConfigElementXml(id: string): Promise<string> {
+        const uri = `https://${this.hostname}:${this.port}/vco/api/configurations/${id}/`
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            headers: {
+                Accept: "application/vcoobject+xml"
+            },
+            json: false,
+            method: "GET",
+            uri,
+            auth: { ...(await this.getAuth()) },
+            resolveWithFullResponse: false
+        }
+
+        return await request(options)
     }
 }
 

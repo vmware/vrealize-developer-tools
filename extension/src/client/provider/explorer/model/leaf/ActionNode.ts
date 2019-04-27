@@ -10,12 +10,12 @@ import { AbstractNode } from "../AbstractNode"
 import { ElementKinds } from "../../../../constants"
 
 export class ActionNode extends AbstractNode {
+    readonly kind: string = ElementKinds.Action
     protected readonly icon = "action"
-    protected readonly kind: string = ElementKinds.Action
 
     constructor(
-        readonly id: string,
-        readonly name: string,
+        public readonly id: string,
+        public readonly name: string,
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {

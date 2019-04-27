@@ -11,12 +11,12 @@ import { ChildConstructor } from "../root/CategoriesRootNode"
 import { ElementKinds } from "../../../../constants"
 
 export class CategoryNode<T extends AbstractNode> extends AbstractNode {
+    readonly kind: string = ElementKinds.Category
     protected readonly icon = vscode.ThemeIcon.Folder
-    protected readonly kind: string = ElementKinds.Category
 
     constructor(
-        readonly id: string,
-        readonly name: string,
+        public readonly id: string,
+        public readonly name: string,
         private categoryElementType: ApiCategoryType,
         private childConstructor: ChildConstructor<T>,
         restClient: VroRestClient,

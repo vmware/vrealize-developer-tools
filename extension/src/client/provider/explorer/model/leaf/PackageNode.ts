@@ -10,10 +10,11 @@ import { AbstractNode } from "../AbstractNode"
 import { ElementKinds } from "../../../../constants"
 
 export class PackageNode extends AbstractNode {
-    protected readonly kind: string = ElementKinds.Package
+    readonly kind: string = ElementKinds.Package
+    readonly name: string
+    readonly id: string
+
     protected readonly icon = "package"
-    protected readonly name: string
-    protected readonly id: string
 
     constructor(
         readonly qualifiedName: string,

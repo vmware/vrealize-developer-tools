@@ -19,7 +19,8 @@ export enum Commands {
     OpenConfiguration = "vrdev.open.configElement",
     RunAction = "vrdev.run.action",
     ToggleTypeScript = "vrdev.toggle.typescript",
-    RefreshExplorer = "vrdev.views.explorer.refresh"
+    RefreshExplorer = "vrdev.views.explorer.refresh",
+    FetchRemoteElement = "vrdev.fetchRemoteElement"
 }
 
 export enum FixCommands {
@@ -52,7 +53,7 @@ export enum ElementKinds {
 
     Category = "vrdev:element:kind:category",
     Module = "vrdev:element:kind:module",
-    Folder = "vrdev:element:kind:folder",
+    Folder = "vrdev:element:kind:folder"
 }
 
 export class Patterns {

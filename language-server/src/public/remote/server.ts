@@ -33,5 +33,3 @@ export const giveConfigCategories = new RequestType0<VroElementPickInfo[], void,
 export const giveConfigsForCategory = new RequestType<string, VroElementPickInfo[], void, void>(
     "vrdev.server.giveConfigsForCategory"
 )
-
-export const giveEntitySource = new RequestType<string, string, void, void>("vrdev.server.giveEntitySource")

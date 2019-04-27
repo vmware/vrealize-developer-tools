@@ -13,12 +13,12 @@ import { AbstractNode, IconPath } from "../AbstractNode"
 import { ElementKinds } from "../../../../constants"
 
 export class InventoryNode extends AbstractNode {
+    readonly kind: string = ElementKinds.InventoryItem
     private readonly iconPath: string
-    protected readonly kind: string = ElementKinds.InventoryItem
 
     constructor(
-        readonly id: string,
-        readonly name: string,
+        public readonly id: string,
+        public readonly name: string,
         readonly type: string,
         readonly namespace: string,
         restClient: VroRestClient,

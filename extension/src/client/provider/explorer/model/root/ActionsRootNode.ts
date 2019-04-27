@@ -13,10 +13,10 @@ import { ActionModuleNode } from "../folder/ActionModuleNode"
 import { FolderNode } from "../folder/FolderNode"
 
 export class ActionsRootNode extends AbstractNode {
-    protected readonly kind: string = ElementKinds.Actions
+    readonly kind: string = ElementKinds.Actions
+    readonly name = "Actions"
+    readonly id = "vro:actions"
     protected readonly icon = "action"
-    protected readonly name = "Actions"
-    protected readonly id = "vro:actions"
 
     constructor(private config: ConfigurationManager, restClient: VroRestClient, context: vscode.ExtensionContext) {
         super(restClient, context)

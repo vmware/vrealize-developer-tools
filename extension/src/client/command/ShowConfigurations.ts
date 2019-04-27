@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, uri, VroElementPickInfo } from "vrealize-common"
+import { AutoWire, Logger, VroElementPickInfo } from "vrealize-common"
 import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { LanguageServices } from "../lang"
 import { Command } from "./Command"
+import { ContentLocation } from "../provider/content/ContentLocation";
 
 @AutoWire
 export class ShowConfigurations extends Command {
@@ -67,12 +68,12 @@ export class ShowConfigurations extends Command {
             return
         }
 
-        const url = uri.locationToUri({
+        const url = ContentLocation.with({
+            scheme: "vro",
             type: "configuration",
-            path: selectedConfig.path || "",
             name: selectedConfig.name,
             extension: "xml",
-            id: selectedConfig.id
+            id: selectedConfig.id || ""
         })
 
         this.logger.debug(`Opening the selected configuration element: ${url.toString()}`)

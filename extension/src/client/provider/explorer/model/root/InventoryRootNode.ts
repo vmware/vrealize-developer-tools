@@ -11,10 +11,10 @@ import { InventoryNode } from "../leaf/InventoryNode"
 import { ElementKinds } from "../../../../constants"
 
 export class InventoryRootNode extends AbstractNode {
+    readonly kind: string = ElementKinds.Inventory
+    readonly name: string = "Inventory"
+    readonly id: string = "vro:inventory"
     protected readonly icon = "inventory"
-    protected readonly name: string = "Inventory"
-    protected readonly id: string = "vro:inventory"
-    protected readonly kind: string = ElementKinds.Inventory
 
     constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
         super(restClient, context)

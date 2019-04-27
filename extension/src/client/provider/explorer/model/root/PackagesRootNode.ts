@@ -11,10 +11,10 @@ import { AbstractNode } from "../AbstractNode"
 import { PackageNode } from "../leaf/PackageNode"
 
 export class PackagesRootNode extends AbstractNode {
+    readonly kind: string = ElementKinds.Packages
+    readonly name = "Packages"
+    readonly id = "vro:packages"
     protected readonly icon = "package"
-    protected readonly name = "Packages"
-    protected readonly id = "vro:packages"
-    protected readonly kind: string = ElementKinds.Packages
 
     constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
         super(restClient, context)

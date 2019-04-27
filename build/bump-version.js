@@ -31,14 +31,14 @@ module.exports = async function () {
     log.info(`Setting version to ${releaseVersion}...`);
     packageJson.version = releaseVersion;
     const content = JSON.stringify(packageJson, null, 2);
-    fs.writeFileSync("../package.json", content, { encoding: "utf-8" });
+    fs.writeFileSync("../package.json", content, { encoding: "utf8" });
 
     // commit changes
     log.info("Committing changes...");
     const repo = { owner: REPO_OWNER, repo: REPO_NAME };
 
     const blob = await octokit.git
-        .createBlob({ ...repo, content, encoding: 'utf-8' })
+        .createBlob({ ...repo, content, encoding: 'utf8' })
         .then((result) => result.data.sha);
 
     const commit = await octokit.git

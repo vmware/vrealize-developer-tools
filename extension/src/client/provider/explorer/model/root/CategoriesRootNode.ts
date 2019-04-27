@@ -18,9 +18,9 @@ export type ChildConstructor<T> = new (
 
 export class CategoriesRootNode<T extends AbstractNode> extends AbstractNode {
     constructor(
-        readonly name: string,
-        readonly id: string,
-        protected readonly kind: string,
+        public readonly name: string,
+        public readonly id: string,
+        public readonly kind: string,
         protected readonly icon: string,
         private categoryElementType: ApiCategoryType,
         private childConstructor: ChildConstructor<T>,

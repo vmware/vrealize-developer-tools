@@ -91,7 +91,7 @@ export class ClientWindow implements vscode.Disposable {
 
         vscode.window.showErrorMessage(errorMessage, "Retry").then(selected => {
             if (selected === "Retry") {
-                vscode.commands.executeCommand(Commands.TriggerServerCollection)
+                vscode.commands.executeCommand(Commands.TriggerServerCollection, this)
             }
         })
     }

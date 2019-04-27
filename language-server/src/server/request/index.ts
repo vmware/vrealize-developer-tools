@@ -5,4 +5,3 @@
 
 export * from "./collection"
 export * from "./QuickPick"
-export * from "./SourceProvider"

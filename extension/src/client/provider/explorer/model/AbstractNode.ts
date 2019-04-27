@@ -16,9 +16,10 @@ export abstract class AbstractNode {
     protected readonly context: vscode.ExtensionContext
     protected readonly restClient: VroRestClient
     protected abstract readonly icon: IconPath
-    protected abstract readonly name: string
-    protected abstract readonly id: string
-    protected abstract readonly kind: string
+
+    abstract readonly name: string
+    abstract readonly id: string
+    abstract readonly kind: string
 
     constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
         this.restClient = restClient
