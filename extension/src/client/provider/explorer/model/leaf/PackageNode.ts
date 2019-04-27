@@ -7,8 +7,10 @@ import { VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { AbstractNode } from "../AbstractNode"
+import { ElementKinds } from "../../../../constants"
 
 export class PackageNode extends AbstractNode {
+    protected readonly kind: string = ElementKinds.Package
     protected readonly icon = "package"
     protected readonly name: string
     protected readonly id: string

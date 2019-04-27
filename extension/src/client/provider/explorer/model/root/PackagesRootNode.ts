@@ -6,7 +6,7 @@
 import { VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Patterns } from "../../../../constants"
+import { ElementKinds, Patterns } from "../../../../constants"
 import { AbstractNode } from "../AbstractNode"
 import { PackageNode } from "../leaf/PackageNode"
 
@@ -14,6 +14,7 @@ export class PackagesRootNode extends AbstractNode {
     protected readonly icon = "package"
     protected readonly name = "Packages"
     protected readonly id = "vro:packages"
+    protected readonly kind: string = ElementKinds.Packages
 
     constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
         super(restClient, context)

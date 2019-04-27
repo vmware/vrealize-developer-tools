@@ -8,17 +8,16 @@ import * as vscode from "vscode"
 
 import { AbstractNode } from "../AbstractNode"
 import { InventoryNode } from "../leaf/InventoryNode"
+import { ElementKinds } from "../../../../constants"
 
 export class InventoryRootNode extends AbstractNode {
     protected readonly icon = "inventory"
-    protected readonly name: string
-    protected readonly id: string
+    protected readonly name: string = "Inventory"
+    protected readonly id: string = "vro:inventory"
+    protected readonly kind: string = ElementKinds.Inventory
 
     constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
         super(restClient, context)
-
-        this.name = "Inventory"
-        this.id = "vro:inventory"
     }
 
     async getChildren(): Promise<AbstractNode[]> {

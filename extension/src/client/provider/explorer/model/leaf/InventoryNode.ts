@@ -10,9 +10,11 @@ import * as vscode from "vscode"
 import * as fs from "fs-extra"
 
 import { AbstractNode, IconPath } from "../AbstractNode"
+import { ElementKinds } from "../../../../constants"
 
 export class InventoryNode extends AbstractNode {
     private readonly iconPath: string
+    protected readonly kind: string = ElementKinds.InventoryItem
 
     constructor(
         readonly id: string,

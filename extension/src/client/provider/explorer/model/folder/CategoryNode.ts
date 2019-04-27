@@ -7,10 +7,12 @@ import { ApiCategoryType, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { AbstractNode } from "../AbstractNode"
-import { ChildConstructor } from "../root/RootNode"
+import { ChildConstructor } from "../root/CategoriesRootNode"
+import { ElementKinds } from "../../../../constants"
 
 export class CategoryNode<T extends AbstractNode> extends AbstractNode {
     protected readonly icon = vscode.ThemeIcon.Folder
+    protected readonly kind: string = ElementKinds.Category
 
     constructor(
         readonly id: string,

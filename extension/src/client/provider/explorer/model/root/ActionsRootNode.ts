@@ -7,11 +7,13 @@ import { makeHierarchical, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { ConfigurationManager } from "../../../../manager"
+import { ElementKinds } from "../../../../constants"
 import { AbstractNode } from "../AbstractNode"
 import { ActionModuleNode } from "../folder/ActionModuleNode"
 import { FolderNode } from "../folder/FolderNode"
 
 export class ActionsRootNode extends AbstractNode {
+    protected readonly kind: string = ElementKinds.Actions
     protected readonly icon = "action"
     protected readonly name = "Actions"
     protected readonly id = "vro:actions"

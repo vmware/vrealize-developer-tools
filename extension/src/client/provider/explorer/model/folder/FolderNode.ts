@@ -7,9 +7,11 @@ import { HierarchicalNode, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { AbstractNode } from "../AbstractNode"
+import { ElementKinds } from "../../../../constants"
 
 export class FolderNode<T extends AbstractNode> extends AbstractNode {
     protected readonly icon = vscode.ThemeIcon.Folder
+    protected readonly kind: string = ElementKinds.Folder
 
     constructor(private node: HierarchicalNode<T>, restClient: VroRestClient, context: vscode.ExtensionContext) {
         super(restClient, context)

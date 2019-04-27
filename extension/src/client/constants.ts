@@ -29,8 +29,30 @@ export enum FixCommands {
 export enum Diagnostics {
     LintingResults = "vRealize diagnostics"
 }
+
 export enum Views {
     Explorer = "vrdev.views.explorer"
+}
+
+export enum ElementKinds {
+    Action = "vrdev:element:kind:action",
+    Actions = "vrdev:element:kind:actions",
+    Workflow = "vrdev:element:kind:workflow",
+    Workflows = "vrdev:element:kind:workflows",
+    Configuraion = "vrdev:element:kind:config",
+    Configuraions = "vrdev:element:kind:configs",
+    Resource = "vrdev:element:kind:resource",
+    Resources = "vrdev:element:kind:resources",
+
+    Package = "vrdev:element:kind:package",
+    Packages = "vrdev:element:kind:packages",
+
+    Inventory = "vrdev:element:kind:inventory",
+    InventoryItem = "vrdev:element:kind:inventoryItem",
+
+    Category = "vrdev:element:kind:category",
+    Module = "vrdev:element:kind:module",
+    Folder = "vrdev:element:kind:folder",
 }
 
 export class Patterns {

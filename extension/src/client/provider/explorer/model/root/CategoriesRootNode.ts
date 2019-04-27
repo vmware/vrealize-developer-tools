@@ -16,10 +16,11 @@ export type ChildConstructor<T> = new (
     context: vscode.ExtensionContext
 ) => T
 
-export class RootNode<T extends AbstractNode> extends AbstractNode {
+export class CategoriesRootNode<T extends AbstractNode> extends AbstractNode {
     constructor(
         readonly name: string,
         readonly id: string,
+        protected readonly kind: string,
         protected readonly icon: string,
         private categoryElementType: ApiCategoryType,
         private childConstructor: ChildConstructor<T>,

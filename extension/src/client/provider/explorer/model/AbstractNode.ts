@@ -18,6 +18,7 @@ export abstract class AbstractNode {
     protected abstract readonly icon: IconPath
     protected abstract readonly name: string
     protected abstract readonly id: string
+    protected abstract readonly kind: string
 
     constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
         this.restClient = restClient
@@ -31,6 +32,7 @@ export abstract class AbstractNode {
     async asTreeItem(): Promise<vscode.TreeItem> {
         const item = new vscode.TreeItem(this.name)
         item.id = this.id
+        item.contextValue = this.kind;
 
         if (typeof this.icon === "string") {
             item.iconPath = {

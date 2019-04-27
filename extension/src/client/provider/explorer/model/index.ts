@@ -5,7 +5,7 @@
 
 export * from "./AbstractNode"
 
-export * from "./root/RootNode"
+export * from "./root/CategoriesRootNode"
 export * from "./root/ActionsRootNode"
 export * from "./root/InventoryRootNode"
 export * from "./root/PackagesRootNode"

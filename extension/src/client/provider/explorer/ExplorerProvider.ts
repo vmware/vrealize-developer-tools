@@ -6,17 +6,17 @@
 import { AutoWire, Logger, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Commands, Views } from "../../constants"
+import { Commands, ElementKinds, Views } from "../../constants"
 import { ConfigurationManager, EnvironmentManager } from "../../manager"
 import { Registrable } from "../../Registrable"
 import {
     AbstractNode,
     ActionsRootNode,
+    CategoriesRootNode,
     ConfigurationNode,
     InventoryRootNode,
     PackagesRootNode,
     ResourceNode,
-    RootNode,
     WorkflowNode
 } from "./model"
 
@@ -66,9 +66,10 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
 
     private async getRootNodes(): Promise<AbstractNode[]> {
         this.rootNodes = [
-            new RootNode(
+            new CategoriesRootNode(
                 "Workflows",
                 "vro:workflows",
+                ElementKinds.Workflows,
                 "workflow",
                 "WorkflowCategory",
                 WorkflowNode,
@@ -78,9 +79,10 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
 
             new ActionsRootNode(this.config, this.restClient, this.context),
 
-            new RootNode(
+            new CategoriesRootNode(
                 "Resources",
                 "vro:resources",
+                ElementKinds.Resources,
                 "resource",
                 "ResourceElementCategory",
                 ResourceNode,
@@ -88,9 +90,10 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
                 this.context
             ),
 
-            new RootNode(
+            new CategoriesRootNode(
                 "Configurations",
                 "vro:configurations",
+                ElementKinds.Configuraions,
                 "configuration",
                 "ConfigurationElementCategory",
                 ConfigurationNode,
