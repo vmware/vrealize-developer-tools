@@ -47,7 +47,11 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
 
         const refreshCommand = vscode.commands.registerCommand(Commands.RefreshExplorer, () => this.refresh())
         const onDidChangeSelection = this.tree.onDidChangeSelection(e => this.onDidChangeSelection(e))
-        context.subscriptions.push(this, this.tree, refreshCommand, onDidChangeSelection)
+        const revealItem = vscode.commands.registerCommand(Commands.RevealItemInExplorer, (node: AbstractNode) =>
+            this.tree.reveal(node)
+        )
+
+        context.subscriptions.push(this, this.tree, refreshCommand, revealItem, onDidChangeSelection)
     }
 
     dispose() {
@@ -59,15 +63,19 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
         this.rootNodes.forEach(node => this.onDidChangeTreeDataEmitter.fire(node))
     }
 
-    async getTreeItem(element: AbstractNode): Promise<vscode.TreeItem> {
-        return await element.asTreeItem()
+    getTreeItem(element: AbstractNode): Promise<vscode.TreeItem> {
+        return element.asTreeItem()
     }
 
-    async getChildren(element?: AbstractNode): Promise<AbstractNode[]> {
+    getChildren(element?: AbstractNode): Promise<AbstractNode[]> {
         if (!element) {
             return this.getRootNodes()
         }
         return element.getChildren()
+    }
+
+    getParent(element: AbstractNode): AbstractNode | undefined {
+        return element.parent
     }
 
     private onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<AbstractNode>): void {

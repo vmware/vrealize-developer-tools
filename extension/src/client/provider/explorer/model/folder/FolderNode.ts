@@ -13,8 +13,13 @@ export class FolderNode<T extends AbstractNode> extends AbstractNode {
     readonly kind: string = ElementKinds.Folder
     protected readonly icon = vscode.ThemeIcon.Folder
 
-    constructor(private node: HierarchicalNode<T>, restClient: VroRestClient, context: vscode.ExtensionContext) {
-        super(restClient, context)
+    constructor(
+        private node: HierarchicalNode<T>,
+        parent: AbstractNode,
+        restClient: VroRestClient,
+        context: vscode.ExtensionContext
+    ) {
+        super(parent, restClient, context)
     }
 
     get name(): string {
@@ -34,7 +39,7 @@ export class FolderNode<T extends AbstractNode> extends AbstractNode {
         for (const node of Object.values(this.node.children)) {
             if (node.value === undefined) {
                 // node is container
-                children.push(new FolderNode(node, this.restClient, this.context))
+                children.push(new FolderNode(node, this, this.restClient, this.context))
                 continue
             }
 

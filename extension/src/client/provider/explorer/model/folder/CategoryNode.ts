@@ -19,10 +19,11 @@ export class CategoryNode<T extends AbstractNode> extends AbstractNode {
         public readonly name: string,
         private categoryElementType: ApiCategoryType,
         private childConstructor: ChildConstructor<T>,
+        parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(restClient, context)
+        super(parent, restClient, context)
     }
 
     async getChildren(): Promise<AbstractNode[]> {
@@ -42,12 +43,13 @@ export class CategoryNode<T extends AbstractNode> extends AbstractNode {
                         child.name,
                         this.categoryElementType,
                         this.childConstructor,
+                        this,
                         this.restClient,
                         this.context
                     )
                 )
             } else {
-                elements.push(new this.childConstructor(child.id, child.name, this.restClient, this.context))
+                elements.push(new this.childConstructor(child.id, child.name, this, this.restClient, this.context))
             }
         }
 

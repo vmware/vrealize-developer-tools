@@ -21,10 +21,11 @@ export class InventoryNode extends AbstractNode {
         public readonly name: string,
         readonly type: string,
         readonly namespace: string,
+        parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(restClient, context)
+        super(parent, restClient, context)
 
         const storagePath = path.join(context["globalStoragePath"], "inventory-icons", namespace)
         if (!fs.existsSync(storagePath)) {
@@ -44,7 +45,15 @@ export class InventoryNode extends AbstractNode {
             }
 
             childNodes.push(
-                new InventoryNode(child.href, child.name, child.type, this.namespace, this.restClient, this.context)
+                new InventoryNode(
+                    child.href,
+                    child.name,
+                    child.type,
+                    this.namespace,
+                    this,
+                    this.restClient,
+                    this.context
+                )
             )
         }
 

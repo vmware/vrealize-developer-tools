@@ -19,10 +19,11 @@ export class PackageNode extends AbstractNode {
     constructor(
         readonly qualifiedName: string,
         readonly version: string | undefined,
+        parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(restClient, context)
+        super(parent, restClient, context)
         this.name = qualifiedName
         this.id = `${qualifiedName}:${version}`
     }

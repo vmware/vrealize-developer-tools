@@ -17,15 +17,16 @@ export class WorkflowNode extends AbstractNode {
     constructor(
         public readonly id: string,
         public readonly name: string,
+        parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(restClient, context)
+        super(parent, restClient, context)
     }
 
     async getProperties(): Promise<PropertyNode[]> {
-        const actionInfo = await this.restClient.getWorkflow(this.id)
-        const properties: PropertyNode[] = Object.entries(actionInfo)
+        const workflow = await this.restClient.getWorkflow(this.id)
+        const properties: PropertyNode[] = Object.entries(workflow)
             .filter(([key]) => key !== "href" && key !== "relations" && key !== "customized-icon")
             .map(([key, value]) => {
                 if (key !== "input-parameters" && key !== "output-parameters") {

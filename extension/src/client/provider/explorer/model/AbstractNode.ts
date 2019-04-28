@@ -15,18 +15,17 @@ export type IconPath =
     | vscode.ThemeIcon
 
 export abstract class AbstractNode {
-    protected readonly context: vscode.ExtensionContext
-    protected readonly restClient: VroRestClient
     protected abstract readonly icon: IconPath
 
     abstract readonly name: string
     abstract readonly id: string
     abstract readonly kind: string
 
-    constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
-        this.restClient = restClient
-        this.context = context
-    }
+    constructor(
+        public readonly parent: AbstractNode | undefined,
+        protected readonly restClient: VroRestClient,
+        protected readonly context: vscode.ExtensionContext
+    ) {}
 
     async getChildren(): Promise<AbstractNode[]> {
         return []

@@ -544,6 +544,17 @@ export class VroRestClient {
         return promise.requestPromiseStream(options)
     }
 
+    async getResourceInfo(id: string): Promise<any> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/resources/${id}`,
+            auth: { ...(await this.getAuth()) }
+        }
+
+        return (await request(options)).body
+    }
+
     async getInventoryItems(href?: string): Promise<InventoryElement[]> {
         const uri = href || `https://${this.hostname}:${this.port}/vco/api/inventory`
         const options = {
@@ -598,6 +609,23 @@ export class VroRestClient {
             uri,
             auth: { ...(await this.getAuth()) },
             resolveWithFullResponse: false
+        }
+
+        const stream = request(options).pipe(fs.createWriteStream(targetPath))
+        return new Promise((resolve, reject) => {
+            stream.on("finish", () => resolve())
+            stream.on("error", e => reject(e))
+        })
+    }
+
+    async fetchWorkflowSchema(id: string, targetPath: string): Promise<void> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            headers: {},
+            json: false,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/schema`,
+            auth: { ...(await this.getAuth()) }
         }
 
         const stream = request(options).pipe(fs.createWriteStream(targetPath))
@@ -682,7 +710,7 @@ export class VroRestClient {
             resolveWithFullResponse: false
         }
 
-        return await request(options)
+        return request(options)
     }
 }
 

@@ -22,8 +22,10 @@ export enum Commands {
     RunAction = "vrdev.run.action",
     ToggleTypeScript = "vrdev.toggle.typescript",
     RefreshExplorer = "vrdev.views.explorer.refresh",
+    RevealItemInExplorer = "vrdev.views.explorer.revealItem",
     ShowItemProperties = "vrdev.views.properties.show",
     CopyPropertyValue = "vrdev.views.properties.copy",
+    LocateItemByProperties = "vrdev.views.properties.locateItem",
     FetchRemoteElement = "vrdev.fetchRemoteElement"
 }
 

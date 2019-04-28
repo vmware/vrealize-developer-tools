@@ -17,19 +17,20 @@ export class ActionNode extends AbstractNode {
     constructor(
         public readonly id: string,
         public readonly name: string,
+        parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(restClient, context)
+        super(parent, restClient, context)
     }
 
     async getProperties(): Promise<PropertyNode[]> {
-        const actionInfo = await this.restClient.getAction(this.id)
-        const properties: PropertyNode[] = Object.entries(actionInfo)
+        const action = await this.restClient.getAction(this.id)
+        const properties: PropertyNode[] = Object.entries(action)
             .filter(([key]) => key !== "href" && key !== "relations")
             .map(([key, value]) => {
                 if (key !== "input-parameters") {
-                    return this.asPropNode(key, `${value}`)
+                    return this.asPropNode(key, `${value}`, `${value}`)
                 }
 
                 const params = (value as { name: string; type: string; description: string }[]).map(prop =>

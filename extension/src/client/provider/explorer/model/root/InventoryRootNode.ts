@@ -17,7 +17,7 @@ export class InventoryRootNode extends AbstractNode {
     protected readonly icon = "inventory"
 
     constructor(restClient: VroRestClient, context: vscode.ExtensionContext) {
-        super(restClient, context)
+        super(undefined, restClient, context)
     }
 
     async getChildren(): Promise<AbstractNode[]> {
@@ -28,6 +28,7 @@ export class InventoryRootNode extends AbstractNode {
                     item.name,
                     item.type,
                     item.name, // namespace = plugin name
+                    this,
                     this.restClient,
                     this.context
                 )

@@ -12,6 +12,7 @@ import { CategoryNode } from "../folder/CategoryNode"
 export type ChildConstructor<T> = new (
     id: string,
     name: string,
+    parent: AbstractNode,
     restClient: VroRestClient,
     context: vscode.ExtensionContext
 ) => T
@@ -27,7 +28,7 @@ export class CategoriesRootNode<T extends AbstractNode> extends AbstractNode {
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(restClient, context)
+        super(undefined, restClient, context)
     }
 
     async getChildren(): Promise<AbstractNode[]> {
@@ -37,6 +38,7 @@ export class CategoriesRootNode<T extends AbstractNode> extends AbstractNode {
                 category.name,
                 this.categoryElementType,
                 this.childConstructor,
+                this,
                 this.restClient,
                 this.context
             )

@@ -74,6 +74,11 @@
         }
       },
       {
+        "command": "vrdev.views.explorer.revealItem",
+        "title": "Reveal Item in Explorer",
+        "category": "vRealize"
+      },
+      {
         "command": "vrdev.views.properties.show",
         "title": "Show Properties",
         "category": "vRealize"
@@ -88,12 +93,21 @@
         }
       },
       {
-        "command": "vrdev.fetchRemoteElement",
-        "title": "Open Remote",
+        "command": "vrdev.views.properties.locateItem",
+        "title": "Locate Item in Explorer",
         "category": "vRealize",
         "icon": {
-          "dark": "assets/icons/dark/link.svg",
-          "light": "assets/icons/light/link.svg"
+          "light": "assets/icons/light/location.svg",
+          "dark": "assets/icons/dark/location.svg"
+        }
+      },
+      {
+        "command": "vrdev.fetchRemoteElement",
+        "title": "Fetch from Remote",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/link-external.svg",
+          "light": "assets/icons/light/link-external.svg"
         }
       },
       {
@@ -162,6 +176,11 @@
         {
           "when": "view =~ /^vrdev\\.views\\.explorer/",
           "command": "vrdev.views.explorer.refresh",
+          "group": "navigation@1"
+        },
+        {
+          "when": "!vrdev:properties:empty && view =~ /^vrdev\\.views\\.properties/",
+          "command": "vrdev.views.properties.locateItem",
           "group": "navigation@1"
         }
       ],
@@ -236,11 +255,23 @@
       ],
       "commandPalette": [
         {
+          "command": "vrdev.fetchRemoteElement",
+          "when": "false"
+        },
+        {
           "command": "vrdev.views.properties.show",
           "when": "false"
         },
         {
           "command": "vrdev.views.properties.copy",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.locateItem",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.explorer.revealItem",
           "when": "false"
         },
         {

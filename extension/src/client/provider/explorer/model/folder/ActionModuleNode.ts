@@ -8,7 +8,8 @@ import * as vscode from "vscode"
 
 import { ActionNode } from "../leaf/ActionNode"
 import { CategoryNode } from "./CategoryNode"
-import { ElementKinds } from "../../../../constants";
+import { ElementKinds } from "../../../../constants"
+import { AbstractNode } from "../AbstractNode"
 
 export class ActionModuleNode extends CategoryNode<ActionNode> {
     readonly kind: string = ElementKinds.Module
@@ -17,9 +18,10 @@ export class ActionModuleNode extends CategoryNode<ActionNode> {
         id: string,
         label: string,
         public fullName: string,
+        parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(id, label, "ScriptModuleCategory", ActionNode, restClient, context)
+        super(id, label, "ScriptModuleCategory", ActionNode, parent, restClient, context)
     }
 }

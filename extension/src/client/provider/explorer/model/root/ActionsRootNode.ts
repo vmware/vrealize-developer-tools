@@ -19,7 +19,7 @@ export class ActionsRootNode extends AbstractNode {
     protected readonly icon = "action"
 
     constructor(private config: ConfigurationManager, restClient: VroRestClient, context: vscode.ExtensionContext) {
-        super(restClient, context)
+        super(undefined, restClient, context)
     }
 
     async getChildren(): Promise<AbstractNode[]> {
@@ -29,6 +29,7 @@ export class ActionsRootNode extends AbstractNode {
                 category.id,
                 layout === "flat" ? category.name : category.name.split(".").pop() || "",
                 category.name,
+                this,
                 this.restClient,
                 this.context
             )
@@ -45,7 +46,7 @@ export class ActionsRootNode extends AbstractNode {
             layout === "compact"
         )
 
-        const rootFolder = await new FolderNode(hierarchy, this.restClient, this.context)
+        const rootFolder = await new FolderNode(hierarchy, this, this.restClient, this.context)
         return rootFolder.getChildren()
     }
 

@@ -21,7 +21,7 @@ export class PropertyNode extends AbstractNode {
         restClient: VroRestClient,
         context: vscode.ExtensionContext
     ) {
-        super(restClient, context)
+        super(undefined, restClient, context)
         this.id = `${name}:${value}`
 
         if (typeof value !== "string") {
