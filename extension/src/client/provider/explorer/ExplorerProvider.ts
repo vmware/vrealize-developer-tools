@@ -28,6 +28,7 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
     private context: vscode.ExtensionContext
     private restClient: VroRestClient
     private rootNodes: AbstractNode[] = []
+    private tree: vscode.TreeView<AbstractNode>
 
     readonly onDidChangeTreeData: vscode.Event<AbstractNode> = this.onDidChangeTreeDataEmitter.event
 
@@ -39,9 +40,14 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
         this.logger.debug("Registering the explorer provider")
 
         this.context = context
-        const providerRegistration = vscode.window.registerTreeDataProvider(Views.Explorer, this)
+        this.tree = vscode.window.createTreeView(Views.Explorer, {
+            showCollapseAll: true,
+            treeDataProvider: this
+        })
+
         const refreshCommand = vscode.commands.registerCommand(Commands.RefreshExplorer, () => this.refresh())
-        context.subscriptions.push(this, providerRegistration, refreshCommand)
+        const onDidChangeSelection = this.tree.onDidChangeSelection(e => this.onDidChangeSelection(e))
+        context.subscriptions.push(this, this.tree, refreshCommand, onDidChangeSelection)
     }
 
     dispose() {
@@ -62,6 +68,24 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
             return this.getRootNodes()
         }
         return element.getChildren()
+    }
+
+    private onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<AbstractNode>): void {
+        const node = event.selection.length > 0 ? event.selection[0] : undefined
+
+        if (!node) {
+            return
+        }
+
+        if (
+            node.kind === ElementKinds.Action ||
+            node.kind === ElementKinds.Workflow ||
+            node.kind === ElementKinds.Configuraion ||
+            node.kind === ElementKinds.Resource ||
+            node.kind === ElementKinds.InventoryItem
+        ) {
+            vscode.commands.executeCommand(Commands.ShowItemProperties, node)
+        }
     }
 
     private async getRootNodes(): Promise<AbstractNode[]> {

@@ -6,6 +6,8 @@
 import { VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
+import { PropertyNode } from "./leaf/PropertyNode"
+
 export type IconPath =
     | string
     | vscode.Uri
@@ -30,10 +32,14 @@ export abstract class AbstractNode {
         return []
     }
 
+    async getProperties(): Promise<PropertyNode[]> {
+        return []
+    }
+
     async asTreeItem(): Promise<vscode.TreeItem> {
         const item = new vscode.TreeItem(this.name)
         item.id = this.id
-        item.contextValue = this.kind;
+        item.contextValue = this.kind
 
         if (typeof this.icon === "string") {
             item.iconPath = {

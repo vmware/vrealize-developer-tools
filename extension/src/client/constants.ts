@@ -22,6 +22,8 @@ export enum Commands {
     RunAction = "vrdev.run.action",
     ToggleTypeScript = "vrdev.toggle.typescript",
     RefreshExplorer = "vrdev.views.explorer.refresh",
+    ShowItemProperties = "vrdev.views.properties.show",
+    CopyPropertyValue = "vrdev.views.properties.copy",
     FetchRemoteElement = "vrdev.fetchRemoteElement"
 }
 
@@ -34,7 +36,8 @@ export enum Diagnostics {
 }
 
 export enum Views {
-    Explorer = "vrdev.views.explorer"
+    Explorer = "vrdev.views.explorer",
+    Properties = "vrdev.views.properties"
 }
 
 export enum ElementKinds {
@@ -46,6 +49,7 @@ export enum ElementKinds {
     Configuraions = "vrdev:element:kind:configs",
     Resource = "vrdev:element:kind:resource",
     Resources = "vrdev:element:kind:resources",
+    Property = "vrdev:element:kind:property",
 
     Package = "vrdev:element:kind:package",
     Packages = "vrdev:element:kind:packages",

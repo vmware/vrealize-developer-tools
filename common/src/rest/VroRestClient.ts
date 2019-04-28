@@ -147,6 +147,30 @@ export class VroRestClient {
         return execResponse.body
     }
 
+    async getAction(id: string): Promise<any> {
+        const executeOptions = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/actions/${id}`,
+            auth: { ...(await this.getAuth()) }
+        }
+
+        const execResponse = await request(executeOptions)
+        return execResponse.body
+    }
+
+    async getConfiguration(id: string): Promise<any> {
+        const executeOptions = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: `https://${this.hostname}:${this.port}/vco/api/configurations/${id}`,
+            auth: { ...(await this.getAuth()) }
+        }
+
+        const execResponse = await request(executeOptions)
+        return execResponse.body
+    }
+
     async executeWorkflow(id: string, ...inputParams: WorkflowParam[]): Promise<WorkflowParam[]> {
         const token: string = await this.startWorkflow(id, ...inputParams)
         let response = await this.getWorkflowExecution(id, token)

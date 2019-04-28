@@ -34,7 +34,9 @@
     "onCommand:vrdev.new.project",
     "onCommand:vrdev.change.profile",
     "onCommand:vrdev.open.action",
-    "onCommand:vrdev.open.configElement",
+    "onCommand:vrdev.open.workflow",
+    "onCommand:vrdev.open.config",
+    "onCommand:vrdev.open.resource",
     "onCommand:vrdev.run.action",
     "onCommand:vrdev.toggle.typescript"
   ],
@@ -44,7 +46,7 @@
       "activitybar": [
         {
           "id": "vro-explorer",
-          "title": "vRO",
+          "title": "vRealize Developer Tools",
           "icon": "assets/icons/explorer.svg"
         }
       ]
@@ -54,6 +56,10 @@
         {
           "id": "vrdev.views.explorer",
           "name": "Explorer"
+        },
+        {
+          "id": "vrdev.views.properties",
+          "name": "Properties"
         }
       ]
     },
@@ -65,6 +71,20 @@
         "icon": {
           "light": "assets/icons/light/refresh.svg",
           "dark": "assets/icons/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "vrdev.views.properties.show",
+        "title": "Show Properties",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.views.properties.copy",
+        "title": "Copy Value",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/clipboard.svg",
+          "dark": "assets/icons/dark/clipboard.svg"
         }
       },
       {
@@ -195,6 +215,16 @@
           "command": "vrdev.open.resource",
           "when": "viewItem =~ /vrdev:element:kind:resources\\b/",
           "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
+          "group": "1_vrdevs@1"
         }
       ],
       "editor/title": [
@@ -202,6 +232,20 @@
           "when": "resourceLangId == javascript || resourceLangId == typescript",
           "command": "vrdev.run.action",
           "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vrdev.views.properties.show",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.explorer.refresh",
+          "when": "false"
         }
       ]
     },
