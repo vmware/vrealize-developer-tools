@@ -555,6 +555,17 @@ export class VroRestClient {
         return (await request(options)).body
     }
 
+    async getInventoryItem(href: string): Promise<any> {
+        const options = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "GET",
+            uri: href,
+            auth: { ...(await this.getAuth()) }
+        }
+
+        return (await request(options)).body
+    }
+
     async getInventoryItems(href?: string): Promise<InventoryElement[]> {
         const uri = href || `https://${this.hostname}:${this.port}/vco/api/inventory`
         const options = {

@@ -9,6 +9,7 @@ import { VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 import * as fs from "fs-extra"
 
+import { PropertyNode } from "./PropertyNode"
 import { AbstractNode, IconPath } from "../AbstractNode"
 import { ElementKinds } from "../../../../constants"
 
@@ -73,7 +74,20 @@ export class InventoryNode extends AbstractNode {
         return item
     }
 
+    async getProperties(): Promise<PropertyNode[]> {
+        const config = await this.restClient.getInventoryItem(this.id)
+        const [, attributes] = Object.entries(config).find(([key]) => key === "attributes") || [null, []]
+
+        return (attributes as { name: string; value: string }[])
+            .filter(att => ["type", "@type"].includes(att.name))
+            .map(att => this.asPropNode(att.name, att.value))
+    }
+
     protected get icon(): IconPath {
         return this.iconPath
+    }
+
+    private asPropNode(name: string, value: string | PropertyNode[], tooltip?: string): PropertyNode {
+        return new PropertyNode(name, value, tooltip, this.restClient, this.context)
     }
 }
