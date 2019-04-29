@@ -120,6 +120,15 @@
         }
       },
       {
+        "command": "vrdev.package.delete",
+        "title": "Delete",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/trash.svg",
+          "light": "assets/icons/light/trash.svg"
+        }
+      },
+      {
         "command": "vrdev.change.profile",
         "title": "Change Active Profile",
         "category": "vRealize"
@@ -215,6 +224,16 @@
           "group": "1_vrdevs@2"
         },
         {
+          "command": "vrdev.package.delete",
+          "when": "viewItem =~ /vrdev:element:kind:package\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.package.delete",
+          "when": "viewItem =~ /vrdev:element:kind:package\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
           "command": "vrdev.open.action",
           "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
           "group": "inline@95"
@@ -279,6 +298,10 @@
         },
         {
           "command": "vrdev.workflow.fetchSchema",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.package.delete",
           "when": "false"
         },
         {

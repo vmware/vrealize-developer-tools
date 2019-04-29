@@ -15,19 +15,23 @@ export enum Commands {
     TriggerServerCollection = "vrdev.triggerServerCollection",
     ChangeProfile = "vrdev.change.profile",
     NewProject = "vrdev.new.project",
+
     OpenAction = "vrdev.open.action",
     OpenWorkflow = "vrdev.open.workflow",
     OpenConfiguration = "vrdev.open.config",
     OpenResource = "vrdev.open.resource",
+
     RunAction = "vrdev.run.action",
     ToggleTypeScript = "vrdev.toggle.typescript",
+
     RefreshExplorer = "vrdev.views.explorer.refresh",
     RevealItemInExplorer = "vrdev.views.explorer.revealItem",
     ShowItemProperties = "vrdev.views.properties.show",
     CopyPropertyValue = "vrdev.views.properties.copy",
     LocateItemByProperties = "vrdev.views.properties.locateItem",
     FetchRemoteElement = "vrdev.fetchRemoteElement",
-    FetchWorkflowSchema = "vrdev.workflow.fetchSchema"
+    FetchWorkflowSchema = "vrdev.workflow.fetchSchema",
+    DeletePackage = "vrdev.package.delete"
 }
 
 export enum FixCommands {

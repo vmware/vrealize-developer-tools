@@ -303,6 +303,20 @@ export class VroRestClient {
         return request(executeOptions)
     }
 
+    async deletePackage(
+        name: string,
+        option: "deletePackage" | "deletePackageWithContent" | "deletePackageKeepingShared"
+    ): Promise<void> {
+        const executeOptions = {
+            ...DEFAULT_REQUEST_OPTIONS,
+            method: "DELETE",
+            uri: `https://${this.hostname}:${this.port}/vco/api/packages/${name}/?option=${option}`,
+            auth: { ...(await this.getAuth()) }
+        }
+
+        return request(executeOptions)
+    }
+
     async getPlugins(): Promise<any> {
         const options = {
             ...DEFAULT_REQUEST_OPTIONS,
