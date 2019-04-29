@@ -26,7 +26,8 @@ export enum Commands {
     ShowItemProperties = "vrdev.views.properties.show",
     CopyPropertyValue = "vrdev.views.properties.copy",
     LocateItemByProperties = "vrdev.views.properties.locateItem",
-    FetchRemoteElement = "vrdev.fetchRemoteElement"
+    FetchRemoteElement = "vrdev.fetchRemoteElement",
+    FetchWorkflowSchema = "vrdev.workflow.fetchSchema"
 }
 
 export enum FixCommands {

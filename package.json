@@ -111,6 +111,15 @@
         }
       },
       {
+        "command": "vrdev.workflow.fetchSchema",
+        "title": "Open Workflow Schema",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
         "command": "vrdev.change.profile",
         "title": "Change Active Profile",
         "category": "vRealize"
@@ -196,6 +205,16 @@
           "group": "1_vrdevs@1"
         },
         {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "viewItem =~ /vrdev:element:kind:workflow\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "viewItem =~ /vrdev:element:kind:workflow\\b/",
+          "group": "1_vrdevs@2"
+        },
+        {
           "command": "vrdev.open.action",
           "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
           "group": "inline@95"
@@ -256,6 +275,10 @@
       "commandPalette": [
         {
           "command": "vrdev.fetchRemoteElement",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
           "when": "false"
         },
         {
