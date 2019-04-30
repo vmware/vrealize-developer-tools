@@ -79,7 +79,7 @@ export class InventoryNode extends AbstractNode {
         const [, attributes] = Object.entries(config).find(([key]) => key === "attributes") || [null, []]
 
         return (attributes as { name: string; value: string }[])
-            .filter(att => ["type", "@type"].includes(att.name))
+            .filter(att => att.name !== "@type")
             .map(att => this.asPropNode(att.name, att.value))
     }
 

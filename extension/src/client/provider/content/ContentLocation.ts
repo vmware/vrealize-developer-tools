@@ -13,14 +13,14 @@ export class ContentLocation {
         public type: string, // "action" | "workflow" | "config" | "resource"
         public name: string,
         public id: string,
-        public extension: string
+        public extension: string | undefined
     ) {}
 
     static from(uri: URI): ContentLocation {
         const { scheme, authority, path } = uri
         const id = path.substring(path.startsWith("/") ? 1 : 0, path.lastIndexOf("/"))
         const name = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."))
-        const extension = path.substring(path.lastIndexOf(".") + 1)
+        const extension = path.lastIndexOf(".") > -1 ? path.substring(path.lastIndexOf(".") + 1) : undefined
 
         return new ContentLocation(scheme, authority, name, id, extension)
     }
@@ -30,7 +30,7 @@ export class ContentLocation {
         type: string
         name: string
         id: string
-        extension: string
+        extension: string | undefined
     }): ContentLocation {
         return new ContentLocation(
             components.scheme,
@@ -42,7 +42,12 @@ export class ContentLocation {
     }
 
     static asUri(location: ContentLocation): URI {
-        return URI.parse(`${location.scheme}://${location.type}/${location.id}/${location.name}.${location.extension}`)
+        if (location.extension) {
+            return URI.parse(
+                `${location.scheme}://${location.type}/${location.id}/${location.name}.${location.extension}`
+            )
+        }
+        return URI.parse(`${location.scheme}://${location.type}/${location.id}/${location.name}`)
     }
 
     toString(): string {

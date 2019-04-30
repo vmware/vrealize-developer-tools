@@ -35,7 +35,7 @@ export class FetchWorkflowSchema extends Command {
             fs.mkdirpSync(storagePath)
         }
         const schemaFile = path.join(storagePath, `${node.id}.png`)
-        await this.restClient.fetchWorkflowSchema(node.id, schemaFile)
+        await this.fetchSchema(node, schemaFile)
         const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined
         const panel = vscode.window.createWebviewPanel(
             "preview-workflow-schema",
@@ -63,5 +63,31 @@ export class FetchWorkflowSchema extends Command {
             </html>`
 
         panel.reveal()
+    }
+
+    private fetchSchema(node: WorkflowNode, schemaFile: string): Thenable<void> {
+        return vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Window
+            },
+            progress => {
+                return new Promise(async (resolve, reject) => {
+                    this.logger.info(`Fetching schema: ${node.id}`)
+                    progress.report({ message: `Fetching schema for ${node.name}...` })
+
+                    try {
+                        await this.restClient.fetchWorkflowSchema(node.id, schemaFile)
+                        resolve()
+                    } catch (err) {
+                        this.logger.error(`Failed schema for '${node.name} (${node.id})'. Error: `, err)
+                        reject(err)
+
+                        vscode.window.showErrorMessage(
+                            `Failed fetching schema (${err.code}). See logs for more information.`
+                        )
+                    }
+                })
+            }
+        )
     }
 }
