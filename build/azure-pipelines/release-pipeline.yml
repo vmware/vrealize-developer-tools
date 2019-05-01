@@ -32,3 +32,8 @@ steps:
   env:
     GITHUB_SECRET: $(GitHubSecret)
     PREV_RELEASE_VERSION: $(PrevVersion)
+
+- script: 'node node_modules/.bin/vsce publish -p ${MARKETPLACE_SECRET} --packagePath *.vsix'
+  displayName: Publish release in Visual Studio Marketplace
+  env:
+    MARKETPLACE_SECRET: $(MarketplaceSecret)
