@@ -9,6 +9,9 @@ pool:
   vmImage: ubuntu-16.04
 
 steps:
+- checkout: self
+  persistCredentials: true
+
 - bash: |
     PACKAGE_VERSION=$(node -p "require('./package.json').version")
     echo "##vso[task.setvariable variable=PrevVersion]${PACKAGE_VERSION}"
@@ -23,6 +26,13 @@ steps:
     RELEASE_VERSION: $(ReleaseVersion)
 
 - bash: |
+    git pull --force origin master
+    git checkout --progress --force $RELEASE_COMMIT_SHA
+  displayName: Pull release commit
+  env:
+    RELEASE_COMMIT_SHA: $(ReleaseCommitSha)
+
+- bash: |
     PACKAGE_VERSION=$(node -p "require('./package.json').version")
     echo "##vso[build.updatebuildnumber]${PACKAGE_VERSION}-release+${BUILD_BUILDID}"
   displayName: Set version number of build
@@ -34,6 +44,7 @@ steps:
   env:
     GITHUB_SECRET: $(GitHubSecret)
     PREV_RELEASE_VERSION: $(PrevVersion)
+    RELEASE_COMMIT_SHA: $(ReleaseCommitSha)
 
 - script: 'node node_modules/.bin/vsce publish -p ${MARKETPLACE_SECRET} --packagePath *.vsix'
   displayName: Publish release in Visual Studio Marketplace
