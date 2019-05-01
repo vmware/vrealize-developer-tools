@@ -20,4 +20,5 @@ steps:
     echo "##vso[build.updatebuildnumber]${VERSION_STRING}+${BUILD_BUILDID}"
   displayName: Set version number of package and build
 
-- template: steps/common.yml
+- template: steps/install-dependencies.yml
+- template: steps/build-package.yml

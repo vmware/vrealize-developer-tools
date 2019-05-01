@@ -1,10 +1,5 @@
 # Steps that happen regardless of CI, PR, or release builds
 steps:
-  - task: NodeTool@0
-    displayName: 'Use Node 9.x'
-    inputs:
-      versionSpec: 9.x
-
   - script: |
       sudo cp build/azure-pipelines/linux/xvfb.init /etc/init.d/xvfb
       sudo chmod +x /etc/init.d/xvfb
@@ -12,9 +7,6 @@ steps:
       sudo service xvfb start
     displayName: 'Linux: Start X Virtual Frame Buffer'
     condition: eq(variables['Agent.OS'], 'Linux')
-
-  - script: yarn install --frozen-lockfile
-    displayName: Install dependencies
 
   - script: 'node node_modules/gulp/bin/gulp.js package'
     displayName: Build VSIX package
