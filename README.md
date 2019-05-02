@@ -1,4 +1,3 @@
-
 [![Build Status](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_apis/build/status/CI%20Pipeline?branchName=master)](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_build/latest?definitionId=1&branchName=master)
 [![Dependencies Status](https://david-dm.org/vmware/vrealize-developer-tools/status.svg)](https://david-dm.org/vmware/vrealize-developer-tools)
 
@@ -12,8 +11,8 @@ and [vRealize Automation](https://www.vmware.com/products/vrealize-automation.ht
 
 To use most of the vRealize Developer Tools's functionality, you will need a development [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html) instance and to set up vRealize Build Tools.
 
-* vRealize Build Tools
-* maven 3.3.9+ available on the PATH system variable
+-   vRealize Build Tools
+-   maven 3.3.9+ available on the PATH system variable
 
 ## Features
 
@@ -42,6 +41,7 @@ Connect to different vRO environments by configuring maven profiles in `~/.m2/se
     </properties>
 </profile>
 ```
+
 Once vRealize Developer Tools extension is activated in VS Code, on the bottom left corner of the status bar, an idicator is shown if there is no currently active profile.
 
 ![Missing profile](./assets/images/no-profile.png)
@@ -84,7 +84,8 @@ The VS Code build tasks palette (<kbd>Cmd+Shift+B</kbd> / <kbd>Ctrl+Shift+B</kbd
 
 ![Push and Pull content](./assets/images/push-pull.png)
 
-The `vrdev.tasks.exclude` setting can be used to *exclude* certain projects from the list of build tasks (`Cmd+Shift+B`) by using glob patterns
+The `vrdev.tasks.exclude` setting can be used to _exclude_ certain projects from the list of build tasks (`Cmd+Shift+B`) by using glob patterns
+
 ```javascript
 "vrdev.tasks.exclude" : [
     "my.example.library*", // Exclude all libraries
@@ -106,6 +107,10 @@ If you have installed any versions prior 2.0.0, do the following to upgrade.
 ## Contributing
 
 If you're interested in contributing, see our [contributing guide](CONTRIBUTING.md).
+
+## Open Source Licenses
+
+Please see the file [open_source_licenses.txt](open_source_licenses.txt).
 
 ## License
 

@@ -1,0 +1,9 @@
+# Steps that happen regardless of CI, PR, or release builds
+steps:
+  - task: NodeTool@0
+    displayName: 'Use Node 10.x'
+    inputs:
+      versionSpec: 10.x
+
+  - script: yarn install --frozen-lockfile
+    displayName: Install dependencies
