@@ -87,5 +87,8 @@ module.exports = function() {
         .then(() => createRelease(releaseVersion))
         .then(() => getReleaseNotes(currentVersion, releaseSha))
         .then(notes => updateRelease(releaseVersion, notes))
-        .catch(error => log.error(error))
+        .catch(error => {
+            log.error(error)
+            throw new Error("Could not release in GitHub")
+        })
 }
