@@ -11,7 +11,7 @@ const { ReleaseNotes } = require("pull-release-notes")
 const REPO_OWNER = "vmware"
 const REPO_NAME = "vrealize-developer-tools"
 
-function createRelease(releaseVersion) {
+function createRelease(releaseVersion, releaseSha, notes) {
     log.info(`Creating GitHub release v${releaseVersion}`)
     const stream = gulp.src("./*.vsix").pipe(
         publishRelease({
@@ -19,8 +19,9 @@ function createRelease(releaseVersion) {
             owner: REPO_OWNER,
             repo: REPO_NAME,
             name: releaseVersion,
-            notes: "Pending changelog",
+            notes: `## Notable changes\n${notes}`,
             tag: `v${releaseVersion}`,
+            target_commitish: releaseSha,
             draft: true,
             reuseDraftOnly: true,
             skipIfPublished: true
@@ -41,23 +42,6 @@ function getReleaseNotes(fromTag, toSha) {
     })
 
     return releaseNotes.pull(process.env.GITHUB_SECRET)
-}
-
-function updateRelease(releaseVersion, notes) {
-    log.info(`Updating GitHub release v${releaseVersion} with release notes`)
-    const stream = publishRelease({
-        token: process.env.GITHUB_SECRET,
-        owner: REPO_OWNER,
-        repo: REPO_NAME,
-        name: releaseVersion,
-        notes: notes,
-        tag: `v${releaseVersion}`,
-        draft: false,
-        reuseDraftOnly: true,
-        skipIfPublished: true
-    })
-
-    return toPromise(stream)
 }
 
 function toPromise(stream) {
@@ -84,9 +68,8 @@ module.exports = function() {
     const releaseSha = process.env.RELEASE_COMMIT_SHA
 
     return Promise.resolve()
-        .then(() => createRelease(releaseVersion))
         .then(() => getReleaseNotes(currentVersion, releaseSha))
-        .then(notes => updateRelease(releaseVersion, notes))
+        .then(notes => createRelease(releaseVersion, releaseSha, notes))
         .catch(error => {
             log.error(error)
             throw new Error("Could not release in GitHub")
