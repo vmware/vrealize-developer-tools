@@ -9,8 +9,7 @@ import * as vscode from "vscode"
 import { ConfigurationManager } from "../../../../manager"
 import { ElementKinds } from "../../../../constants"
 import { AbstractNode } from "../AbstractNode"
-import { ActionModuleNode } from "../folder/ActionModuleNode"
-import { FolderNode } from "../folder/FolderNode"
+import { ActionModuleNode } from "../branch/ActionModuleNode"
 
 export class ActionsRootNode extends AbstractNode {
     readonly kind: string = ElementKinds.Actions
@@ -24,29 +23,28 @@ export class ActionsRootNode extends AbstractNode {
 
     async getChildren(): Promise<AbstractNode[]> {
         const layout = this.config.vrdev.views.explorer.actions.layout
-        const categories = (await this.restClient.getRootCategories("ScriptModuleCategory")).map(category => {
-            return new ActionModuleNode(
-                category.id,
-                layout === "flat" ? category.name : category.name.split(".").pop() || "",
-                category.name,
-                this,
-                this.restClient,
-                this.context
-            )
-        })
+        const categories = await this.restClient.getRootCategories("ScriptModuleCategory")
 
         if (layout === "flat") {
-            return categories
+            return categories.map(category => {
+                return new ActionModuleNode(
+                    { path: category.name, name: category.name, value: category },
+                    this,
+                    this.restClient,
+                    this.context
+                )
+            })
         }
 
         const hierarchy = makeHierarchical(
             categories,
-            category => category.fullName.split("."),
+            category => category.name.split("."),
             (...paths: string[]) => paths.join("."),
+            () => true,
             layout === "compact"
         )
 
-        const rootFolder = await new FolderNode(hierarchy, this, this.restClient, this.context)
+        const rootFolder = await new ActionModuleNode(hierarchy, this, this.restClient, this.context)
         return rootFolder.getChildren()
     }
 

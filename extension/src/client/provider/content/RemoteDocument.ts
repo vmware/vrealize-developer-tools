@@ -108,7 +108,7 @@ export class RemoteDocument {
 
         js += " * \n"
 
-        const params: ParamInfo[] = Array.isArray(xml.param) ? xml.param : [xml.param]
+        const params: ParamInfo[] = Array.isArray(xml.param) || !xml.param ? xml.param : [xml.param]
         if (params && params.length > 0) {
             js += params
                 .map(p => {

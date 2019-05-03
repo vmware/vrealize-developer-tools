@@ -65,8 +65,7 @@ export enum ElementKinds {
     InventoryItem = "vrdev:element:kind:inventoryItem",
 
     Category = "vrdev:element:kind:category",
-    Module = "vrdev:element:kind:module",
-    Folder = "vrdev:element:kind:folder"
+    Module = "vrdev:element:kind:module"
 }
 
 export class Patterns {

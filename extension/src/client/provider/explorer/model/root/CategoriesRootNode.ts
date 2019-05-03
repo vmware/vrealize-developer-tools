@@ -7,7 +7,7 @@ import { ApiCategoryType, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { AbstractNode } from "../AbstractNode"
-import { CategoryNode } from "../folder/CategoryNode"
+import { CategoryNode } from "../branch/CategoryNode"
 
 export type ChildConstructor<T> = new (
     id: string,

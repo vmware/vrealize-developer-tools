@@ -10,9 +10,8 @@ export * from "./root/ActionsRootNode"
 export * from "./root/InventoryRootNode"
 export * from "./root/PackagesRootNode"
 
-export * from "./folder/FolderNode"
-export * from "./folder/CategoryNode"
-export * from "./folder/ActionModuleNode"
+export * from "./branch/CategoryNode"
+export * from "./branch/ActionModuleNode"
 
 export * from "./leaf/ActionNode"
 export * from "./leaf/ConfigurationNode"
