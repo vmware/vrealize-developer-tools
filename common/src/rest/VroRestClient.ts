@@ -10,78 +10,20 @@ import * as request from "request-promise-native"
 
 import { Logger, MavenCliProxy, promise, sleep } from ".."
 
-import { ApiCategoryType, ApiElementType } from "../types"
+import { ApiCategoryType } from "../types"
 import { BaseConfiguration, BaseEnvironment } from "../platform"
 import { Auth, BasicAuth, VraSsoAuth } from "./auth"
-
-export interface WorkflowParam {
-    type: string
-    name: string
-    value: any
-}
-
-export interface LogMessage {
-    timestamp: string
-    severity: string
-    description: string
-}
-
-export interface Version {
-    "version": string
-    "build-number": string
-    "build-date": string
-    "api-version": string
-}
-
-export type WorkflowState =
-    | "canceled"
-    | "completed"
-    | "running"
-    | "suspended"
-    | "waiting"
-    | "waiting-signal"
-    | "failed"
-    | "initializing"
-
-interface WorkflowLogsResponse {
-    logs: {
-        entry: {
-            "origin": string
-            "severity": string
-            "time-stamp": string
-            "short-description": string
-            "long-description": string
-        }
-    }[]
-}
-
-interface ApiElement {
-    name: string
-    id: string
-    type: ApiCategoryType | ApiElementType
-    rel: string
-}
-
-interface InventoryElement {
-    name: string
-    id: string
-    type: string
-    rel: string
-    href: string
-}
-
-interface ContentLinksResponse {
-    link: {
-        attributes: { name: string; value: string; type: string }[]
-        rel: string
-        href: string
-    }[]
-}
-
-interface ContentChildrenResponse {
-    href: string
-    relations: ContentLinksResponse
-}
+import {
+    ApiElement,
+    ContentChildrenResponse,
+    ContentLinksResponse,
+    InventoryElement,
+    LogMessage,
+    Version,
+    WorkflowLogsResponse,
+    WorkflowParam,
+    WorkflowState
+} from "./api"
 
 export class VroRestClient {
     private readonly logger = Logger.get("VroRestClient")
@@ -122,53 +64,41 @@ export class VroRestClient {
         return auth.toRequestJson()
     }
 
-    async getVersion(): Promise<Version> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/about`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
+    private async send<T = any>(
+        method: "GET" | "POST" | "PUT" | "DELETE",
+        route: string,
+        options?: Partial<request.OptionsWithUrl>
+    ): Promise<T> {
+        const url = route.indexOf("://") > 0 ? route : `https://${this.hostname}:${this.port}/vco/api/${route}`
+        return request({
+            headers: {
+                Accept: "application/json"
+            },
+            json: true,
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
+            ...options,
+            method,
+            url,
+            auth: { ...(await this.getAuth()) }
+        })
+    }
 
-        const execResponse: Version = await request(executeOptions)
-        return execResponse
+    async getVersion(): Promise<Version> {
+        return this.send("GET", "about")
     }
 
     async getWorkflow(id: string): Promise<any> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}`,
-            auth: { ...(await this.getAuth()) }
-        }
-
-        const execResponse = await request(executeOptions)
-        return execResponse.body
+        return this.send("GET", `workflows/${id}`)
     }
 
     async getAction(id: string): Promise<any> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/actions/${id}`,
-            auth: { ...(await this.getAuth()) }
-        }
-
-        const execResponse = await request(executeOptions)
-        return execResponse.body
+        return this.send("GET", `actions/${id}`)
     }
 
     async getConfiguration(id: string): Promise<any> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/configurations/${id}`,
-            auth: { ...(await this.getAuth()) }
-        }
-
-        const execResponse = await request(executeOptions)
-        return execResponse.body
+        return this.send("GET", `configurations/${id}`)
     }
 
     async executeWorkflow(id: string, ...inputParams: WorkflowParam[]): Promise<WorkflowParam[]> {
@@ -184,38 +114,20 @@ export class VroRestClient {
     }
 
     async getWorkflowExecution(id: string, token: string): Promise<any> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/executions/${token}`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const response = request(executeOptions)
-        return response
+        return this.send("GET", `workflows/${id}/executions/${token}`)
     }
 
     async getWorkflowExecutionState(id: string, token: string): Promise<WorkflowState> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/executions/${token}`,
-            auth: { ...(await this.getAuth()) },
+        const response = await this.send("GET", `workflows/${id}/executions/${token}`, {
             resolveWithFullResponse: false
-        }
-
-        const response = await request(executeOptions)
+        })
         return response.state
     }
 
     async startWorkflow(id: string, ...inputParams: WorkflowParam[]): Promise<string> {
         const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "POST",
-            uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/executions`,
-            auth: { ...(await this.getAuth()) },
-            body: {} as any
+            body: {} as any,
+            resolveWithFullResponse: true
         }
 
         if (inputParams.length > 0) {
@@ -228,7 +140,7 @@ export class VroRestClient {
             }
         }
 
-        const execResponse = await request(executeOptions)
+        const execResponse = await this.send("POST", `workflows/${id}/executions`, executeOptions)
 
         if (execResponse.statusCode !== 202) {
             throw new Error(`Expected status code 202, but got ${execResponse.statusCode}`)
@@ -236,7 +148,7 @@ export class VroRestClient {
 
         let location: string | undefined = execResponse.headers.location
         if (!location) {
-            throw new Error(`Missing location header in the response of ${executeOptions.uri}`)
+            throw new Error(`Missing location header in the response of POST /workflows/${id}/executions`)
         }
 
         location = location.replace(/\/$/, "") // remove trailing slash
@@ -251,20 +163,18 @@ export class VroRestClient {
         timestamp: number
     ): Promise<LogMessage[]> {
         const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "POST",
-            uri:
-                `https://${this.hostname}:${this.port}/vco/api` +
-                `/workflows/${workflowId}/executions/${executionId}/syslogs`,
-            auth: { ...(await this.getAuth()) },
             body: {
                 "severity": severity,
                 "older-than": timestamp
-            },
-            resolveWithFullResponse: false
+            }
         }
 
-        const response: WorkflowLogsResponse = await request(executeOptions)
+        const response: WorkflowLogsResponse = await this.send(
+            "POST",
+            `workflows/${workflowId}/executions/${executionId}/syslogs`,
+            executeOptions
+        )
+
         const messages: LogMessage[] = []
 
         for (const log of response.logs) {
@@ -290,55 +200,29 @@ export class VroRestClient {
     }
 
     async importPackage(path: string): Promise<void> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "POST",
-            uri: `https://${this.hostname}:${this.port}/vco/api/content/packages?overwrite=true`,
-            auth: { ...(await this.getAuth()) },
+        return this.send("POST", "content/packages?overwrite=true", {
             formData: {
                 file: [fs.createReadStream(path)]
-            }
-        }
-
-        return request(executeOptions)
+            },
+            resolveWithFullResponse: true
+        })
     }
 
     async deletePackage(
         name: string,
         option: "deletePackage" | "deletePackageWithContent" | "deletePackageKeepingShared"
     ): Promise<void> {
-        const executeOptions = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "DELETE",
-            uri: `https://${this.hostname}:${this.port}/vco/api/packages/${name}/?option=${option}`,
-            auth: { ...(await this.getAuth()) }
-        }
-
-        return request(executeOptions)
+        return this.send("DELETE", `packages/${name}/?option=${option}`, {
+            resolveWithFullResponse: true
+        })
     }
 
     async getPlugins(): Promise<any> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/plugins`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        return request(options)
+        return this.send("GET", "plugins")
     }
 
     async getPackages(): Promise<string[]> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/packages`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentLinksResponse = await request(options)
+        const responseJson: ContentLinksResponse = await this.send("GET", "packages")
         const packages: string[] = responseJson.link
             .map(pkg => {
                 const name = pkg.attributes.find(att => att.name === "name")
@@ -350,15 +234,7 @@ export class VroRestClient {
     }
 
     async getActions(): Promise<{ fqn: string; id: string; version: string }[]> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/actions`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentLinksResponse = await request(options)
+        const responseJson: ContentLinksResponse = await this.send("GET", "actions")
         const actions: { fqn: string; id: string; version: string }[] = responseJson.link
             .map(action => {
                 if (!action.attributes) {
@@ -383,15 +259,7 @@ export class VroRestClient {
     }
 
     async getWorkflows(): Promise<{ name: string; id: string; version: string }[]> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/workflows`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentLinksResponse = await request(options)
+        const responseJson: ContentLinksResponse = await this.send("GET", "workflows")
         const workflows: { name: string; id: string; version: string }[] = responseJson.link
             .map(wf => {
                 if (!wf.attributes) {
@@ -416,15 +284,7 @@ export class VroRestClient {
     }
 
     async getConfigurations(): Promise<{ name: string; id: string; version: string }[]> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/configurations`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentLinksResponse = await request(options)
+        const responseJson: ContentLinksResponse = await this.send("GET", "configurations")
         const configs: { name: string; id: string; version: string }[] = responseJson.link
             .map(conf => {
                 if (!conf.attributes) {
@@ -449,15 +309,7 @@ export class VroRestClient {
     }
 
     async getResources(): Promise<{ name: string; id: string }[]> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/resources`,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentLinksResponse = await request(options)
+        const responseJson: ContentLinksResponse = await this.send("GET", "resources")
         const resources: { name: string; id: string }[] = responseJson.link
             .map(res => {
                 if (!res.attributes) {
@@ -480,16 +332,10 @@ export class VroRestClient {
     }
 
     async getRootCategories(categoryType: ApiCategoryType): Promise<ApiElement[]> {
-        const uri = `https://${this.hostname}:${this.port}/vco/api/categories?isRoot=true&categoryType=${categoryType}`
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentLinksResponse = await request(options)
+        const responseJson: ContentLinksResponse = await this.send(
+            "GET",
+            `categories?isRoot=true&categoryType=${categoryType}`
+        )
         const categories = responseJson.link
             .map(child => {
                 const name = child.attributes.find(att => att.name === "name")
@@ -509,16 +355,7 @@ export class VroRestClient {
     }
 
     async getChildrenOfCategory(categoryId: string): Promise<ApiElement[]> {
-        const uri = `https://${this.hostname}:${this.port}/vco/api/categories/${categoryId}`
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentChildrenResponse = await request(options)
+        const responseJson: ContentChildrenResponse = await this.send("GET", `categories/${categoryId}`)
         const children = responseJson.relations.link
             .map(child => {
                 if (!child.attributes) {
@@ -545,7 +382,9 @@ export class VroRestClient {
 
     async getResource(id: string): Promise<http.IncomingMessage> {
         const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: true,
+            rejectUnauthorized: false,
             method: "GET",
             uri: `https://${this.hostname}:${this.port}/vco/api/resources/${id}`,
             auth: { ...(await this.getAuth()) },
@@ -559,38 +398,15 @@ export class VroRestClient {
     }
 
     async getResourceInfo(id: string): Promise<any> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: `https://${this.hostname}:${this.port}/vco/api/resources/${id}`,
-            auth: { ...(await this.getAuth()) }
-        }
-
-        return (await request(options)).body
+        return this.send("GET", `resources/${id}`)
     }
 
     async getInventoryItem(href: string): Promise<any> {
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri: href,
-            auth: { ...(await this.getAuth()) }
-        }
-
-        return (await request(options)).body
+        return this.send("GET", href)
     }
 
     async getInventoryItems(href?: string): Promise<InventoryElement[]> {
-        const uri = href || `https://${this.hostname}:${this.port}/vco/api/inventory`
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
-            method: "GET",
-            uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        const responseJson: ContentChildrenResponse = await request(options)
+        const responseJson: ContentChildrenResponse = await this.send("GET", href || "inventory")
         const children = responseJson.relations.link
             .map(child => {
                 if (!child.attributes) {
@@ -626,14 +442,18 @@ export class VroRestClient {
 
     async fetchIcon(namespace: string, type: string, targetPath: string): Promise<void> {
         type = type || ""
-        const uri = `https://${this.hostname}:${this.port}/vco/api/catalog/${namespace}/${type}/metadata/icon`
+        const url = `https://${this.hostname}:${this.port}/vco/api/catalog/${namespace}/${type}/metadata/icon`
         const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
+            headers: {
+                Accept: "application/json"
+            },
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
             json: false,
             method: "GET",
-            uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
+            url,
+            auth: { ...(await this.getAuth()) }
         }
 
         const stream = request(options).pipe(fs.createWriteStream(targetPath))
@@ -645,7 +465,9 @@ export class VroRestClient {
 
     async fetchWorkflowSchema(id: string, targetPath: string): Promise<void> {
         const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: true,
+            rejectUnauthorized: false,
             headers: {},
             json: false,
             method: "GET",
@@ -663,15 +485,16 @@ export class VroRestClient {
     async fetchAction(id: string, targetPath: string): Promise<void> {
         const uri = `https://${this.hostname}:${this.port}/vco/api/actions/${id}/`
         const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
             headers: {
                 Accept: "application/zip"
             },
             json: false,
             method: "GET",
             uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
+            auth: { ...(await this.getAuth()) }
         }
 
         const stream = request(options).pipe(fs.createWriteStream(targetPath))
@@ -684,13 +507,14 @@ export class VroRestClient {
     async fetchWorkflow(id: string, targetPath: string): Promise<void> {
         const uri = `https://${this.hostname}:${this.port}/vco/api/content/workflows/${id}/`
         const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
             headers: {},
             json: false,
             method: "GET",
             uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
+            auth: { ...(await this.getAuth()) }
         }
 
         const stream = request(options).pipe(fs.createWriteStream(targetPath))
@@ -703,15 +527,16 @@ export class VroRestClient {
     async fetchResource(id: string, targetPath: string): Promise<void> {
         const uri = `https://${this.hostname}:${this.port}/vco/api/resources/${id}/`
         const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
             headers: {
                 Accept: "application/octet-stream"
             },
             json: false,
             method: "GET",
             uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
+            auth: { ...(await this.getAuth()) }
         }
 
         const stream = request(options).pipe(fs.createWriteStream(targetPath))
@@ -722,29 +547,11 @@ export class VroRestClient {
     }
 
     async getConfigElementXml(id: string): Promise<string> {
-        const uri = `https://${this.hostname}:${this.port}/vco/api/configurations/${id}/`
-        const options = {
-            ...DEFAULT_REQUEST_OPTIONS,
+        return this.send("GET", `configurations/${id}/`, {
             headers: {
                 Accept: "application/vcoobject+xml"
             },
-            json: false,
-            method: "GET",
-            uri,
-            auth: { ...(await this.getAuth()) },
-            resolveWithFullResponse: false
-        }
-
-        return request(options)
+            json: false
+        })
     }
-}
-
-const DEFAULT_REQUEST_OPTIONS = {
-    headers: {
-        Accept: "application/json"
-    },
-    json: true,
-    simple: true, // reject non-2xx
-    resolveWithFullResponse: true,
-    rejectUnauthorized: false
 }

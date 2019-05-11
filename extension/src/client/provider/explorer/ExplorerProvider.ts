@@ -68,10 +68,7 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
     }
 
     getChildren(element?: AbstractNode): Promise<AbstractNode[]> {
-        if (!element) {
-            return this.getRootNodes()
-        }
-        return element.getChildren()
+        return element ? element.getChildren() : this.getRootNodes()
     }
 
     getParent(element: AbstractNode): AbstractNode | undefined {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { LogLevel } from "./types/settings"
+import { LogLevel } from "./types/settings";
 
 export interface LogChannel {
     debug(message: string): void
