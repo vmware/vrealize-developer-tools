@@ -38,7 +38,7 @@
     "onCommand:vrdev.toggle.typescript"
   ],
   "main": "./extension/out/extension",
-  "icon": "./assets/logo.png",
+  "icon": "assets/logo.png",
   "contributes": {
     "commands": [
       {
