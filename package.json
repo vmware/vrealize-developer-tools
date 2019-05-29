@@ -38,6 +38,7 @@
     "onCommand:vrdev.toggle.typescript"
   ],
   "main": "./extension/out/extension",
+  "icon": "./assets/logo.png",
   "contributes": {
     "commands": [
       {
@@ -164,7 +165,7 @@
         "vrdev.buildTools.defaultVersion": {
           "type": "string",
           "required": false,
-          "default": "1.5.9",
+          "default": "1.5.11",
           "description": "The version of vRealize Build Tools to be used outside the context of a project (e.g. when onboarding project and running untitled actions).",
           "scope": "application"
         }

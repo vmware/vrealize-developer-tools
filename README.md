@@ -11,8 +11,9 @@ and [vRealize Automation](https://www.vmware.com/products/vrealize-automation.ht
 
 To use most of the vRealize Developer Tools's functionality, you will need a development [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html) instance and to set up vRealize Build Tools.
 
--   vRealize Build Tools
--   maven 3.3.9+ available on the PATH system variable
+-   [vRealize Build Tools v1.5.11+](https://labs.vmware.com/flings/vrealize-build-tools)
+-   maven v3.3.9+ available on the PATH system variable
+-   jdk 1.8
 
 ## Features
 
