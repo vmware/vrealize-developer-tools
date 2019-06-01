@@ -213,7 +213,7 @@
     "jest": "^24.5.0",
     "jest-create-mock-instance": "^1.1.0",
     "jest-extended": "^0.11.1",
-    "merge-stream": "^1.0.1",
+    "merge-stream": "^2.0.0",
     "minimist": "^1.2.0",
     "prettier": "^1.17.0",
     "publish-release": "^1.6.0",
