@@ -184,7 +184,7 @@
   },
   "devDependencies": {
     "@octokit/rest": "^16.25.0",
-    "@types/adm-zip": "^0.4.31",
+    "@types/adm-zip": "^0.4.32",
     "@types/chokidar": "^1.7.5",
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "5.0.35",
