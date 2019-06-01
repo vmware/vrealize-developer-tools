@@ -183,7 +183,7 @@
     "vro-language-server": "language-server/out/public"
   },
   "devDependencies": {
-    "@octokit/rest": "^16.25.0",
+    "@octokit/rest": "^16.27.3",
     "@types/adm-zip": "^0.4.31",
     "@types/chokidar": "^1.7.5",
     "@types/fs-extra": "^5.0.4",
