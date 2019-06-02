@@ -219,8 +219,8 @@
     "publish-release": "^1.6.0",
     "pull-release-notes": "^1.2.0",
     "ts-jest": "^24.0.0",
-    "typescript": "^3.4.1",
-    "vsce": "^1.54.0"
+    "typescript": "~3.4.5",
+    "vsce": "^1.62.0"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
