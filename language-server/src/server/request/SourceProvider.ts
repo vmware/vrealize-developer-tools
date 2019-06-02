@@ -4,7 +4,7 @@
  */
 
 import { AutoWire, uri, VroRestClient } from "vrealize-common"
-import URI from "vscode-uri"
+import { URI } from "vscode-uri"
 
 import { remote } from "../../public"
 import { ConnectionLocator, Environment, Settings } from "../core"

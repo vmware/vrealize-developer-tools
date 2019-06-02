@@ -5,7 +5,7 @@
 
 import * as path from "path"
 
-import URI, { UriComponents } from "vscode-uri"
+import { URI, UriComponents } from "vscode-uri"
 
 import { default as Logger } from "../logger"
 import { PomFile } from "../maven/"

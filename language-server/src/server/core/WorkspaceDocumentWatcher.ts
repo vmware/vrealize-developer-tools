@@ -5,7 +5,7 @@
 
 import { AbstractWatcher, AutoWire, ChangeListener, Logger, WorkspaceFolder } from "vrealize-common"
 import { DidSaveTextDocumentParams, Disposable, FileChangeType, FileEvent } from "vscode-languageserver"
-import URI from "vscode-uri"
+import { URI } from "vscode-uri"
 
 import { ConnectionLocator } from "./ConnectionLocator"
 import { Environment } from "./Environment"
