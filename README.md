@@ -1,18 +1,21 @@
-[![Build Status](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_apis/build/status/CI%20Pipeline?branchName=master)](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_build/latest?definitionId=1&branchName=master)
-[![Dependencies Status](https://david-dm.org/vmware/vrealize-developer-tools/status.svg)](https://david-dm.org/vmware/vrealize-developer-tools)
-
 # vRealize Developer Tools
 
-A [Visual Studio Code](https://code.visualstudio.com/) extension that provides code intelligence features and enables a more
-developer-friendly experience when creating [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html)
-and [vRealize Automation](https://www.vmware.com/products/vrealize-automation.html) content.
+> A [Visual Studio Code](https://code.visualstudio.com/) extension that provides code intelligence features and enables a more
+> developer-friendly experience when creating [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html)
+> and [vRealize Automation](https://www.vmware.com/products/vrealize-automation.html) content.
+
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/vmware-pscoe.vrealize-developer-tools.svg?label=VS%20Marketplace)
+[![Build Status](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_apis/build/status/CI%20Pipeline?branchName=master)](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_build/latest?definitionId=1&branchName=master)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=vmware/vrealize-developer-tools)](https://dependabot.com)
+[![Dependencies Status](https://david-dm.org/vmware/vrealize-developer-tools/status.svg)](https://david-dm.org/vmware/vrealize-developer-tools)
+[![Coverage Status](https://codecov.io/gh/vmware/vrealize-developer-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/vmware/vrealize-developer-tools/)
 
 ## Prerequisites
 
 To use most of the vRealize Developer Tools's functionality, you will need a development [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html) instance and to set up vRealize Build Tools.
 
 -   [vRealize Build Tools v1.5.11+](https://labs.vmware.com/flings/vrealize-build-tools)
--   maven v3.3.9+ available on the PATH system variable
+-   maven v3.5+ available on the PATH system variable
 -   jdk 1.8
 
 ## Features
