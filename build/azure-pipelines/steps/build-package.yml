@@ -13,7 +13,7 @@ steps:
     env:
       DISPLAY: :10
 
-  - script: './node_modules/.bin/codecov -f **/coverage/*.json'
+  - script: './node_modules/.bin/codecov -f **/coverage/*.json -t 2ed85a74-0517-4235-963f-4a2ba3e51438'
     displayName: Upload coverage to codecov.io
 
   - task: CopyFiles@2
