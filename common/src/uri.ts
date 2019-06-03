@@ -5,7 +5,7 @@
 
 import * as URL from "url"
 
-import URI from "vscode-uri"
+import { URI } from "vscode-uri"
 
 const fileSchemeLength = "file://".length - 1
 export const O11N_URI_SCHEME = "o11n"
