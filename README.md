@@ -4,7 +4,7 @@
 > developer-friendly experience when creating [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html)
 > and [vRealize Automation](https://www.vmware.com/products/vrealize-automation.html) content.
 
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/vmware-pscoe.vrealize-developer-tools.svg?label=VS%20Marketplace)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/vmware-pscoe.vrealize-developer-tools.svg?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=vmware-pscoe.vrealize-developer-tools)
 [![Build Status](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_apis/build/status/CI%20Pipeline?branchName=master)](https://dev.azure.com/vmware-pscoe/vRealize%20Developer%20Tools/_build/latest?definitionId=1&branchName=master)
 [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=vmware/vrealize-developer-tools)](https://dependabot.com)
 [![Dependencies Status](https://david-dm.org/vmware/vrealize-developer-tools/status.svg)](https://david-dm.org/vmware/vrealize-developer-tools)
