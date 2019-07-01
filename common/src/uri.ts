@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as URL from "url"
-
 import { URI } from "vscode-uri"
 
-const fileSchemeLength = "file://".length - 1
 export const O11N_URI_SCHEME = "o11n"
 
 export interface O11nContentLocation {
@@ -37,12 +34,4 @@ export function uriToLocation(uri: URI): O11nContentLocation {
         id: fragment,
         extension
     }
-}
-
-export function pathToUrl(path: string): string {
-    return URL.format(URL.parse(`file://${path}`))
-}
-
-export function urlToPath(uri: string): string {
-    return uri.substr(fileSchemeLength)
 }

@@ -5,7 +5,7 @@
 
 import * as path from "path"
 
-import { AutoWire, Logger, MavenCliProxy, ProjectPickInfo, ProjectType, uri } from "vrealize-common"
+import { AutoWire, Logger, MavenCliProxy, ProjectPickInfo, ProjectType } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands, MavenPom } from "../constants"
@@ -150,7 +150,7 @@ export class NewProject extends Command {
         })
 
         if (uri && uri.length > 0) {
-            this.state.destination = uri[0].toString()
+            this.state.destination = uri[0];
             this.generateProject()
         }
     }
@@ -182,7 +182,7 @@ export class NewProject extends Command {
                                 this.state.projectType.id,
                                 this.state.groupId,
                                 this.state.name,
-                                uri.urlToPath(this.state.destination),
+                                this.state.destination.fsPath,
                                 this.state.projectType.containsWorkflows,
                                 this.state.workflowsPath
                             )
@@ -194,7 +194,7 @@ export class NewProject extends Command {
                     }
 
                     if (!canceled) {
-                        const projectFolder = path.join(this.state.destination, this.state.name)
+                        const projectFolder = path.join(this.state.destination.toString(), this.state.name)
                         vscode.commands.executeCommand(
                             "vscode.openFolder",
                             vscode.Uri.parse(projectFolder),

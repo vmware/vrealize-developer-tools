@@ -15,5 +15,5 @@ export interface ProjectPickInfo {
     groupId: string
     name: string
     workflowsPath?: string
-    destination?: string
+    destination?: vscode.Uri
 }
