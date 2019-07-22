@@ -194,10 +194,10 @@ export class NewProject extends Command {
                     }
 
                     if (!canceled) {
-                        const projectFolder = path.join(this.state.destination.toString(), this.state.name)
+                        const projectFolder = path.join(this.state.destination.fsPath, this.state.name)
                         vscode.commands.executeCommand(
                             "vscode.openFolder",
-                            vscode.Uri.parse(projectFolder),
+                            vscode.Uri.file(projectFolder),
                             vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
                         )
                     }
