@@ -38,7 +38,7 @@ export class WorkspaceDocumentWatcher extends AbstractWatcher<FileSavedEventPara
     private watchedFilesSaved(event: DidSaveTextDocumentParams): void {
         this.logger.info("Watched workspace files were saved.")
         const newEvent: FileSavedEventParams = {
-            changes: [this.convertEvent.bind(this)]
+            changes: [this.convertEvent(event)]
         }
 
         this.notifyListeners(newEvent)

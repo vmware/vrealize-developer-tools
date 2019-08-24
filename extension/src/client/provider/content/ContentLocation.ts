@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import URI from "vscode-uri"
+import { URI } from "vscode-uri"
 
 export class ContentLocation {
     static readonly VRO_URI_SCHEME = "vro"

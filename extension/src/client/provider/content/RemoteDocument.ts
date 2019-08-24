@@ -43,8 +43,13 @@ export class RemoteDocument {
                         switch (location.type) {
                             case "action": {
                                 await this.restClient.fetchAction(location.id, filePath)
-                                this.source = new AdmZip(filePath)
-                                    .readFile("action-content") // content is in UTF-16BE
+                                const fileBuffer = new AdmZip(filePath).readFile("action-content")
+
+                                if (!fileBuffer) {
+                                    throw new Error(`Could not extact action content from $filePath`)
+                                }
+
+                                this.source = fileBuffer // content is in UTF-16BE
                                     .swap16() // convert to UTF-16LE
                                     .toString("utf16le")
                                 this.source = this.toJavaScript(this.source)
@@ -53,9 +58,14 @@ export class RemoteDocument {
                             }
                             case "workflow": {
                                 await this.restClient.fetchWorkflow(location.id, filePath)
-                                this.source = new AdmZip(filePath)
-                                    .readFile("workflow-content")
-                                    .swap16()
+                                const fileBuffer = new AdmZip(filePath).readFile("workflow-content")
+
+                                if (!fileBuffer) {
+                                    throw new Error(`Could not extact action content from $filePath`)
+                                }
+
+                                this.source = fileBuffer // content is in UTF-16BE
+                                    .swap16() // convert to UTF-16LE
                                     .toString("utf16le")
                                 fs.removeSync(filePath)
                                 break
