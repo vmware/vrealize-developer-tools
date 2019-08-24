@@ -12,7 +12,7 @@ import {
     Position,
     TextDocumentPositionParams
 } from "vscode-languageserver"
-import URI from "vscode-uri"
+import { URI } from "vscode-uri"
 
 import { ConnectionLocator, Environment, HintLookup } from "../core"
 import { Synchronizer, TextDocumentWrapper } from "../document"

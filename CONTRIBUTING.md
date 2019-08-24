@@ -21,7 +21,7 @@ git clone https://github.com/vmware/vrealize-developer-tools.git
 #### Prerequisites
 
 -   [Git](https://git-scm.com/)
--   [Node.js](https://nodejs.org/en/), `>= 9.0.0`
+-   [Node.js](https://nodejs.org/en/), `>= 10.0.0`
 -   [yarn](https://yarnpkg.com/en/), `>= 1.10.1`
 -   [gulp CLI](https://gulpjs.com/), `>= 2.0.1`
 -   [Visual Studio Code](https://code.visualstudio.com/), `>= 1.30.0`

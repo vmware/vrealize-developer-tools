@@ -1,0 +1,29 @@
+codecov:
+  branch: master
+  notify:
+    require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: 30...70
+
+  flags:
+    common:
+      paths:
+        - common/
+    extension:
+      paths:
+        - extension/
+    language-server:
+      paths:
+        - language-server/
+
+  ignore:
+    - "**/__tests__/*"
+    - "**/src/proto/*"
+
+comment:
+  layout: header, changes, diff
+  behavior: default
+  require_changes: true

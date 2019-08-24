@@ -5,8 +5,8 @@
 
 const major = parseInt(/^(\d+)\./.exec(process.versions.node)[1]);
 
-if (major < 9) {
-    console.error('\033[1;31m*** Please use node >=9.0.0.\033[0;0m');
+if (major < 10) {
+    console.error('\033[1;31m*** Please use node >=10.0.0.\033[0;0m');
     process.exit(1);
 }
 

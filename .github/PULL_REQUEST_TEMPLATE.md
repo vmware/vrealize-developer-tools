@@ -48,3 +48,7 @@ Examples:
 ### Screenshot
 
 <!-- Include an image of the most relevant user-facing change, if any. -->
+
+### Related issues and PRs
+
+<!-- Link any related issues and pull requests here using #number or user/repo#number -->
