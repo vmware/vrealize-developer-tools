@@ -8,8 +8,6 @@ import * as http from "http"
 import * as fs from "fs-extra"
 import * as request from "request-promise-native"
 
-import { Logger, MavenCliProxy, promise, sleep } from ".."
-
 import { ApiCategoryType } from "../types"
 import { BaseConfiguration, BaseEnvironment } from "../platform"
 import { Auth, BasicAuth, VraSsoAuth } from "./auth"
@@ -24,6 +22,8 @@ import {
     WorkflowParam,
     WorkflowState
 } from "./api"
+
+import { Logger, MavenCliProxy, promise, sleep } from ".."
 
 export class VroRestClient {
     private readonly logger = Logger.get("VroRestClient")

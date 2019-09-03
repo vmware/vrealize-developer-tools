@@ -6,7 +6,9 @@
 import * as vscode from "vscode"
 
 class InputFlowAction {
-    private constructor() {}
+    private constructor() {
+        // empty constructor
+    }
     static back = new InputFlowAction()
     static cancel = new InputFlowAction()
     static resume = new InputFlowAction()

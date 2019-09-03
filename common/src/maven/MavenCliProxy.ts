@@ -7,10 +7,11 @@ import * as path from "path"
 
 import * as fs from "fs-extra"
 
-import { Logger, proc } from ".."
 
 import { BaseEnvironment } from "../platform"
 import { MavenInfo } from "../types"
+
+import { Logger, proc } from ".."
 
 const archetypeIdByProjectType: { [key: string]: string } = {
     "vro-ts": "package-typescript-archetype",

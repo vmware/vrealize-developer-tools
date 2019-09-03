@@ -21,8 +21,6 @@ export class PropertiesProvider implements vscode.TreeDataProvider<AbstractNode>
 
     readonly onDidChangeTreeData: vscode.Event<AbstractNode> = this.onDidChangeTreeDataEmitter.event
 
-    constructor() {}
-
     register(context: vscode.ExtensionContext): void {
         this.logger.debug("Registering the properties provider")
 
