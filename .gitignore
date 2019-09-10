@@ -21,3 +21,4 @@ node_modules/
 !/.vscode/extensions.json
 
 language-server/src/proto/**
+workflow-schema/*
