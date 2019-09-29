@@ -150,7 +150,7 @@ export class NewProject extends Command {
         })
 
         if (uri && uri.length > 0) {
-            this.state.destination = uri[0];
+            this.state.destination = uri[0]
             this.generateProject()
         }
     }

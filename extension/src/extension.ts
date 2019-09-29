@@ -25,7 +25,7 @@ export async function activate(context: vscode.ExtensionContext) {
     Logger.setup(getLoggingChannel(), config.get<LogLevel>("log"))
 
     logger.info("\n\n=== Activating vRealize Developer Tools ===\n")
-    const window = new ClientWindow(config.get("maven.profile"))
+    const window = new ClientWindow(config.get("maven.profile"), context)
     context.subscriptions.push(window)
 
     const registry = new ModuleRegistry(context, window)

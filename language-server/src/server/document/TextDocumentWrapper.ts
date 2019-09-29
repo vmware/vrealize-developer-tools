@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { Position, TextDocument } from "vscode-languageserver";
+import { Position, TextDocument } from "vscode-languageserver"
 
 export class TextDocumentWrapper {
     constructor(readonly textDocument: TextDocument) {}

@@ -9,7 +9,6 @@ import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { LanguageServices } from "../lang"
-import { ClientWindow } from "../ui"
 import { Command } from "./Command"
 
 @AutoWire
@@ -26,7 +25,7 @@ export class TriggerCollection extends Command {
         this.languageServices = languageServices
     }
 
-    async execute(context: vscode.ExtensionContext, clientWindow: ClientWindow) {
+    async execute(context: vscode.ExtensionContext) {
         this.logger.info("Executing command Trigger Hint Collection")
         const languageClient = this.languageServices.client
 
@@ -35,7 +34,7 @@ export class TriggerCollection extends Command {
             return
         }
 
-        clientWindow.onCollectionStart()
+        await vscode.commands.executeCommand(Commands.EventCollectionStart)
 
         vscode.window.withProgress(
             {
@@ -57,7 +56,7 @@ export class TriggerCollection extends Command {
                     this.logger.debug("Collection finished:", status)
 
                     if (status.error !== undefined) {
-                        clientWindow.onCollectionError(status.error)
+                        await vscode.commands.executeCommand(Commands.EventCollectionError, status.error)
 
                         if (status.data.hintsPluginBuild === 0) {
                             vscode.window.showErrorMessage(
@@ -65,7 +64,7 @@ export class TriggerCollection extends Command {
                             )
                         }
                     } else {
-                        clientWindow.onCollectionSuccess()
+                        await vscode.commands.executeCommand(Commands.EventCollectionSuccess)
                     }
 
                     resolve()

@@ -31,7 +31,11 @@ export enum Commands {
     LocateItemByProperties = "vrdev.views.properties.locateItem",
     FetchRemoteElement = "vrdev.fetchRemoteElement",
     FetchWorkflowSchema = "vrdev.workflow.fetchSchema",
-    DeletePackage = "vrdev.package.delete"
+    DeletePackage = "vrdev.package.delete",
+
+    EventCollectionStart = "vrdev.event.onCollectionStart",
+    EventCollectionSuccess = "vrdev.event.onCollectionSuccess",
+    EventCollectionError = "vrdev.event.onCollectionError"
 }
 
 export enum FixCommands {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { ApiCategoryType, ApiElementType } from "../types";
+import { ApiCategoryType, ApiElementType } from "../types"
 
 export interface WorkflowParam {
     type: string
