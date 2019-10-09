@@ -20,8 +20,8 @@ export class InventoryNode extends AbstractNode {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        readonly type: string,
-        readonly namespace: string,
+        public readonly type: string,
+        public readonly namespace: string,
         parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext

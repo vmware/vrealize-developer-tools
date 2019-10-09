@@ -36,7 +36,7 @@ interface CompletionPrefix {
 class CompletionPrefixPattern {
     private readonly patterns: RegExp[]
 
-    constructor(readonly kind: CompletionPrefixKind, ...patterns: RegExp[]) {
+    constructor(public readonly kind: CompletionPrefixKind, ...patterns: RegExp[]) {
         this.patterns = patterns
     }
 

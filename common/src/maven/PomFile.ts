@@ -51,7 +51,7 @@ export class PomFile {
         return modules.module || []
     }
 
-    constructor(readonly filePath: string) {
+    constructor(public readonly filePath: string) {
         const pomContent = fs.readFileSync(filePath, { encoding: "utf8" })
         this.jsonContent = xmlParser.parse(pomContent)
 

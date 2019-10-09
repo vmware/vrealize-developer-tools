@@ -17,8 +17,8 @@ export class PackageNode extends AbstractNode {
     protected readonly icon = "package"
 
     constructor(
-        readonly qualifiedName: string,
-        readonly version: string | undefined,
+        public readonly qualifiedName: string,
+        public readonly version: string | undefined,
         parent: AbstractNode,
         restClient: VroRestClient,
         context: vscode.ExtensionContext

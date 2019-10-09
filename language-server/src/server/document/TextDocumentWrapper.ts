@@ -6,7 +6,7 @@
 import { Position, TextDocument } from "vscode-languageserver"
 
 export class TextDocumentWrapper {
-    constructor(readonly textDocument: TextDocument) {}
+    constructor(public readonly textDocument: TextDocument) {}
 
     getWordAt(position: Position): string {
         const text = this.textDocument.getText()
