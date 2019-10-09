@@ -76,11 +76,20 @@ The `vRealize: Run Action` command from the VS Code comand palette (<kbd>Cmd+Shi
 
 ![Run action](./assets/images/run-action.png)
 
-### Open action's source
+### Explore the inventory
 
-The source code of actions that are available only on the remove vRO instance can be viewed by using the `vRealize: Open Action` command.
+A vRO explorer view is available in the activity bar that allows browsing the whole vRO inventory (actions, workflows, resources, configurations, packages and plugin objects).
 
-![Open action's source](./assets/images/open-action.gif)
+-   Browse, search by name, fetch source (read-only) of all elements
+-   Fetch schema (read-only) of workflows
+-   3 different layouts for the actions hierarchy (controlled by `vrdev.views.explorer.actions.layout` setting)
+    -   **tree** - Displays action packages as a tree
+    -   **compact** - Displays action packages as a tree, but flattens any folders that have no children
+    -   **flat** - Displays action packages as a list
+-   Delete packages
+-   Browse the inventory and see properties of each plugin object
+
+![vRO Explorer](./assets/images/explorer.png)
 
 ### Push and Pull content
 
