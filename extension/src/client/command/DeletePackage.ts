@@ -11,6 +11,10 @@ import { Commands } from "../constants"
 import { PackageNode } from "../provider/explorer/model"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
 
+const LABEL_DELETE = "Delete";
+const LABEL_DELETE_KEEP_SHARED = "Delete (Keep Shared)"
+const LABEL_DELETE_WITH_CONTENT = "Delete (With Content)"
+
 @AutoWire
 export class DeletePackage extends Command {
     private readonly logger = Logger.get("DeletePackage")
@@ -32,22 +36,22 @@ export class DeletePackage extends Command {
             .showWarningMessage(
                 `Delete package ${fullName}?`,
                 { modal: true },
-                "Delete",
-                "Delete (Keep Shared)",
-                "Delete (With Content)"
+                LABEL_DELETE,
+                LABEL_DELETE_KEEP_SHARED,
+                LABEL_DELETE_WITH_CONTENT
             )
             .then(async selected => {
                 try {
                     switch (selected) {
-                        case "Delete":
+                        case LABEL_DELETE:
                             await this.restClient.deletePackage(fullName, "deletePackage")
                             vscode.commands.executeCommand(Commands.RefreshExplorer)
                             break
-                        case "Delete (Keep Shared)":
+                        case LABEL_DELETE_KEEP_SHARED:
                             await this.restClient.deletePackage(fullName, "deletePackageKeepingShared")
                             vscode.commands.executeCommand(Commands.RefreshExplorer)
                             break
-                        case "Delete (With Content)":
+                        case LABEL_DELETE_WITH_CONTENT:
                             await this.restClient.deletePackage(fullName, "deletePackageWithContent")
                             vscode.commands.executeCommand(Commands.RefreshExplorer)
                             break
