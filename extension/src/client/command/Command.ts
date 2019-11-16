@@ -13,8 +13,8 @@ export abstract class Command implements Registrable {
     register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
         Logger.get("Command").debug(`Registering command '${this.commandId}'`)
 
-        const disposable: vscode.Disposable = vscode.commands.registerCommand(this.commandId, () =>
-            this.execute(context, clientWindow)
+        const disposable: vscode.Disposable = vscode.commands.registerCommand(this.commandId, (...args: any[]) =>
+            this.execute(context, ...args)
         )
 
         context.subscriptions.push(disposable)
@@ -22,5 +22,5 @@ export abstract class Command implements Registrable {
 
     abstract get commandId(): string
 
-    abstract execute(context: vscode.ExtensionContext, clientWindow: ClientWindow): Promise<void> | void
+    abstract execute(context: vscode.ExtensionContext, ...args: any[]): Promise<void> | void
 }

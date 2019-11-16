@@ -13,7 +13,7 @@ import { PomFile } from "../maven/"
 export class WorkspaceFolder {
     private readonly logger = Logger.get("WorkspaceFolder")
 
-    constructor(readonly uri: URI, readonly name: string) {}
+    constructor(public readonly uri: URI, public readonly name: string) {}
 
     get projectType(): string | undefined {
         try {

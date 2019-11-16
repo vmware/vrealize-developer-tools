@@ -8,7 +8,7 @@ import * as path from "path"
 import { AutoWire, Logger, MavenCliProxy, ProjectPickInfo, ProjectType } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Commands, MavenPom } from "../constants"
+import { Commands, Patterns } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
 import { MultiStepInput, QuickPickParameters } from "../ui"
 import { Command } from "./Command"
@@ -150,7 +150,7 @@ export class NewProject extends Command {
         })
 
         if (uri && uri.length > 0) {
-            this.state.destination = uri[0];
+            this.state.destination = uri[0]
             this.generateProject()
         }
     }
@@ -210,7 +210,7 @@ export class NewProject extends Command {
     }
 
     private async validateName(value: string) {
-        if (!MavenPom.ArtifactIdPattern.test(value)) {
+        if (!Patterns.PomArtifactId.test(value)) {
             return "The project name should contain only letters, numbers, dashes and underscores"
         }
 
@@ -218,7 +218,7 @@ export class NewProject extends Command {
     }
 
     private async validateGroupId(value: string) {
-        if (!MavenPom.GroupIdPattern.test(value)) {
+        if (!Patterns.PomGroupId.test(value)) {
             return "The project group ID should contain only letters, numbers, dots, dashes and underscores"
         }
 

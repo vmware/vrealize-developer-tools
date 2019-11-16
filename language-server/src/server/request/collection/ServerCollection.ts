@@ -79,6 +79,8 @@ export class ServerCollection {
                     } else if (!this.currentStatus.finished) {
                         return op.apply(this)
                     }
+
+                    return undefined
                 })
                 .catch(errorMessage => {
                     this.setError(errorMessage)

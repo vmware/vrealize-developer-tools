@@ -12,7 +12,7 @@ module.exports = {
     parserOptions: {
         ecmaVersion: 2018,
         sourceType: "module",
-        project: "./tsconfig.json"
+        project: "./tsconfig.eslint.json"
     },
     env: {
         node: true,
@@ -20,12 +20,12 @@ module.exports = {
         jest: true
     },
     rules: {
-        "@typescript-eslint/array-type": ["error", "array"],
+        "@typescript-eslint/array-type": ["error", { "default": "array" }],
         "@typescript-eslint/member-ordering": "off",
-        "@typescript-eslint/prefer-interface": "error",
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/no-parameter-properties": "off",
         "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/no-object-literal-type-assertion": "off",

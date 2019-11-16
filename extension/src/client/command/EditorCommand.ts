@@ -15,7 +15,7 @@ export abstract class EditorCommand implements Registrable {
 
         const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
             this.commandId,
-            (editor, edit) => this.execute(context, clientWindow, editor, edit)
+            (editor, edit, ...args: any[]) => this.execute(context, editor, edit, ...args)
         )
 
         context.subscriptions.push(disposable)
@@ -25,8 +25,8 @@ export abstract class EditorCommand implements Registrable {
 
     abstract execute(
         context: vscode.ExtensionContext,
-        clientWindow: ClientWindow,
         editor: vscode.TextEditor,
-        edit: vscode.TextEditorEdit
+        edit: vscode.TextEditorEdit,
+        ...args: any[]
     ): Promise<void> | void
 }

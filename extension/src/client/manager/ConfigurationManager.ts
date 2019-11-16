@@ -130,7 +130,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         const currentProfileName = this.hasActiveProfile() ? this.activeProfile.get("id") : undefined
 
         if (this.clientWindow.verifyConfiguration(this) && currentProfileName !== this.clientWindow.profileName) {
-            vscode.commands.executeCommand(Commands.TriggerServerCollection)
+            vscode.commands.executeCommand(Commands.TriggerServerCollection, this.clientWindow)
         }
     }
 }

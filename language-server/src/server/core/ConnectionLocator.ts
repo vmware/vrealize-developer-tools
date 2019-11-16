@@ -19,6 +19,4 @@ export class ConnectionLocator {
      * @see https://github.com/Microsoft/vscode-languageserver-node/issues/299
      */
     readonly connection: server.IConnection = server.createConnection()
-
-    constructor() {}
 }

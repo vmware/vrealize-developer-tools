@@ -16,8 +16,14 @@ export class ClientWindow implements vscode.Disposable {
 
     profileName: string | undefined
 
-    constructor(initialProfileName: string | undefined) {
+    constructor(initialProfileName: string | undefined, context: vscode.ExtensionContext) {
         this.logger.debug("Instantiating the client window")
+
+        context.subscriptions.push(
+            vscode.commands.registerCommand(Commands.EventCollectionStart, this.onCollectionStart.bind(this)),
+            vscode.commands.registerCommand(Commands.EventCollectionSuccess, this.onCollectionSuccess.bind(this)),
+            vscode.commands.registerCommand(Commands.EventCollectionError, this.onCollectionError.bind(this))
+        )
 
         this.collectionStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10101)
         this.collectionButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10100)
@@ -66,21 +72,21 @@ export class ClientWindow implements vscode.Disposable {
         return false
     }
 
-    onCollectionStart() {
+    private onCollectionStart() {
         this.collectionButton.text = "$(watch) "
         this.collectionButton.command = undefined
         this.collectionButton.tooltip = undefined
         this.collectionButton.color = undefined
     }
 
-    onCollectionSuccess() {
+    private onCollectionSuccess() {
         this.collectionButton.text = "$(cloud-download)"
         this.collectionButton.command = Commands.TriggerServerCollection
         this.collectionButton.tooltip = "Trigger vRO hint collection"
         this.collectionButton.color = undefined
     }
 
-    onCollectionError(message: string) {
+    private onCollectionError(message: string) {
         this.collectionButton.text = "$(alert)"
         this.collectionButton.command = Commands.TriggerServerCollection
         this.collectionButton.tooltip = `Collection failed: ${message}`
@@ -91,7 +97,7 @@ export class ClientWindow implements vscode.Disposable {
 
         vscode.window.showErrorMessage(errorMessage, "Retry").then(selected => {
             if (selected === "Retry") {
-                vscode.commands.executeCommand(Commands.TriggerServerCollection)
+                vscode.commands.executeCommand(Commands.TriggerServerCollection, this)
             }
         })
     }

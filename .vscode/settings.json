@@ -9,13 +9,12 @@
   "files.exclude": {
     "**/node_modules": true,
     "**/.vscode-test": true,
-    "**/out": false
+    "**/out": false,
+    "**/workflow-schema": true
   },
   "files.associations": {
     "**/build/azure-pipelines/**/*.yml": "azure-pipelines"
   },
-
-  "prettier.eslintIntegration": true,
   "eslint.autoFixOnSave": true,
   "eslint.validate": [
     "javascript",

@@ -3,44 +3,55 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, uri, VroElementPickInfo } from "vrealize-common"
-import { remote } from "vro-language-server"
+import { AutoWire, Logger, VroElementPickInfo, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
-import { LanguageServices } from "../lang"
 import { Command } from "./Command"
+import { ContentLocation } from "../provider/content/ContentLocation"
+import { ConfigurationManager, EnvironmentManager } from "../manager"
 
 @AutoWire
 export class ShowActions extends Command {
     private readonly logger = Logger.get("ShowActions")
-    private languageServices: LanguageServices
+    private restClient: VroRestClient
 
     get commandId(): string {
         return Commands.OpenAction
     }
 
-    constructor(languageServices: LanguageServices) {
+    constructor(environment: EnvironmentManager, private config: ConfigurationManager) {
         super()
-        this.languageServices = languageServices
+        this.restClient = new VroRestClient(config, environment)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
         this.logger.info("Executing command Show Actions")
-        const config = vscode.workspace.getConfiguration("vrdev")
-        const useFullyQualifiedNames = config.get<boolean>("commandPalette.useFullyQualifiedNames")
-        const languageClient = this.languageServices.client
+        const useFullyQualifiedNames = this.config.vrdev.commandPalette.useFullyQualifiedNames
 
-        if (!languageClient) {
-            vscode.window.showErrorMessage("The vRO language server is not running")
-            return
-        }
-
-        let actions: VroElementPickInfo[]
+        let actions: Thenable<VroElementPickInfo[]>
         if (useFullyQualifiedNames) {
-            actions = await languageClient.sendRequest(remote.server.giveAllActions)
+            actions = this.restClient.getActions().then(result =>
+                result.map(action => {
+                    return {
+                        id: action.id,
+                        name: action.fqn,
+                        label: `$(file-code) ${action.fqn}`,
+                        description: `v${action.version}`
+                    }
+                })
+            )
         } else {
-            const modules: VroElementPickInfo[] = await languageClient.sendRequest(remote.server.giveActionModules)
+            const modules: VroElementPickInfo[] = (await this.restClient.getRootCategories("ScriptModuleCategory")).map(
+                category => {
+                    return {
+                        id: category.id,
+                        name: category.name,
+                        label: `$(gift) ${category.name}`
+                    }
+                }
+            )
+
             const selectedModule: VroElementPickInfo | undefined = await vscode.window.showQuickPick(modules, {
                 placeHolder: "Pick a module"
             })
@@ -51,7 +62,15 @@ export class ShowActions extends Command {
                 return
             }
 
-            actions = await languageClient.sendRequest(remote.server.giveActionsForModule, selectedModule.name)
+            actions = this.restClient.getChildrenOfCategory(selectedModule.id).then(result =>
+                result.map(action => {
+                    return {
+                        name: `${selectedModule.name}/${action.name}`,
+                        label: `$(file-code) ${selectedModule.name}/${action.name}`,
+                        id: action.id
+                    }
+                })
+            )
         }
 
         const selectedAction: VroElementPickInfo | undefined = await vscode.window.showQuickPick(actions, {
@@ -64,9 +83,9 @@ export class ShowActions extends Command {
             return
         }
 
-        const url = uri.locationToUri({
+        const url = ContentLocation.with({
+            scheme: "vro",
             type: "action",
-            path: selectedAction.path || "",
             name: selectedAction.name,
             extension: "js",
             id: selectedAction.id

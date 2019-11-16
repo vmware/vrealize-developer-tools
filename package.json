@@ -30,17 +30,105 @@
     "onLanguage:javascript",
     "onLanguage:typescript",
     "workspaceContains:.o11n/",
+    "onView:vrdev.views.explorer",
     "onCommand:vrdev.new.project",
     "onCommand:vrdev.change.profile",
     "onCommand:vrdev.open.action",
-    "onCommand:vrdev.open.configElement",
+    "onCommand:vrdev.open.workflow",
+    "onCommand:vrdev.open.config",
+    "onCommand:vrdev.open.resource",
     "onCommand:vrdev.run.action",
     "onCommand:vrdev.toggle.typescript"
   ],
   "main": "./extension/out/extension",
   "icon": "assets/logo.png",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vro-explorer",
+          "title": "vRealize Developer Tools",
+          "icon": "assets/icons/explorer.svg"
+        }
+      ]
+    },
+    "views": {
+      "vro-explorer": [
+        {
+          "id": "vrdev.views.explorer",
+          "name": "Explorer"
+        },
+        {
+          "id": "vrdev.views.properties",
+          "name": "Properties"
+        }
+      ]
+    },
     "commands": [
+      {
+        "command": "vrdev.views.explorer.refresh",
+        "title": "Refresh",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/refresh.svg",
+          "dark": "assets/icons/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "vrdev.views.explorer.revealItem",
+        "title": "Reveal Item in Explorer",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.views.properties.show",
+        "title": "Show Properties",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.views.properties.copy",
+        "title": "Copy Value",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/clipboard.svg",
+          "dark": "assets/icons/dark/clipboard.svg"
+        }
+      },
+      {
+        "command": "vrdev.views.properties.locateItem",
+        "title": "Locate Item in Explorer",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/location.svg",
+          "dark": "assets/icons/dark/location.svg"
+        }
+      },
+      {
+        "command": "vrdev.fetchRemoteElement",
+        "title": "Fetch from Remote",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/link-external.svg",
+          "light": "assets/icons/light/link-external.svg"
+        }
+      },
+      {
+        "command": "vrdev.workflow.fetchSchema",
+        "title": "Open Workflow Schema",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.package.delete",
+        "title": "Delete",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/trash.svg",
+          "light": "assets/icons/light/trash.svg"
+        }
+      },
       {
         "command": "vrdev.change.profile",
         "title": "Change Active Profile",
@@ -49,12 +137,38 @@
       {
         "command": "vrdev.open.action",
         "title": "Open Action",
-        "category": "vRealize"
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
       },
       {
-        "command": "vrdev.open.configElement",
-        "title": "Open Configuration Element",
-        "category": "vRealize"
+        "command": "vrdev.open.workflow",
+        "title": "Open Workflow",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.open.config",
+        "title": "Open Configuration",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.open.resource",
+        "title": "Open Resource",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
       },
       {
         "command": "vrdev.new.project",
@@ -77,11 +191,139 @@
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "when": "view =~ /^vrdev\\.views\\.explorer/",
+          "command": "vrdev.views.explorer.refresh",
+          "group": "navigation@1"
+        },
+        {
+          "when": "!vrdev:properties:empty && view =~ /^vrdev\\.views\\.properties/",
+          "command": "vrdev.views.properties.locateItem",
+          "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vrdev.fetchRemoteElement",
+          "when": "viewItem =~ /vrdev:element:kind:(action|workflow|config|resource)\\b/",
+          "group": "inline@98"
+        },
+        {
+          "command": "vrdev.fetchRemoteElement",
+          "when": "viewItem =~ /vrdev:element:kind:(action|workflow|config|resource)\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "viewItem =~ /vrdev:element:kind:workflow\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "viewItem =~ /vrdev:element:kind:workflow\\b/",
+          "group": "1_vrdevs@2"
+        },
+        {
+          "command": "vrdev.package.delete",
+          "when": "viewItem =~ /vrdev:element:kind:package\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.package.delete",
+          "when": "viewItem =~ /vrdev:element:kind:package\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.action",
+          "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.action",
+          "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.workflow",
+          "when": "viewItem =~ /vrdev:element:kind:workflows\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.workflow",
+          "when": "viewItem =~ /vrdev:element:kind:workflows\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.config",
+          "when": "viewItem =~ /vrdev:element:kind:configs\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.config",
+          "when": "viewItem =~ /vrdev:element:kind:configs\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.resource",
+          "when": "viewItem =~ /vrdev:element:kind:resources\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.resource",
+          "when": "viewItem =~ /vrdev:element:kind:resources\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
+          "group": "1_vrdevs@1"
+        }
+      ],
       "editor/title": [
         {
           "when": "resourceLangId == javascript || resourceLangId == typescript",
           "command": "vrdev.run.action",
           "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vrdev.fetchRemoteElement",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.package.delete",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.show",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.locateItem",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.explorer.revealItem",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.explorer.refresh",
+          "when": "false"
         }
       ]
     },
@@ -168,6 +410,22 @@
           "default": "1.7.1",
           "description": "The version of vRealize Build Tools to be used outside the context of a project (e.g. when onboarding project and running untitled actions).",
           "scope": "application"
+        },
+        "vrdev.views.explorer.actions.layout": {
+          "type": "string",
+          "default": "compact",
+          "enum": [
+            "tree",
+            "compact",
+            "flat"
+          ],
+          "enumDescriptions": [
+            "Displays action packages as a tree",
+            "Displays action packages as a tree, but flattens any folders that have no children",
+            "Displays action packages as a list"
+          ],
+          "markdownDescription": "Specifies how the _Explorer_ view will display vRO action packages",
+          "scope": "window"
         }
       }
     },
@@ -189,43 +447,43 @@
     "@types/fs-extra": "~5.0.4",
     "@types/glob": "7.1.1",
     "@types/jest": "^24.0.13",
-    "@types/lodash": "^4.14.133",
-    "@types/micromatch": "^3.1.0",
-    "@types/node": "~10.5.6",
-    "@types/request": "^2.48.1",
-    "@types/request-promise-native": "^1.0.16",
+    "@types/lodash": "^4.14.148",
+    "@types/micromatch": "^3.1.1",
+    "@types/node": "^10.5.6",
+    "@types/request": "^2.48.3",
+    "@types/request-promise-native": "^1.0.17",
     "@types/semver": "^6.0.0",
     "@types/tmp": "^0.1.0",
     "@types/vscode": "^1.32.0",
-    "@typescript-eslint/eslint-plugin": "^1.9.0",
-    "@typescript-eslint/parser": "^1.9.0",
-    "codecov": "^3.5.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.3.0",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
+    "codecov": "^3.6.1",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-header": "^3.0.0",
-    "eslint-plugin-import": "^2.17.2",
-    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.1.1",
     "fancy-log": "^1.3.3",
     "gulp": "^4.0.0",
-    "gulp-eslint": "^5.0.0",
+    "gulp-eslint": "^6.0.0",
     "gulp-github-release": "^1.2.1",
-    "gulp-if": "^2.0.2",
-    "jest": "^24.5.0",
+    "gulp-if": "^3.0.0",
+    "jest": "^24.7.1",
     "jest-create-mock-instance": "^1.1.0",
     "jest-extended": "^0.11.1",
     "merge-stream": "^2.0.0",
     "minimist": "^1.2.0",
-    "prettier": "^1.17.0",
+    "prettier": "^1.19.1",
     "publish-release": "^1.6.0",
-    "pull-release-notes": "^1.2.0",
-    "ts-jest": "^24.0.0",
-    "typescript": "~3.4.5",
-    "vsce": "^1.62.0"
+    "pull-release-notes": "^1.2.1",
+    "ts-jest": "^24.1.0",
+    "typescript": "~3.7.2",
+    "vsce": "^1.69.0"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
     "chokidar": "~2.0.4",
-    "fast-xml-parser": "3.12.16",
+    "fast-xml-parser": "3.12.20",
     "fs-extra": "~7.0.0",
     "glob": "^7.1.4",
     "jsonc-parser": "^2.1.0",
