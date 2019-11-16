@@ -11,7 +11,7 @@ module.exports = {
     testMatch: ["**/__tests__/**/*.spec.ts"],
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/../" }),
     collectCoverage: true,
-    coveragePathIgnorePatterns: [".*/__tests__/.*", ".*/src/proto/.*"],
+    coveragePathIgnorePatterns: [".*/__tests__/.*", ".*/src/proto/.*", ".*/common/src/rest/.*"],
     globals: {
         "ts-jest": {
             "tsConfig": "<rootDir>/tsconfig.json",

@@ -15,8 +15,6 @@
   "files.associations": {
     "**/build/azure-pipelines/**/*.yml": "azure-pipelines"
   },
-
-  "prettier.eslintIntegration": true,
   "eslint.autoFixOnSave": true,
   "eslint.validate": [
     "javascript",
