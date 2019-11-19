@@ -6,7 +6,7 @@
 import { AutoWire, Logger, VroElementPickInfo, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Commands } from "../constants"
+import { Commands, ElementKinds } from "../constants"
 import { Command } from "./Command"
 import { ContentLocation } from "../provider/content/ContentLocation"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
@@ -50,8 +50,8 @@ export class ShowWorkflows extends Command {
         }
 
         const url = ContentLocation.with({
-            scheme: "vro",
-            type: "workflow",
+            scheme: ContentLocation.VRO_URI_SCHEME,
+            type: ElementKinds.Workflow,
             name: selected.name,
             extension: "xml",
             id: selected.id

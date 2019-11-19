@@ -34,8 +34,8 @@ export class ContentLocation {
     }): ContentLocation {
         return new ContentLocation(
             components.scheme,
-            components.type,
-            components.name,
+            components.type.replace("vrdev:element:kind:", ""),
+            components.name.substring(components.name.lastIndexOf("/") + 1),
             components.id,
             components.extension
         )
