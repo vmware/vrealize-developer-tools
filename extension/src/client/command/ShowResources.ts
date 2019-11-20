@@ -6,7 +6,7 @@
 import { AutoWire, Logger, VroElementPickInfo, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Commands } from "../constants"
+import { Commands, ElementKinds } from "../constants"
 import { Command } from "./Command"
 import { ContentLocation } from "../provider/content/ContentLocation"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
@@ -50,8 +50,8 @@ export class ShowResources extends Command {
 
         const [name, extension] = selected.name.split(".")
         const url = ContentLocation.with({
-            scheme: "vro",
-            type: "resource",
+            scheme: ContentLocation.VRO_URI_SCHEME,
+            type: ElementKinds.Resource,
             id: selected.id,
             name,
             extension
