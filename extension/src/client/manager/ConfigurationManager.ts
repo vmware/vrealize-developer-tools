@@ -95,6 +95,14 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
     }
 
     private forceLoadProfiles(): MavenProfilesMap | undefined {
+        if (!fs.existsSync(this.settingsXmlPath)) {
+            vscode.window.showErrorMessage("Missing maven settings file: ~/.m2/settings.xml", "Reload Window").then(selected => {
+                if (selected === "Reload Window") {
+                    vscode.commands.executeCommand("workbench.action.reloadWindow")
+                }
+            })
+        }
+
         const settingsXmlContent = fs.readFileSync(this.settingsXmlPath)
 
         if (settingsXmlContent.length < 1) {
