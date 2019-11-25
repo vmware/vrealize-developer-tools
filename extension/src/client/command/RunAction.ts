@@ -14,7 +14,6 @@ import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
-import { ClientWindow } from "../ui"
 import { Command } from "./Command"
 
 const IIFE_WRAPPER_PATTERN = /\(function\s*\(\)\s*{([\s\S]*)}\);?/
@@ -43,8 +42,8 @@ export class RunAction extends Command {
         this.vrotsc = new VrotscCliProxy(this.logger)
     }
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
-        super.register(context, clientWindow)
+    register(context: vscode.ExtensionContext): void {
+        super.register(context)
 
         this.runtimeExceptionDecoration = vscode.window.createTextEditorDecorationType({
             isWholeLine: true,

@@ -8,7 +8,6 @@ import * as vscode from "vscode"
 
 import { Linter } from "../../lint"
 import { EnvironmentManager } from "../../manager"
-import { ClientWindow } from "../../ui"
 import { Registrable } from "../../Registrable"
 
 export abstract class LintCodeActionProvider implements vscode.CodeActionProvider, Registrable {
@@ -19,7 +18,7 @@ export abstract class LintCodeActionProvider implements vscode.CodeActionProvide
     protected abstract get documentSelector(): vscode.DocumentSelector
     protected abstract get fixCommandId(): string
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext): void {
         this.logger.debug(`Registering lint code action provider with document selector ${this.documentSelector}`)
 
         context.subscriptions.push(

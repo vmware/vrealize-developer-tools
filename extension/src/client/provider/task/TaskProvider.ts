@@ -13,7 +13,6 @@ import { Logger, PomFile, TasksInfo } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { extensionShortName } from "../../constants"
-import { ClientWindow } from "../../ui"
 import { Registrable } from "../../Registrable"
 import { TASKS_BY_TOOLCHAIN_PARENT } from "./DefaultTasksJson"
 
@@ -54,7 +53,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         return undefined
     }
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext): void {
         this.logger.debug("Registering the task provider")
         this.context = context
 

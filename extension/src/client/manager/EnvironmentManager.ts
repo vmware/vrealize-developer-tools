@@ -6,7 +6,7 @@
 import { AutoWire, BaseEnvironment, Logger, WorkspaceFolder } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { extensionShortName } from "../constants"
+import { extensionShortName, ProjectArchetypes } from "../constants"
 import { ConfigurationManager } from "./ConfigurationManager"
 
 @AutoWire
@@ -25,5 +25,13 @@ export class EnvironmentManager extends BaseEnvironment {
 
     get displayName(): string {
         return extensionShortName
+    }
+
+    hasRelevantProject(): boolean {
+        const projectTypes = Object.values(ProjectArchetypes) as string[]
+
+        return this.workspaceFolders.some(folder => {
+            return !!folder.projectType && projectTypes.includes(folder.projectType)
+        })
     }
 }

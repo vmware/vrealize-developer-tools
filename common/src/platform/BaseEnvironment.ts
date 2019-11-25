@@ -65,16 +65,12 @@ export abstract class BaseEnvironment {
         return path.join(tokensFolder, this.getHostname())
     }
 
-    getLocalHintsDir(workspaceFolder: WorkspaceFolder): string {
+    private getLocalHintsDir(workspaceFolder: WorkspaceFolder): string {
         return this.createAndResolveDir(workspaceFolder.uri.fsPath, ".o11n", "hints")
     }
 
     getGlobalO11nDir(): string {
         return this.createAndResolveDir(this.homeDir, ".o11n")
-    }
-
-    getLocalO11nDir(workspaceFolder: WorkspaceFolder): string {
-        return this.createAndResolveDir(workspaceFolder.uri.fsPath, ".o11n")
     }
 
     resolveHintFile(name: string, workspaceFolder?: WorkspaceFolder): string {
@@ -95,10 +91,6 @@ export abstract class BaseEnvironment {
         }
 
         return path.join(this.getGlobalHintsDir(), this.getHostname())
-    }
-
-    resolveOutputFile(name: string, workspaceFolder: WorkspaceFolder): string {
-        return path.join(this.getLocalHintsDir(workspaceFolder), "..", name)
     }
 
     resolvePluginHintFiles(): string[] {
