@@ -92,5 +92,6 @@ export enum ProjectArchetypes {
     Base = "com.vmware.pscoe.o11n:base-package",
     Actions = "com.vmware.pscoe.o11n:actions-package",
     Xml = "com.vmware.pscoe.o11n:xml-package",
-    Vra = "com.vmware.pscoe.vra:vra-package"
+    Vra = "com.vmware.pscoe.vra:vra-package",
+    VraNg = "com.vmware.pscoe.vra-ng:vra-ng-package"
 }

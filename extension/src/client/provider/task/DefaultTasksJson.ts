@@ -97,5 +97,17 @@ export const TASKS_BY_TOOLCHAIN_PARENT = {
             label: "Pull",
             command: "mvn vra:pull -P${config:vrdev.maven.profile}"
         }
+    ],
+
+    [ProjectArchetypes.VraNg]: [
+        {
+            label: "Push",
+            command:
+                "mvn clean package vrealize:push -DincludeDependencies=false -DskipTests -P${config:vrdev.maven.profile}"
+        },
+        {
+            label: "Pull",
+            command: "mvn vra-ng:pull -P${config:vrdev.maven.profile}"
+        }
     ]
 }
