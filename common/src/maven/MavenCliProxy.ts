@@ -19,7 +19,8 @@ const archetypeIdByProjectType: { [key: string]: string } = {
     "vro-xml": "package-xml-archetype",
     "vro-mixed": "package-mixed-archetype",
     "vra-yaml": "package-vra-archetype",
-    "vra-vro": "package-vrealize-archetype"
+    "vra-vro": "package-vrealize-archetype",
+    "vra-ng": "package-vra-ng-archetype"
 }
 
 export class MavenCliProxy {
@@ -63,7 +64,13 @@ export class MavenCliProxy {
             return Promise.reject(`Unsupported project type: ${projectType}`)
         }
 
-        const archetypeGroup = projectType === "vra-yaml" ? "vra" : "o11n"
+        let archetypeGroup = "o11n"
+
+        if (projectType === "vra-yaml") {
+            archetypeGroup = "vra"
+        } else if (projectType === "vra-ng") {
+            archetypeGroup = "vra-ng"
+        }
 
         let command =
             `mvn archetype:generate -DinteractiveMode=false ` +
