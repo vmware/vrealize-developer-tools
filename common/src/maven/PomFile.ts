@@ -12,7 +12,8 @@ export class PomFile {
         "actions-package": "com.vmware.pscoe.o11n",
         "xml-package": "com.vmware.pscoe.o11n",
         "typescript-project": "com.vmware.pscoe.o11n",
-        "vra-package": "com.vmware.pscoe.vra"
+        "vra-package": "com.vmware.pscoe.vra",
+        "vra-ng-package": "com.vmware.pscoe.vra-ng"
     }
 
     readonly jsonContent: any

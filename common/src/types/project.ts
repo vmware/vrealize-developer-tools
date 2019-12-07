@@ -6,7 +6,7 @@
 import * as vscode from "vscode"
 
 export interface ProjectType extends vscode.QuickPickItem {
-    id: "vro-ts" | "vro-js" | "vro-xml" | "vro-mixed" | "vra-yaml" | "vra-vro"
+    id: "vro-ts" | "vro-js" | "vro-xml" | "vro-mixed" | "vra-yaml" | "vra-vro" | "vra-ng"
     containsWorkflows: boolean
 }
 

@@ -40,13 +40,19 @@ const projectTypes: ProjectType[] = [
     },
     {
         id: "vra-yaml",
-        label: "vRA YAML-based",
+        label: "vRA 7.x",
+        containsWorkflows: false,
+        description: "A vRA project that contains content exported from a vRA instance."
+    },
+    {
+        id: "vra-ng",
+        label: "vRA 8.x",
         containsWorkflows: false,
         description: "A vRA project that contains content exported from a vRA instance."
     },
     {
         id: "vra-vro",
-        label: "vRA and vRO",
+        label: "vRA 7.x and vRO",
         containsWorkflows: true,
         description: "A vRO Mixed project with an additional module for vRA content."
     }
