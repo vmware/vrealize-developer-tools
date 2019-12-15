@@ -441,6 +441,7 @@
     "vro-language-server": "language-server/out/public"
   },
   "devDependencies": {
+    "@nblagoev/pull-release-notes": "^1.2.2",
     "@octokit/rest": "^16.27.3",
     "@types/adm-zip": "^0.4.32",
     "@types/chokidar": "~1.7.5",
@@ -475,7 +476,6 @@
     "minimist": "^1.2.0",
     "prettier": "^1.19.1",
     "publish-release": "^1.6.0",
-    "pull-release-notes": "^1.2.1",
     "ts-jest": "^24.1.0",
     "typescript": "~3.7.2",
     "vsce": "^1.69.0"
