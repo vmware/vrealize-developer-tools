@@ -15,14 +15,10 @@
   "files.associations": {
     "**/build/azure-pipelines/**/*.yml": "azure-pipelines"
   },
-  "eslint.autoFixOnSave": true,
-  "eslint.validate": [
-    "javascript",
-    {
-      "language": "typescript",
-      "autoFix": true
-    }
-  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": ["javascript", "typescript"],
 
   "editor.formatOnSave": true,
   "[javascript]": {
