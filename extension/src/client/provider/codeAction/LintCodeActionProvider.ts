@@ -7,7 +7,7 @@ import { Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Linter } from "../../lint"
-import { EnvironmentManager } from "../../manager"
+import { EnvironmentManager } from "../../system"
 import { ClientWindow } from "../../ui"
 import { Registrable } from "../../Registrable"
 

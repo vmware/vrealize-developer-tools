@@ -8,7 +8,7 @@ import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Diagnostics } from "../constants"
-import { EnvironmentManager } from "../manager"
+import { EnvironmentManager } from "../system"
 import { Registrable } from "../Registrable"
 import * as ruleDefs from "./rule"
 import { LintRule } from "./LintRule"

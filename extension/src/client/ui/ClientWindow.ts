@@ -7,7 +7,7 @@ import { Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
-import { ConfigurationManager } from "../manager"
+import { ConfigurationManager } from "../system"
 
 export class ClientWindow implements vscode.Disposable {
     private readonly logger = Logger.get("ClientWindow")

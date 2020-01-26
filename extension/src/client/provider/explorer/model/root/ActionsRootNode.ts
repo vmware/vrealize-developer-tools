@@ -6,7 +6,7 @@
 import { makeHierarchical, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { ConfigurationManager } from "../../../../manager"
+import { ConfigurationManager } from "../../../../system"
 import { ElementKinds } from "../../../../constants"
 import { AbstractNode } from "../AbstractNode"
 import { ActionModuleNode } from "../branch/ActionModuleNode"

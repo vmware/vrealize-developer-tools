@@ -13,7 +13,7 @@ import { AutoWire, Logger, MavenCliProxy, PomFile, sleep, VroRestClient, VrotscC
 import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"
-import { ConfigurationManager, EnvironmentManager } from "../manager"
+import { ConfigurationManager, EnvironmentManager } from "../system"
 import { ClientWindow } from "../ui"
 import { Command } from "./Command"
 

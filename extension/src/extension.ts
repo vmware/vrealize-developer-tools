@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -13,7 +13,7 @@ import * as command from "./client/command"
 import { Commands, OutputChannels } from "./client/constants"
 import * as lang from "./client/lang"
 import * as lint from "./client/lint"
-import * as manager from "./client/manager"
+import * as system from "./client/system"
 import * as provider from "./client/provider"
 import { ClientWindow } from "./client/ui"
 
@@ -35,9 +35,9 @@ export async function activate(context: vscode.ExtensionContext) {
     langServices = registry.get(lang.LanguageServices)
     await langServices.initialize()
 
-    registry.registerModules(manager, command, lint, provider)
+    registry.registerModules(system, command, lint, provider)
 
-    if (window.verifyConfiguration(registry.get(manager.ConfigurationManager))) {
+    if (window.verifyConfiguration(registry.get(system.ConfigurationManager))) {
         vscode.commands.executeCommand(Commands.TriggerServerCollection, window)
     }
 }

@@ -7,7 +7,7 @@ import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
-import { ConfigurationManager } from "../manager"
+import { ConfigurationManager } from "../system"
 import { Command } from "./Command"
 
 @AutoWire
