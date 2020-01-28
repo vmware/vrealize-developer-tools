@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -156,7 +156,7 @@ export class VroRestClient {
         return execToken
     }
 
-    async getWorkflowLogs(
+    async getWorkflowLogsPre76(
         workflowId: string,
         executionId: string,
         severity: string,
@@ -184,6 +184,41 @@ export class VroRestClient {
             if (
                 e.origin === "server" || // skip server messages, as they are always included in the result
                 description.indexOf("*** End of execution stack.") > 0 ||
+                description.startsWith("__item_stack:/")
+            ) {
+                continue
+            }
+
+            messages.push({
+                timestamp: e["time-stamp"],
+                severity: e.severity,
+                description
+            })
+        }
+
+        return messages
+    }
+
+    async getWorkflowLogsPost76(
+        workflowId: string,
+        executionId: string,
+        severity: string,
+        timestamp: number
+    ): Promise<LogMessage[]> {
+        const response: WorkflowLogsResponse = await this.send(
+            "GET",
+            `workflows/${workflowId}/executions/${executionId}/syslogs` +
+                `?conditions=severity=${severity}` +
+                `&conditions=timestamp${encodeURIComponent(">")}${timestamp}` +
+                "&conditions=type=system"
+        )
+
+        const messages: LogMessage[] = []
+
+        for (const log of response.logs) {
+            const e = log.entry
+            const description = e["long-description"] ? e["long-description"] : e["short-description"]
+            if (description.indexOf("*** End of execution stack.") > 0 ||
                 description.startsWith("__item_stack:/")
             ) {
                 continue

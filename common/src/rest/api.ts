@@ -42,6 +42,7 @@ export interface WorkflowLogsResponse {
             "time-stamp": string
             "short-description": string
             "long-description": string
+            "time-stamp-val": number
         }
     }[]
 }
