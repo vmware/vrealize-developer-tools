@@ -7,7 +7,7 @@ import { AutoWire, Logger, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands, ElementKinds, Views } from "../../constants"
-import { ConfigurationManager, EnvironmentManager } from "../../manager"
+import { ConfigurationManager, EnvironmentManager } from "../../system"
 import { Registrable } from "../../Registrable"
 import {
     AbstractNode,

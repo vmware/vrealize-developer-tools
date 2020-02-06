@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -13,7 +13,7 @@ import * as command from "./client/command"
 import { Commands, OutputChannels } from "./client/constants"
 import * as lang from "./client/lang"
 import * as lint from "./client/lint"
-import * as manager from "./client/manager"
+import * as system from "./client/system"
 import * as provider from "./client/provider"
 import * as ui from "./client/ui"
 
@@ -27,12 +27,12 @@ export async function activate(context: vscode.ExtensionContext) {
     logger.info("\n\n=== Activating vRealize Developer Tools ===\n")
 
     const registry = new ModuleRegistry(context)
-    registry.registerModules(manager, lang)
+    registry.registerModules(system, lang)
 
     langServices = registry.get(lang.LanguageServices)
     await langServices.initialize()
 
-    const configManager = registry.get(manager.ConfigurationManager)
+    const configManager = registry.get(system.ConfigurationManager)
     configManager.forceLoadProfiles() // initial load and send to LS
 
     registry.registerModules(ui, command, lint, provider)

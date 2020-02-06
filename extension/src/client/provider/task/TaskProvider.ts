@@ -15,7 +15,7 @@ import * as vscode from "vscode"
 import { extensionShortName } from "../../constants"
 import { Registrable } from "../../Registrable"
 import { TASKS_BY_TOOLCHAIN_PARENT } from "./DefaultTasksJson"
-import { EnvironmentManager } from "../../manager"
+import { EnvironmentManager, ScopedMemento } from "../../system"
 
 interface VrealizeTaskDefinition extends vscode.TaskDefinition {
     command: string
@@ -28,7 +28,7 @@ interface VrealizeTaskDefinition extends vscode.TaskDefinition {
 @AutoWire
 export class TaskProvider implements vscode.TaskProvider, Registrable {
     private readonly logger = Logger.get("TaskProvider")
-    private context: vscode.ExtensionContext
+    private ignoredTaskWarnings: ScopedMemento
 
     constructor(private env: EnvironmentManager) {
         // empty
@@ -61,10 +61,10 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
 
     register(context: vscode.ExtensionContext): void {
         this.logger.debug("Registering the task provider")
-        this.context = context
+        this.ignoredTaskWarnings = ScopedMemento.from(context.globalState, "ignoredTaskWarnings")
 
         const providerRegistration = vscode.tasks.registerTaskProvider(extensionShortName, this)
-        this.context.subscriptions.push(this, providerRegistration)
+        context.subscriptions.push(this, providerRegistration)
     }
 
     private tasksForWorkspace(folder: vscode.WorkspaceFolder, excludePatterns: string[]) {
@@ -150,14 +150,10 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
     }
 
     private showWarning(message: string, workspaceFolderPath: string): void {
-        const state = this.context.globalState.get("ignoredTaskWarnings", {})
-
-        if (state[workspaceFolderPath] !== true) {
+        if (this.ignoredTaskWarnings.get<boolean>(workspaceFolderPath) !== true) {
             vscode.window.showWarningMessage(message, "Ignore for Project").then(selected => {
                 if (selected === "Ignore for Project") {
-                    // TODO: Wrap this into a more pleasant API that will be used across the extenion
-                    state[workspaceFolderPath] = true
-                    this.context.globalState.update("ignoredTaskWarnings", state)
+                    this.ignoredTaskWarnings.set(workspaceFolderPath, true)
                 }
             })
         }

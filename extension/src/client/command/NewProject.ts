@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -9,7 +9,7 @@ import { AutoWire, Logger, MavenCliProxy, ProjectPickInfo, ProjectType } from "v
 import * as vscode from "vscode"
 
 import { Commands, Patterns } from "../constants"
-import { ConfigurationManager, EnvironmentManager } from "../manager"
+import { ConfigurationManager, EnvironmentManager } from "../system"
 import { MultiStepInput, QuickPickParameters } from "../ui/MultiStepInput"
 import { Command } from "./Command"
 

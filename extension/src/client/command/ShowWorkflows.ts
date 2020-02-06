@@ -9,7 +9,7 @@ import * as vscode from "vscode"
 import { Commands, ElementKinds } from "../constants"
 import { Command } from "./Command"
 import { ContentLocation } from "../provider/content/ContentLocation"
-import { ConfigurationManager, EnvironmentManager } from "../manager"
+import { ConfigurationManager, EnvironmentManager } from "../system"
 
 @AutoWire
 export class ShowWorkflows extends Command {

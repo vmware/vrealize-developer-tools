@@ -12,7 +12,7 @@ import * as fs from "fs-extra"
 import { Commands } from "../constants"
 import { Command } from "./Command"
 import { WorkflowNode } from "../provider/explorer/model"
-import { ConfigurationManager, EnvironmentManager } from "../manager"
+import { ConfigurationManager, EnvironmentManager } from "../system"
 
 @AutoWire
 export class FetchWorkflowSchema extends Command {

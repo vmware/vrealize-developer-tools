@@ -10,7 +10,7 @@ import * as vscode from "vscode"
 import * as fs from "fs-extra"
 
 import { Registrable } from "../../Registrable"
-import { ConfigurationManager, EnvironmentManager } from "../../manager"
+import { ConfigurationManager, EnvironmentManager } from "../../system"
 import { RemoteDocument } from "./RemoteDocument"
 import { ContentLocation } from "./ContentLocation"
 

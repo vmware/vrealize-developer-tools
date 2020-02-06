@@ -22,7 +22,7 @@ import {
 import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"
-import { ConfigurationManager, EnvironmentManager } from "../manager"
+import { ConfigurationManager, EnvironmentManager } from "../system"
 import { Command } from "./Command"
 
 const IIFE_WRAPPER_PATTERN = /\(function\s*\(\)\s*{([\s\S]*)}\);?/

@@ -12,7 +12,7 @@ import * as client from "vscode-languageclient"
 
 import { OutputChannels } from "../constants"
 import { Registrable } from "../Registrable"
-import { ConfigurationManager, EnvironmentManager } from "../manager"
+import { ConfigurationManager, EnvironmentManager } from "../system"
 
 class ErrorHandler {
     closed(): client.CloseAction {
