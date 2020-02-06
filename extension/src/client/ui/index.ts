@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: MIT
  */
 
-export * from "./ClientWindow"
-export * from "./MultiStepInput"
+export * from "./StatusBarController"

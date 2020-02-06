@@ -6,7 +6,7 @@
 import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { BuiltInCommands, Commands, Views } from "../../constants"
+import { BuiltInCommands, CommandContext, Commands, Views } from "../../constants"
 import { Registrable } from "../../Registrable"
 import { AbstractNode } from "./model"
 import { PropertyNode } from "./model/leaf/PropertyNode"
@@ -28,7 +28,7 @@ export class PropertiesProvider implements vscode.TreeDataProvider<AbstractNode>
             showCollapseAll: true,
             treeDataProvider: this
         })
-        vscode.commands.executeCommand(BuiltInCommands.SetContext, "vrdev:properties:empty", true)
+        vscode.commands.executeCommand(BuiltInCommands.SetContext, CommandContext.EmptyProperties, true)
 
         const showProperties = vscode.commands.registerCommand(Commands.ShowItemProperties, (node: AbstractNode) =>
             this.refresh(node)

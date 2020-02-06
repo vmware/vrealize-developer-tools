@@ -16,35 +16,28 @@ import {
     MavenProfileWrapper,
     VrealizeSettings
 } from "vrealize-common"
-import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 
-import { Commands } from "../constants"
-import { LanguageServices } from "../lang"
-import { ClientWindow } from "../ui"
+import { BuiltInCommands } from "../constants"
 import { Registrable } from "../Registrable"
 
 @AutoWire
 export class ConfigurationManager extends BaseConfiguration implements Registrable {
-    private clientWindow: ClientWindow
-    private languageServices: LanguageServices
 
     private homeDir = process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"] || "~"
     private readonly logger = Logger.get("ConfigurationManager")
 
     readonly settingsXmlPath: string = path.resolve(this.homeDir, ".m2", "settings.xml")
 
-    constructor(languageServices: LanguageServices) {
+    constructor() {
         super()
-        this.languageServices = languageServices
     }
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext): void {
         this.logger.debug("Registering the configuration manager")
-        this.clientWindow = clientWindow
         this.vrdev = vscode.workspace.getConfiguration().get<VrealizeSettings>("vrdev") as VrealizeSettings
 
-        vscode.workspace.onDidChangeConfiguration(this.onDidChangeConfiguration, this, context.subscriptions)
+        vscode.workspace.onDidChangeConfiguration(this.onConfigurationChanged, this, context.subscriptions)
 
         this.subscribeToSettingsXmlChanges(context)
     }
@@ -58,9 +51,19 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         }
     }
 
+    private _onDidChangeConfig = new vscode.EventEmitter<vscode.ConfigurationChangeEvent>()
+    get onDidChangeConfig(): vscode.Event<vscode.ConfigurationChangeEvent> {
+        return this._onDidChangeConfig.event
+    }
+
+    private _onDidChangeProfiles = new vscode.EventEmitter<MavenProfilesMap>()
+    get onDidChangeProfiles(): vscode.Event<MavenProfilesMap> {
+        return this._onDidChangeProfiles.event
+    }
+
     private subscribeToSettingsXmlChanges(context: vscode.ExtensionContext) {
         const watcher = chokidar.watch(this.settingsXmlPath, { awaitWriteFinish: true })
-        watcher.on("change", this.onDidChangeProfiles.bind(this))
+        watcher.on("change", this.onMavenProfilesChanged.bind(this))
 
         const disposable = {
             dispose() {
@@ -70,44 +73,37 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         }
 
         context.subscriptions.push(disposable)
-        // force load profiles and send notification to the LS upon initialization
-        this.onDidChangeProfiles()
     }
 
-    private onDidChangeConfiguration(event: vscode.ConfigurationChangeEvent) {
+    private onConfigurationChanged(event: vscode.ConfigurationChangeEvent) {
         this.vrdev = vscode.workspace.getConfiguration().get<VrealizeSettings>("vrdev") as VrealizeSettings
         this.logger.debug("Configuration change has been detected. New config: ", this.vrdev)
         Logger.setup(undefined, this.vrdev.log)
-        this.updateClientWindow()
+        this._onDidChangeConfig.fire(event)
     }
 
-    private onDidChangeProfiles() {
+    private onMavenProfilesChanged() {
         this.logger.debug(`Maven settings.xml change event has been detected.`)
-
-        this.allProfiles = this.forceLoadProfiles()
-        if (this.allProfiles) {
-            if (this.languageServices.client) {
-                this.languageServices.client.sendNotification(remote.client.didChangeMavenProfiles, this.allProfiles)
-            }
-
-            this.updateClientWindow()
-        }
+        this.forceLoadProfiles()
     }
 
-    private forceLoadProfiles(): MavenProfilesMap | undefined {
+    forceLoadProfiles(): void {
         if (!fs.existsSync(this.settingsXmlPath)) {
-            vscode.window.showErrorMessage("Missing maven settings file: ~/.m2/settings.xml", "Reload Window").then(selected => {
-                if (selected === "Reload Window") {
-                    vscode.commands.executeCommand("workbench.action.reloadWindow")
-                }
-            })
+            vscode.window
+                .showErrorMessage("Missing maven settings file: ~/.m2/settings.xml", "Reload Window")
+                .then(selected => {
+                    if (selected === "Reload Window") {
+                        vscode.commands.executeCommand(BuiltInCommands.ReloadWindow)
+                    }
+                })
         }
 
         const settingsXmlContent = fs.readFileSync(this.settingsXmlPath)
 
         if (settingsXmlContent.length < 1) {
             this.logger.warn(`Got no content from ${this.settingsXmlPath}`)
-            return undefined
+            this.allProfiles = undefined
+            return
         }
 
         const settingsJson = xmlParser.parse(settingsXmlContent.toString("utf8"))
@@ -116,7 +112,8 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
 
         if (!allProfiles) {
             this.logger.warn(`No profiles found in ${this.settingsXmlPath}`)
-            return undefined
+            this.allProfiles = undefined
+            return
         }
 
         for (const profile of allProfiles) {
@@ -131,14 +128,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         }
 
         this.logger.info("Found vRO profiles: ", vroProfiles)
-        return vroProfiles
-    }
-
-    private updateClientWindow() {
-        const currentProfileName = this.hasActiveProfile() ? this.activeProfile.get("id") : undefined
-
-        if (this.clientWindow.verifyConfiguration(this) && currentProfileName !== this.clientWindow.profileName) {
-            vscode.commands.executeCommand(Commands.TriggerServerCollection, this.clientWindow)
-        }
+        this.allProfiles = vroProfiles
+        this._onDidChangeProfiles.fire(vroProfiles)
     }
 }

@@ -10,7 +10,7 @@ import * as vscode from "vscode"
 
 import { Commands, Patterns } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../manager"
-import { MultiStepInput, QuickPickParameters } from "../ui"
+import { MultiStepInput, QuickPickParameters } from "../ui/MultiStepInput"
 import { Command } from "./Command"
 
 interface State extends ProjectPickInfo {

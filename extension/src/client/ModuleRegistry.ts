@@ -6,7 +6,6 @@
 import { di, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { ClientWindow } from "./ui"
 import { Registrable } from "./Registrable"
 
 type Constructable<T> = new () => T
@@ -15,7 +14,7 @@ export class ModuleRegistry {
     private readonly container: di.Container
     private readonly logger = Logger.get("ModuleRegistry")
 
-    constructor(private context: vscode.ExtensionContext, private clientWindow: ClientWindow) {
+    constructor(private context: vscode.ExtensionContext) {
         this.container = new di.Container()
     }
 
@@ -44,7 +43,7 @@ export class ModuleRegistry {
             }
 
             if (this.isRegistrable(clsInstance)) {
-                clsInstance.register(this.context, this.clientWindow)
+                clsInstance.register(this.context)
             }
         }
     }

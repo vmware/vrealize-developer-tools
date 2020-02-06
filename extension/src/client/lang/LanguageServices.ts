@@ -5,13 +5,14 @@
 
 import * as path from "path"
 
-import { AutoWire, Logger } from "vrealize-common"
+import { AutoWire, Logger, MavenProfilesMap } from "vrealize-common"
+import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 import * as client from "vscode-languageclient"
 
 import { OutputChannels } from "../constants"
-import { ClientWindow } from "../ui"
 import { Registrable } from "../Registrable"
+import { ConfigurationManager, EnvironmentManager } from "../manager"
 
 class ErrorHandler {
     closed(): client.CloseAction {
@@ -29,9 +30,12 @@ export class LanguageServices implements Registrable, vscode.Disposable {
     private languageClient: client.LanguageClient | undefined
     private outputChannel: vscode.OutputChannel
     private extensionContext: vscode.ExtensionContext
+    private config: ConfigurationManager
+    private env: EnvironmentManager
 
-    constructor() {
-        // empty
+    constructor(configuration: ConfigurationManager, environment: EnvironmentManager) {
+        this.config = configuration
+        this.env = environment
     }
 
     get client(): client.LanguageClient | undefined {
@@ -46,15 +50,26 @@ export class LanguageServices implements Registrable, vscode.Disposable {
         return Promise.resolve()
     }
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext): void {
         this.extensionContext = context
+        this.config.onDidChangeProfiles(this.onMavenProfilesChanged, this, context.subscriptions)
     }
 
     initialize(): Promise<void> {
+        if (!this.env.hasRelevantProject()) {
+            return Promise.resolve()
+        }
+
         this.outputChannel = vscode.window.createOutputChannel(OutputChannels.LanguageServerLogs)
         this.languageClient = this.newLanguageClient()
         this.languageClient.start()
         return this.languageClient.onReady()
+    }
+
+    private onMavenProfilesChanged(profiles: MavenProfilesMap) {
+        if (this.languageClient) {
+            this.languageClient.sendNotification(remote.client.didChangeMavenProfiles, profiles)
+        }
     }
 
     private newLanguageClient(): client.LanguageClient {
