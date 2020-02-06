@@ -6,7 +6,7 @@
 const gulp = require("gulp")
 const log = require("fancy-log")
 const publishRelease = require("gulp-github-release")
-const { ReleaseNotes } = require("pull-release-notes")
+const { ReleaseNotes } = require("@nblagoev/pull-release-notes")
 
 const REPO_OWNER = "vmware"
 const REPO_NAME = "vrealize-developer-tools"

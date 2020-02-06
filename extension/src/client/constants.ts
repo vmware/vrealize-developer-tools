@@ -8,6 +8,7 @@ export const extensionShortName = "vRealize"
 export enum BuiltInCommands {
     Open = "vscode.open",
     OpenFolder = "vscode.openFolder",
+    ReloadWindow = "workbench.action.reloadWindow",
     SetContext = "setContext"
 }
 
@@ -40,6 +41,11 @@ export enum Commands {
 
 export enum FixCommands {
     PomFixLine = "vrdev.pom.diagnostics.fixLine"
+}
+
+export enum CommandContext {
+    EmptyProperties = "vrdev:properties:empty",
+    Project = "vrdev:context:project"
 }
 
 export enum Diagnostics {

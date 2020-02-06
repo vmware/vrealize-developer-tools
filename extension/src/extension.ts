@@ -15,7 +15,7 @@ import * as lang from "./client/lang"
 import * as lint from "./client/lint"
 import * as system from "./client/system"
 import * as provider from "./client/provider"
-import { ClientWindow } from "./client/ui"
+import * as ui from "./client/ui"
 
 const logger = Logger.get("extension")
 let langServices: lang.LanguageServices
@@ -25,20 +25,21 @@ export async function activate(context: vscode.ExtensionContext) {
     Logger.setup(getLoggingChannel(), config.get<LogLevel>("log"))
 
     logger.info("\n\n=== Activating vRealize Developer Tools ===\n")
-    const window = new ClientWindow(config.get("maven.profile"), context)
-    context.subscriptions.push(window)
 
-    const registry = new ModuleRegistry(context, window)
-    registry.registerModules(lang)
+    const registry = new ModuleRegistry(context)
+    registry.registerModules(system, lang)
 
-    // register and initialize the language services before the rest of the modules
     langServices = registry.get(lang.LanguageServices)
     await langServices.initialize()
 
-    registry.registerModules(system, command, lint, provider)
+    const configManager = registry.get(system.ConfigurationManager)
+    configManager.forceLoadProfiles() // initial load and send to LS
 
-    if (window.verifyConfiguration(registry.get(system.ConfigurationManager))) {
-        vscode.commands.executeCommand(Commands.TriggerServerCollection, window)
+    registry.registerModules(ui, command, lint, provider)
+
+    const statusBar = registry.get(ui.StatusBarController)
+    if (statusBar.verifyConfiguration()) {
+        vscode.commands.executeCommand(Commands.TriggerServerCollection)
     }
 }
 

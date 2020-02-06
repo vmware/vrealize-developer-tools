@@ -9,7 +9,6 @@ import { AutoWire, Logger, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 import * as fs from "fs-extra"
 
-import { ClientWindow } from "../../ui"
 import { Registrable } from "../../Registrable"
 import { ConfigurationManager, EnvironmentManager } from "../../system"
 import { RemoteDocument } from "./RemoteDocument"
@@ -33,7 +32,7 @@ export class ContentProvider implements vscode.TextDocumentContentProvider, Regi
         this.documents.clear()
     }
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext): void {
         this.logger.debug(`Registering content provider for URI scheme ${ContentLocation.VRO_URI_SCHEME}`)
         this.subscriptions = vscode.workspace.onDidCloseTextDocument(doc => this.documents.delete(doc.uri.toString()))
         const providerRegistration = vscode.workspace.registerTextDocumentContentProvider(

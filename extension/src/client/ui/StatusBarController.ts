@@ -3,35 +3,49 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { Logger } from "vrealize-common"
+import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
-import { ConfigurationManager } from "../system"
+import { ConfigurationManager, EnvironmentManager } from "../system"
+import { Registrable } from "../Registrable"
 
-export class ClientWindow implements vscode.Disposable {
-    private readonly logger = Logger.get("ClientWindow")
+@AutoWire
+export class StatusBarController implements Registrable, vscode.Disposable {
+    private readonly logger = Logger.get("StatusBarController")
     private readonly collectionButton: vscode.StatusBarItem
     private readonly collectionStatus: vscode.StatusBarItem
+    private readonly config: ConfigurationManager
+    private readonly env: EnvironmentManager
 
     profileName: string | undefined
 
-    constructor(initialProfileName: string | undefined, context: vscode.ExtensionContext) {
-        this.logger.debug("Instantiating the client window")
-
-        context.subscriptions.push(
-            vscode.commands.registerCommand(Commands.EventCollectionStart, this.onCollectionStart.bind(this)),
-            vscode.commands.registerCommand(Commands.EventCollectionSuccess, this.onCollectionSuccess.bind(this)),
-            vscode.commands.registerCommand(Commands.EventCollectionError, this.onCollectionError.bind(this))
-        )
+    constructor(config: ConfigurationManager, env: EnvironmentManager) {
+        this.logger.debug("Instantiating the status bar controller")
 
         this.collectionStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10101)
         this.collectionButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10100)
+        this.profileName = config.vrdev.maven.profile
+        this.config = config
+        this.env = env
+    }
+
+    register(context: vscode.ExtensionContext): void {
+        context.subscriptions.push(this)
+
+        if (this.env.hasRelevantProject()) {
+            context.subscriptions.push(
+                vscode.commands.registerCommand(Commands.EventCollectionStart, this.onCollectionStart.bind(this)),
+                vscode.commands.registerCommand(Commands.EventCollectionSuccess, this.onCollectionSuccess.bind(this)),
+                vscode.commands.registerCommand(Commands.EventCollectionError, this.onCollectionError.bind(this))
+            )
+        }
 
         this.collectionStatus.text = "$(plug) $(kebab-horizontal)"
-        this.profileName = initialProfileName
-
         this.collectionStatus.show()
+
+        this.config.onDidChangeConfig(this.onConfigurationOrProfilesChanged, this, context.subscriptions)
+        this.config.onDidChangeProfiles(this.onConfigurationOrProfilesChanged, this, context.subscriptions)
     }
 
     dispose() {
@@ -39,20 +53,30 @@ export class ClientWindow implements vscode.Disposable {
         this.collectionStatus.dispose()
     }
 
-    verifyConfiguration(config: ConfigurationManager): boolean {
-        this.profileName = config.hasActiveProfile() ? config.activeProfile.get("id") : undefined
+    private onConfigurationOrProfilesChanged() {
+        const currentProfileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
+
+        if (this.verifyConfiguration() && currentProfileName !== this.profileName) {
+            vscode.commands.executeCommand(Commands.TriggerServerCollection)
+        }
+    }
+
+    verifyConfiguration(): boolean {
+        this.profileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
         this.logger.info(`Verifying configuration for active profile ${this.profileName}`)
 
         const serverConfIsValid = !!this.profileName
         if (serverConfIsValid) {
-            this.collectionButton.show()
+            if (this.env.hasRelevantProject()) {
+                this.collectionButton.show()
 
-            this.collectionButton.text = "$(cloud-download)"
-            this.collectionButton.command = Commands.TriggerServerCollection
-            this.collectionButton.tooltip = "Trigger vRO hint collection"
-            this.collectionButton.color = undefined
+                this.collectionButton.text = "$(cloud-download)"
+                this.collectionButton.command = Commands.TriggerServerCollection
+                this.collectionButton.tooltip = "Trigger vRO hint collection"
+                this.collectionButton.color = undefined
+            }
 
-            const hostname = config.activeProfile.get("vro.host")
+            const hostname = this.config.activeProfile.get("vro.host")
             this.collectionStatus.text = `$(server) ${this.profileName} (${hostname})`
             this.collectionStatus.tooltip = "Change active profile"
             this.collectionStatus.command = Commands.ChangeProfile
@@ -97,7 +121,7 @@ export class ClientWindow implements vscode.Disposable {
 
         vscode.window.showErrorMessage(errorMessage, "Retry").then(selected => {
             if (selected === "Retry") {
-                vscode.commands.executeCommand(Commands.TriggerServerCollection, this)
+                vscode.commands.executeCommand(Commands.TriggerServerCollection)
             }
         })
     }

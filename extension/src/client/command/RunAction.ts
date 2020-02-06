@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -9,12 +9,20 @@ import * as fs from "fs-extra"
 import * as moment from "moment"
 import * as semver from "semver"
 import * as tmp from "tmp"
-import { AutoWire, Logger, MavenCliProxy, PomFile, sleep, VroRestClient, VrotscCliProxy } from "vrealize-common"
+import {
+    AutoWire,
+    Logger,
+    LogMessage,
+    MavenCliProxy,
+    PomFile,
+    sleep,
+    VroRestClient,
+    VrotscCliProxy
+} from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
-import { ClientWindow } from "../ui"
 import { Command } from "./Command"
 
 const IIFE_WRAPPER_PATTERN = /\(function\s*\(\)\s*{([\s\S]*)}\);?/
@@ -24,8 +32,6 @@ const RUN_SCRIPT_WORKFLOW_ID = "98568979-76ed-4a4a-854b-1e730e2ef4f1"
 @AutoWire
 export class RunAction extends Command {
     private readonly logger = Logger.get("RunAction")
-    private readonly restClient: VroRestClient
-    private readonly mavenProxy: MavenCliProxy
     private readonly vrotsc: VrotscCliProxy
     private readonly outputChannel = vscode.window.createOutputChannel(OutputChannels.RunActionLogs)
     private runtimeExceptionDecoration: vscode.TextEditorDecorationType
@@ -38,13 +44,11 @@ export class RunAction extends Command {
 
     constructor(private config: ConfigurationManager, private environment: EnvironmentManager) {
         super()
-        this.restClient = new VroRestClient(config, environment)
-        this.mavenProxy = new MavenCliProxy(environment, config.vrdev.maven, this.logger)
         this.vrotsc = new VrotscCliProxy(this.logger)
     }
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
-        super.register(context, clientWindow)
+    register(context: vscode.ExtensionContext): void {
+        super.register(context)
 
         this.runtimeExceptionDecoration = vscode.window.createTextEditorDecorationType({
             isWholeLine: true,
@@ -91,20 +95,57 @@ export class RunAction extends Command {
             const scriptContent = await this.getScriptContent(activeTextEditor.document)
 
             this.outputChannel.appendLine(`# Running ${activeFileName}`)
-            const supportsSysLog = await this.supportsSysLog()
-            const token = await this.runScript(context, scriptContent, supportsSysLog)
-            this.outputChannel.appendLine(`# Execution ID: ${token}\n`)
-            const finalState = await this.waitToFinish(token, activeTextEditor, supportsSysLog)
-            const duration = await this.calculateExecutionTime(token)
-            const finished = finalState.charAt(0).toUpperCase() + finalState.slice(1)
-            this.outputChannel.appendLine(`\n# ${finished} after ${duration}`)
+            const actionRunner = new ActionRunner(this.config, this.environment)
+            await actionRunner.prepare(context)
+
+            await actionRunner.run(scriptContent, (version, token) => {
+                this.outputChannel.appendLine(`# vRO Version: ${version}`)
+                this.outputChannel.appendLine(`# Execution ID: ${token}\n`)
+            })
+
+            await actionRunner.observe(
+                (message: string) => this.onLog(message),
+                (lineNumber: number, message: string) => this.onError(lineNumber, message, activeTextEditor),
+                (state: string, duration: string) => this.onEnd(state, duration)
+            )
         } catch (e) {
             const errorMessage = typeof e === "string" ? e : e.message
             this.outputChannel.appendLine(`# An error occurred: ${errorMessage}`)
+            this.logger.error(e)
+            this.logger.debug(e.stack)
             vscode.window.showErrorMessage(errorMessage)
         } finally {
             this.running = false
         }
+    }
+
+    private onLog(message: string) {
+        this.outputChannel.appendLine(message)
+    }
+
+    private onError(lineNumber: number, message: string, editor: vscode.TextEditor) {
+        const hasIife = IIFE_WRAPPER_PATTERN.exec(editor.document.getText())
+
+        if (hasIife) {
+            const offsetIndex = hasIife.index // store the position of the beggining of the regex match
+            if (offsetIndex > 0) {
+                lineNumber += editor.document.positionAt(offsetIndex).line
+            }
+        }
+
+        const range = editor.document.lineAt(lineNumber - 1).range
+        const filename = path.basename(editor.document.uri.fsPath)
+        const hoverMessage = [
+            new vscode.MarkdownString(`A runtime exception ocurred while executing script _${filename}_`),
+            new vscode.MarkdownString(`\`${message}\``)
+        ]
+        const decoration = { range, hoverMessage }
+        editor.setDecorations(this.runtimeExceptionDecoration, [decoration])
+    }
+
+    private onEnd(state: string, duration: string) {
+        const capitalizedState = state.charAt(0).toUpperCase() + state.slice(1)
+        this.outputChannel.appendLine(`\n# ${capitalizedState} after ${duration}`)
     }
 
     private validateFileType(document: vscode.TextDocument): boolean {
@@ -173,12 +214,21 @@ export class RunAction extends Command {
 
         return Promise.reject(`Unsupported language ID: ${document.languageId}`)
     }
+}
 
-    private async runScript(
-        context: vscode.ExtensionContext,
-        scriptContent: string,
-        supportsSysLog: boolean
-    ): Promise<string> {
+class ActionRunner {
+    private readonly logger = Logger.get("ActionRunner")
+    private readonly restClient: VroRestClient
+    private readonly mavenProxy: MavenCliProxy
+    private vroVersion: string
+    private executionToken: string
+
+    constructor(config: ConfigurationManager, private environment: EnvironmentManager) {
+        this.restClient = new VroRestClient(config, environment)
+        this.mavenProxy = new MavenCliProxy(environment, config.vrdev.maven, this.logger)
+    }
+
+    async prepare(context: vscode.ExtensionContext) {
         try {
             this.logger.info(`Checking if workflow with ID ${RUN_SCRIPT_WORKFLOW_ID} exists in target vRO`)
             await this.restClient.getWorkflow(RUN_SCRIPT_WORKFLOW_ID)
@@ -206,6 +256,10 @@ export class RunAction extends Command {
                 }
             )
         }
+    }
+
+    async run(scriptContent: string, callback: (version: string, token: string) => void): Promise<void> {
+        this.vroVersion = await this.getVroVersion()
 
         let fileContent = scriptContent
         const hasIife = IIFE_WRAPPER_PATTERN.exec(fileContent)
@@ -213,7 +267,8 @@ export class RunAction extends Command {
             fileContent = hasIife[1]
         }
 
-        this.logger.info(`Running workflow ${RUN_SCRIPT_WORKFLOW_ID}`)
+        this.logger.info(`Running workflow ${RUN_SCRIPT_WORKFLOW_ID} (vRO ${this.vroVersion})`)
+        const supportsSysLog = semver.gt(this.vroVersion, "7.3.1")
         const params = [
             {
                 name: "script",
@@ -231,12 +286,12 @@ export class RunAction extends Command {
             }
         ]
 
-        const token = await this.restClient.startWorkflow(RUN_SCRIPT_WORKFLOW_ID, ...params)
-        return token
+        this.executionToken = await this.restClient.startWorkflow(RUN_SCRIPT_WORKFLOW_ID, ...params)
+        callback(this.vroVersion, this.executionToken)
     }
 
     private async getExecPackage(context: vscode.ExtensionContext): Promise<string> {
-        const storagePath = context["globalStoragePath"]
+        const storagePath = context.globalStoragePath
         if (!fs.existsSync(storagePath)) {
             fs.mkdirSync(storagePath)
         }
@@ -251,59 +306,41 @@ export class RunAction extends Command {
         return path.join(storagePath, "exec.package")
     }
 
-    private async waitToFinish(token: string, editor: vscode.TextEditor, supportsSysLog: boolean): Promise<string> {
-        const printedMessages = new Set<string>()
-        let lastLogTimestamp = 0
+    async observe(
+        onLog: (message: string) => void,
+        onError: (lineNumber: number, message: string) => void,
+        onEnd: (state: string, duration: string) => void
+    ): Promise<void> {
+        const fetchLogsStrategy = this.getLoggingStrategy(onLog, onError)
+        const finalStates = ["completed", "failed", "canceled"]
         let state = "initializing"
 
         do {
-            if (supportsSysLog) {
-                lastLogTimestamp = await this.printMessagesSince(token, printedMessages, lastLogTimestamp, editor)
-            }
+            await fetchLogsStrategy.printMessages()
             await sleep(200)
-            state = await this.restClient.getWorkflowExecutionState(RUN_SCRIPT_WORKFLOW_ID, token)
+            state = await this.restClient.getWorkflowExecutionState(RUN_SCRIPT_WORKFLOW_ID, this.executionToken)
             this.logger.debug(`Workflow ${RUN_SCRIPT_WORKFLOW_ID} execution state: ${state}`)
-        } while (["completed", "failed", "canceled"].indexOf(state) < 0)
+        } while (finalStates.indexOf(state) < 0)
 
-        if (supportsSysLog) {
-            await sleep(1500)
-            await this.printMessagesSince(token, printedMessages, lastLogTimestamp, editor)
-        } else {
-            const execution = await this.restClient.getWorkflowExecution(RUN_SCRIPT_WORKFLOW_ID, token)
-            const logs = execution["output-parameters"][0].value.string.value
-            this.outputChannel.appendLine(logs)
+        await fetchLogsStrategy.finalize()
+        onEnd(state, await this.getDuration())
+    }
+
+    private getLoggingStrategy(
+        onLog: (message: string) => void,
+        onError: (lineNumber: number, message: string) => void
+    ): FetchLogsStrategy {
+        if (semver.lt(this.vroVersion, "7.4.0")) {
+            return new FetchLogsPre74(onLog, onError, this.executionToken, this.restClient)
+        } else if (semver.lt(this.vroVersion, "7.6.0")) {
+            return new FetchLogsPre76(onLog, onError, this.executionToken, this.restClient)
         }
 
-        return state
+        return new FetchLogsPost76(onLog, onError, this.executionToken, this.restClient)
     }
 
-    private async printMessagesSince(
-        token: string,
-        printedMessages: Set<string>,
-        lastLogTimestamp: number,
-        editor: vscode.TextEditor
-    ): Promise<number> {
-        const timestamp = Date.now() - 10000 // 10sec earlier
-        const logs = await this.restClient.getWorkflowLogs(RUN_SCRIPT_WORKFLOW_ID, token, "debug", lastLogTimestamp)
-        logs.forEach(logMessage => {
-            const timestamp = moment(logMessage.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")
-            const msg = `[${timestamp}] [${logMessage.severity}] ${logMessage.description}`
-            if (!printedMessages.has(msg)) {
-                this.outputChannel.appendLine(msg)
-                printedMessages.add(msg)
-
-                const hasErrorLineNumber = SCRIPT_ERROR_LINE_PATTERN.exec(msg)
-                if (hasErrorLineNumber) {
-                    this.highlightError(parseInt(hasErrorLineNumber[1], 10), hasErrorLineNumber[2], editor)
-                }
-            }
-        })
-
-        return timestamp
-    }
-
-    private async calculateExecutionTime(token: string): Promise<string> {
-        const execution = await this.restClient.getWorkflowExecution(RUN_SCRIPT_WORKFLOW_ID, token)
+    private async getDuration(): Promise<string> {
+        const execution = await this.restClient.getWorkflowExecution(RUN_SCRIPT_WORKFLOW_ID, this.executionToken)
         const start = moment(execution["start-date"])
         const end = moment(execution["end-date"])
         const duration = moment.duration(end.diff(start))
@@ -311,30 +348,123 @@ export class RunAction extends Command {
         return moment.utc(duration.as("milliseconds")).format("m[m] s[s]")
     }
 
-    private highlightError(lineNumber: number, message: string, editor: vscode.TextEditor) {
-        const hasIife = IIFE_WRAPPER_PATTERN.exec(editor.document.getText())
+    private async getVroVersion(): Promise<string> {
+        const versionInfo = await this.restClient.getVersion()
+        return versionInfo.version.replace(`.${versionInfo["build-number"]}`, "")
+    }
+}
 
-        if (hasIife) {
-            const offsetIndex = hasIife.index // store the position of the beggining of the regex match
-            if (offsetIndex > 0) {
-                lineNumber += editor.document.positionAt(offsetIndex).line
-            }
-        }
+abstract class FetchLogsStrategy {
+    constructor(
+        protected readonly log: (message: string) => void,
+        protected readonly error: (lineNumber: number, message: string) => void,
+        protected readonly executionToken: string,
+        protected readonly restClient: VroRestClient
+    ) {}
 
-        const range = editor.document.lineAt(lineNumber - 1).range
-        const filename = path.basename(editor.document.uri.fsPath)
-        const hoverMessage = [
-            new vscode.MarkdownString(`A runtime exception ocurred while executing script _${filename}_`),
-            new vscode.MarkdownString(`\`${message}\``)
-        ]
-        const decoration = { range, hoverMessage }
-        editor.setDecorations(this.runtimeExceptionDecoration, [decoration])
+    abstract async printMessages(): Promise<void>
+    abstract async finalize(): Promise<void>
+}
+
+class FetchLogsPre74 extends FetchLogsStrategy {
+    constructor(
+        onLog: (message: string) => void,
+        onError: (lineNumber: number, message: string) => void,
+        executionToken: string,
+        restClient: VroRestClient
+    ) {
+        super(onLog, onError, executionToken, restClient)
     }
 
-    private async supportsSysLog(): Promise<boolean> {
-        const versionInfo = await this.restClient.getVersion()
-        const version = versionInfo.version.replace(`.${versionInfo["build-number"]}`, "")
+    async printMessages(): Promise<void> {
+        // we do nothing since vRO API below version 7.4
+        // does not support getting the execution logs
+    }
 
-        return semver.gt(version, "7.3.1")
+    async finalize(): Promise<void> {
+        const execution = await this.restClient.getWorkflowExecution(RUN_SCRIPT_WORKFLOW_ID, this.executionToken)
+        const logs = execution["output-parameters"][0].value.string.value
+        this.log(logs)
+    }
+}
+
+abstract class FetchSysLogsStrategy extends FetchLogsStrategy {
+    protected readonly printedMessages = new Set<string>()
+    protected lastTimestamp = 0
+
+    constructor(
+        onLog: (message: string) => void,
+        onError: (lineNumber: number, message: string) => void,
+        executionToken: string,
+        restClient: VroRestClient
+    ) {
+        super(onLog, onError, executionToken, restClient)
+    }
+
+    protected abstract getLogMessages(): Promise<LogMessage[]>
+
+    async printMessages(): Promise<void> {
+        const timestamp = Date.now() - 10000 // 10sec earlier
+        const logs = await this.getLogMessages()
+        logs.forEach(logMessage => {
+            const timestamp = moment(logMessage.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")
+            const msg = `[${timestamp}] [${logMessage.severity}] ${logMessage.description}`
+            if (!this.printedMessages.has(msg)) {
+                this.log(msg)
+                this.printedMessages.add(msg)
+
+                const hasErrorLineNumber = SCRIPT_ERROR_LINE_PATTERN.exec(msg)
+                if (hasErrorLineNumber) {
+                    this.error(parseInt(hasErrorLineNumber[1], 10), hasErrorLineNumber[2])
+                }
+            }
+        })
+
+        this.lastTimestamp = timestamp
+    }
+
+    async finalize(): Promise<void> {
+        await sleep(1500) // give some time to vRO to flush the logs on disk
+        await this.printMessages()
+    }
+}
+
+class FetchLogsPre76 extends FetchSysLogsStrategy {
+    constructor(
+        onLog: (message: string) => void,
+        onError: (lineNumber: number, message: string) => void,
+        executionToken: string,
+        restClient: VroRestClient
+    ) {
+        super(onLog, onError, executionToken, restClient)
+    }
+
+    protected getLogMessages(): Promise<LogMessage[]> {
+        return this.restClient.getWorkflowLogsPre76(
+            RUN_SCRIPT_WORKFLOW_ID,
+            this.executionToken,
+            "debug",
+            this.lastTimestamp
+        )
+    }
+}
+
+class FetchLogsPost76 extends FetchSysLogsStrategy {
+    constructor(
+        onLog: (message: string) => void,
+        onError: (lineNumber: number, message: string) => void,
+        executionToken: string,
+        restClient: VroRestClient
+    ) {
+        super(onLog, onError, executionToken, restClient)
+    }
+
+    protected getLogMessages(): Promise<LogMessage[]> {
+        return this.restClient.getWorkflowLogsPost76(
+            RUN_SCRIPT_WORKFLOW_ID,
+            this.executionToken,
+            "debug",
+            this.lastTimestamp
+        )
     }
 }

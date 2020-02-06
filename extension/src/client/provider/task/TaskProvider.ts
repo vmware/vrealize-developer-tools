@@ -9,14 +9,13 @@ import * as fs from "fs-extra"
 import * as jsonParser from "jsonc-parser"
 import * as _ from "lodash"
 import * as micromatch from "micromatch"
-import { Logger, PomFile, TasksInfo } from "vrealize-common"
+import { AutoWire, Logger, PomFile, TasksInfo } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { extensionShortName } from "../../constants"
-import { ClientWindow } from "../../ui"
 import { Registrable } from "../../Registrable"
 import { TASKS_BY_TOOLCHAIN_PARENT } from "./DefaultTasksJson"
-import { ScopedMemento } from "../../system"
+import { EnvironmentManager, ScopedMemento } from "../../system"
 
 interface VrealizeTaskDefinition extends vscode.TaskDefinition {
     command: string
@@ -26,9 +25,14 @@ interface VrealizeTaskDefinition extends vscode.TaskDefinition {
     osx?: { command: string }
 }
 
+@AutoWire
 export class TaskProvider implements vscode.TaskProvider, Registrable {
     private readonly logger = Logger.get("TaskProvider")
     private ignoredTaskWarnings: ScopedMemento
+
+    constructor(private env: EnvironmentManager) {
+        // empty
+    }
 
     dispose() {
         // empty
@@ -37,7 +41,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
     async provideTasks(token?: vscode.CancellationToken): Promise<vscode.Task[]> {
         const tasksConf = vscode.workspace.getConfiguration("vrdev").get<TasksInfo>("tasks")
 
-        if (tasksConf && tasksConf.disable === true) {
+        if (tasksConf && tasksConf.disable === true || !this.env.hasRelevantProject()) {
             return []
         }
 
@@ -55,7 +59,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         return undefined
     }
 
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext): void {
         this.logger.debug("Registering the task provider")
         this.ignoredTaskWarnings = ScopedMemento.from(context.globalState, "ignoredTaskWarnings")
 

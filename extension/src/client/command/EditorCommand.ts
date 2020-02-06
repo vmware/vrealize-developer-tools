@@ -6,11 +6,10 @@
 import { Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { ClientWindow } from "../ui"
 import { Registrable } from "../Registrable"
 
 export abstract class EditorCommand implements Registrable {
-    register(context: vscode.ExtensionContext, clientWindow: ClientWindow): void {
+    register(context: vscode.ExtensionContext): void {
         Logger.get("EditorCommand").debug(`Registering editor command '${this.commandId}'`)
 
         const disposable: vscode.Disposable = vscode.commands.registerTextEditorCommand(
