@@ -8,7 +8,7 @@ import * as path from "path"
 import { URI, UriComponents } from "vscode-uri"
 
 import { default as Logger } from "../logger"
-import { PomFile } from "../maven/"
+import { PomFile } from "../maven"
 
 export class WorkspaceFolder {
     private readonly logger = Logger.get("WorkspaceFolder")
@@ -23,6 +23,15 @@ export class WorkspaceFolder {
             this.logger.warn(`Could not find project type of workspace folder ${this.uri.fsPath}`, e)
             return undefined
         }
+    }
+
+    is(otherType: string): boolean {
+        const thisType = this.projectType
+        if (!thisType || !otherType) {
+            return false
+        }
+
+        return thisType === otherType
     }
 
     static fromProtocol(source: { uri: string; name: string }): WorkspaceFolder {

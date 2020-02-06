@@ -27,11 +27,14 @@ export class EnvironmentManager extends BaseEnvironment {
         return extensionShortName
     }
 
-    hasRelevantProject(): boolean {
+    hasRelevantProject(filter?: (folder: WorkspaceFolder) => boolean): boolean {
         const projectTypes = Object.values(ProjectArchetypes) as string[]
 
         return this.workspaceFolders.some(folder => {
-            return !!folder.projectType && projectTypes.includes(folder.projectType)
+            const isSupportedProjectType = !!folder.projectType && projectTypes.includes(folder.projectType)
+            const matchesFilter = !filter || filter(folder)
+
+            return isSupportedProjectType && matchesFilter
         })
     }
 }

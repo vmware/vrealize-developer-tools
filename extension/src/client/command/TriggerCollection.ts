@@ -30,7 +30,7 @@ export class TriggerCollection extends Command {
         const languageClient = this.languageServices.client
 
         if (!languageClient) {
-            vscode.window.showErrorMessage("The vRO language server is not running")
+            this.logger.warn("The vRO language server is not running")
             return
         }
 

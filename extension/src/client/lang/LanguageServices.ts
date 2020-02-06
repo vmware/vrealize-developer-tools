@@ -10,7 +10,7 @@ import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 import * as client from "vscode-languageclient"
 
-import { OutputChannels } from "../constants"
+import { OutputChannels, ProjectArchetypes } from "../constants"
 import { Registrable } from "../Registrable"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 
@@ -56,7 +56,7 @@ export class LanguageServices implements Registrable, vscode.Disposable {
     }
 
     initialize(): Promise<void> {
-        if (!this.env.hasRelevantProject()) {
+        if (!this.env.hasRelevantProject(prj => prj.is(ProjectArchetypes.Actions))) {
             return Promise.resolve()
         }
 

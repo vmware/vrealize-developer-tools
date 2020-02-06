@@ -5,4 +5,3 @@
 
 export * from "./ConfigurationManager"
 export * from "./EnvironmentManager"
-export * from "./ScopedMemento"
