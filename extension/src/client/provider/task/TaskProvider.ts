@@ -126,7 +126,8 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
 
         if (pomFile.isBase && pomFile.modules.length > 0) {
             pomFile.modules.forEach(module => {
-                this.includeDefaultTasks(folder, module, tasks, excludePatterns)
+                const dirname = subfolder ? path.basename(path.dirname(pomFile.filePath)) : undefined
+                this.includeDefaultTasks(folder, dirname ? `${dirname}/${module}` : module, tasks, excludePatterns)
             })
         }
     }
