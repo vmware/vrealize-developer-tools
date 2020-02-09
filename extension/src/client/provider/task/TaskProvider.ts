@@ -15,7 +15,8 @@ import * as vscode from "vscode"
 import { extensionShortName } from "../../constants"
 import { Registrable } from "../../Registrable"
 import { TASKS_BY_TOOLCHAIN_PARENT } from "./DefaultTasksJson"
-import { EnvironmentManager, ScopedMemento } from "../../system"
+import { EnvironmentManager } from "../../system"
+import { ScopedMemento } from "../../system/ScopedMemento"
 
 interface VrealizeTaskDefinition extends vscode.TaskDefinition {
     command: string

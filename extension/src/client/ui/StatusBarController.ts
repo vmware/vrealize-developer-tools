@@ -6,7 +6,7 @@
 import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Commands } from "../constants"
+import { Commands, ProjectArchetypes } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 import { Registrable } from "../Registrable"
 
@@ -33,7 +33,7 @@ export class StatusBarController implements Registrable, vscode.Disposable {
     register(context: vscode.ExtensionContext): void {
         context.subscriptions.push(this)
 
-        if (this.env.hasRelevantProject()) {
+        if (this.env.hasRelevantProject(prj => prj.is(ProjectArchetypes.Actions))) {
             context.subscriptions.push(
                 vscode.commands.registerCommand(Commands.EventCollectionStart, this.onCollectionStart.bind(this)),
                 vscode.commands.registerCommand(Commands.EventCollectionSuccess, this.onCollectionSuccess.bind(this)),
@@ -56,7 +56,11 @@ export class StatusBarController implements Registrable, vscode.Disposable {
     private onConfigurationOrProfilesChanged() {
         const currentProfileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
 
-        if (this.verifyConfiguration() && currentProfileName !== this.profileName) {
+        if (
+            this.verifyConfiguration() &&
+            currentProfileName !== this.profileName &&
+            this.env.hasRelevantProject(prj => prj.is(ProjectArchetypes.Actions))
+        ) {
             vscode.commands.executeCommand(Commands.TriggerServerCollection)
         }
     }
@@ -67,7 +71,7 @@ export class StatusBarController implements Registrable, vscode.Disposable {
 
         const serverConfIsValid = !!this.profileName
         if (serverConfIsValid) {
-            if (this.env.hasRelevantProject()) {
+            if (this.env.hasRelevantProject(prj => prj.is(ProjectArchetypes.Actions))) {
                 this.collectionButton.show()
 
                 this.collectionButton.text = "$(cloud-download)"
