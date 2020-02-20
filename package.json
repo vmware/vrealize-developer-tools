@@ -38,7 +38,8 @@
     "onCommand:vrdev.open.config",
     "onCommand:vrdev.open.resource",
     "onCommand:vrdev.run.action",
-    "onCommand:vrdev.toggle.typescript"
+    "onCommand:vrdev.toggle.typescript",
+    "onCommand:vrdev.blueprint.create"
   ],
   "main": "./extension/out/extension",
   "icon": "assets/logo.png",
@@ -188,6 +189,42 @@
         "command": "vrdev.toggle.typescript",
         "title": "Toggle TypeScript Support (Experimental)",
         "category": "vRealize"
+      },
+      {
+        "command": "vrdev.blueprint.create",
+        "title": "Create Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.save",
+        "title": "Save Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.get",
+        "title": "Get Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.deploy",
+        "title": "Deploy Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
       }
     ],
     "menus": {
@@ -282,6 +319,16 @@
         {
           "command": "vrdev.views.properties.copy",
           "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.blueprint.create",
+          "when": "viewItem =~ /vrdev:element:kind:blueprint\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.blueprint.create",
+          "when": "viewItem =~ /vrdev:element:kind:blueprint\\b/",
           "group": "1_vrdevs@1"
         }
       ],
@@ -395,6 +442,12 @@
           "type": "string",
           "default": "",
           "description": "A maven profile (i.e. -Pprofile) to be used for maven executions, e.g. pull, push, Maven collection.",
+          "scope": "window"
+        },
+        "vrdev.auth.profile": {
+          "type": "string",
+          "default": "",
+          "description": "Authentication method. Authenticate via refresh token or user-password.",
           "scope": "window"
         },
         "vrdev.experimental.typescript": {

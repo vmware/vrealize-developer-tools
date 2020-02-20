@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-export type AuthMethod = "basic" | "vra" | "vc"
+export type AuthMethod = "basic" | "vra" | "vc" | "vrang"
 
 export interface Auth {
     readonly method: AuthMethod
@@ -41,6 +41,23 @@ export class BasicAuth implements Auth {
 
 export class VraSsoAuth implements Auth {
     readonly method: AuthMethod = "vra"
+    readonly token: string
+
+    constructor(token: string) {
+        this.token = token
+    }
+
+    toRequestJson(): object {
+        return {
+            bearer: this.token
+        }
+    }
+}
+
+
+//TEST VRA-8
+export class VraNGAuth implements Auth {
+    readonly method: AuthMethod = "vrang"
     readonly token: string
 
     constructor(token: string) {

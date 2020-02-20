@@ -14,6 +14,16 @@ export interface MavenInfo {
     profile?: string
 }
 
+export interface AuthInfo {
+    profile?: string
+    host?: string
+    port?: string
+    user?: string
+    password?: string
+    domain?: string
+    refreshToken?: string
+}
+
 export interface TasksInfo {
     disable: boolean
     exclude: string[]
@@ -48,4 +58,5 @@ export interface VrealizeSettings {
     experimental: ExperimentalFlags
     buildTools: BuildTools,
     views: Views
+    auth: AuthInfo
 }

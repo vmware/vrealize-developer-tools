@@ -36,7 +36,12 @@ export enum Commands {
 
     EventCollectionStart = "vrdev.event.onCollectionStart",
     EventCollectionSuccess = "vrdev.event.onCollectionSuccess",
-    EventCollectionError = "vrdev.event.onCollectionError"
+    EventCollectionError = "vrdev.event.onCollectionError", 
+
+    CreateBluePrint = "vrdev.blueprint.create",
+    SaveBluePrint = "vrdev.blueprint.save",
+    GetBluePrint = "vrdev.blueprint.get",
+    DeployBluePrint = "vrdev.blueprint.deploy"
 }
 
 export enum FixCommands {
@@ -75,7 +80,8 @@ export enum ElementKinds {
     InventoryItem = "vrdev:element:kind:inventoryItem",
 
     Category = "vrdev:element:kind:category",
-    Module = "vrdev:element:kind:module"
+    Module = "vrdev:element:kind:module",
+    Blueprint = "vrdev:element:kind:blueprint"
 }
 
 export class Patterns {

@@ -6,3 +6,4 @@
 export * from "./auth"
 export * from "./api"
 export * from "./VroRestClient"
+export * from "./VraNGRestClient"
