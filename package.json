@@ -458,7 +458,7 @@
     "@types/vscode": "1.40.0",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
-    "codecov": "^3.6.1",
+    "codecov": "^3.6.5",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-header": "^3.0.0",
