@@ -36,12 +36,13 @@ export enum Commands {
 
     EventCollectionStart = "vrdev.event.onCollectionStart",
     EventCollectionSuccess = "vrdev.event.onCollectionSuccess",
-    EventCollectionError = "vrdev.event.onCollectionError", 
+    EventCollectionError = "vrdev.event.onCollectionError",
 
-    CreateBluePrint = "vrdev.blueprint.create",
-    SaveBluePrint = "vrdev.blueprint.save",
-    GetBluePrint = "vrdev.blueprint.get",
-    DeployBluePrint = "vrdev.blueprint.deploy"
+    ConfigureVraAuth = "vrdev.vra.auth.configure",
+    CreateBlueprint = "vrdev.blueprint.create",
+    UploadBlueprint = "vrdev.blueprint.upload",
+    FetchBlueprint = "vrdev.blueprint.fetch",
+    DeployBlueprint = "vrdev.blueprint.deploy"
 }
 
 export enum FixCommands {

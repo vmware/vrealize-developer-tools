@@ -51,7 +51,7 @@ class MavenProfileItem implements vscode.QuickPickItem {
 }
 
 @AutoWire
-export class ChangeMavenProfile extends Command {
+export class ChangeMavenProfile extends Command<void> {
     private readonly logger = Logger.get("ChangeMavenProfile")
 
     constructor(private config: ConfigurationManager) {

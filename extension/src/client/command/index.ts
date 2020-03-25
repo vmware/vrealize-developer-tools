@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -14,8 +14,9 @@ export * from "./RunAction"
 export * from "./ToggleTypeScript"
 export * from "./FetchRemoteElement"
 export * from "./FetchWorkflowSchema"
+export * from "./ConfigureVraAuth"
 export * from "./DeletePackage"
-export * from "./CreateBluePrint"
-export * from "./GetBluePrint"
-export * from "./SaveBluePrint"
-export * from "./DeployBluePrint"
+export * from "./CreateBlueprint"
+export * from "./FetchBlueprint"
+export * from "./UploadBlueprint"
+export * from "./DeployBlueprint"

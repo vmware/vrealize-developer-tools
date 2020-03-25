@@ -15,7 +15,7 @@ import { WorkflowNode } from "../provider/explorer/model"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 
 @AutoWire
-export class FetchWorkflowSchema extends Command {
+export class FetchWorkflowSchema extends Command<void> {
     private readonly logger = Logger.get("FetchWorkflowSchema")
     private readonly restClient: VroRestClient
 

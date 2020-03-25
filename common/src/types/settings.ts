@@ -5,6 +5,7 @@
 
 export type TraceLevel = "off" | "messages" | "verbose"
 export type LogLevel = "off" | "info" | "debug"
+export type VraAuthType = "refresh_token" | "password"
 
 export interface CommandPaletteInfo {
     useFullyQualifiedNames: boolean
@@ -14,14 +15,14 @@ export interface MavenInfo {
     profile?: string
 }
 
+export interface VraInfo {
+    auth: AuthInfo
+}
+
 export interface AuthInfo {
-    profile?: string
+    type?: VraAuthType
     host?: string
-    port?: string
-    user?: string
-    password?: string
-    domain?: string
-    refreshToken?: string
+    port?: number
 }
 
 export interface TasksInfo {
@@ -56,7 +57,7 @@ export interface VrealizeSettings {
     tasks: TasksInfo
     maven: MavenInfo
     experimental: ExperimentalFlags
-    buildTools: BuildTools,
+    buildTools: BuildTools
     views: Views
-    auth: AuthInfo
+    vra: VraInfo
 }

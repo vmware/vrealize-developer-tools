@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -54,9 +54,7 @@ export class VraSsoAuth implements Auth {
     }
 }
 
-
-//TEST VRA-8
-export class VraNGAuth implements Auth {
+export class VraNgAuth implements Auth {
     readonly method: AuthMethod = "vrang"
     readonly token: string
 

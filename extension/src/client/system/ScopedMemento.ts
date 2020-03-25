@@ -93,7 +93,7 @@ export class ScopedMemento {
         return items
     }
 
-    clear() {
+    clear(): Thenable<void> {
         this.state = {}
         return this.memento.update(this.namespace, undefined)
     }

@@ -11,7 +11,7 @@ import { ConfigurationManager } from "../system"
 import { Command } from "./Command"
 
 @AutoWire
-export class ToggleTypeScript extends Command {
+export class ToggleTypeScript extends Command<void> {
     private readonly logger = Logger.get("ToggleTypeScript")
 
     constructor(private config: ConfigurationManager) {

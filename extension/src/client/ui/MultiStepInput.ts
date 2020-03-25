@@ -31,6 +31,7 @@ export interface InputBoxParameters {
     totalSteps: number
     value: string
     prompt: string
+    password: boolean
     buttons?: vscode.QuickInputButton[]
     validate(value: string): Promise<string | undefined>
 }
@@ -114,7 +115,7 @@ export class MultiStepInput {
         }
     }
 
-    async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt, validate, buttons }: P) {
+    async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt, validate, password, buttons }: P) {
         const disposables: vscode.Disposable[] = []
         try {
             return await new Promise<string | (P extends { buttons: (infer I)[] } ? I : never)>((resolve, reject) => {
@@ -124,6 +125,7 @@ export class MultiStepInput {
                 input.totalSteps = totalSteps
                 input.value = value || ""
                 input.prompt = prompt
+                input.password = password
                 input.buttons = [...(this.steps.length > 1 ? [vscode.QuickInputButtons.Back] : []), ...(buttons || [])]
                 let validating = validate("")
                 disposables.push(

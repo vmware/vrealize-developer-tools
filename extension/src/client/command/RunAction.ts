@@ -30,7 +30,7 @@ const SCRIPT_ERROR_LINE_PATTERN = /\(eval\)#(\d+)\)\s+(.*)/
 const RUN_SCRIPT_WORKFLOW_ID = "98568979-76ed-4a4a-854b-1e730e2ef4f1"
 
 @AutoWire
-export class RunAction extends Command {
+export class RunAction extends Command<void> {
     private readonly logger = Logger.get("RunAction")
     private readonly vrotsc: VrotscCliProxy
     private readonly outputChannel = vscode.window.createOutputChannel(OutputChannels.RunActionLogs)

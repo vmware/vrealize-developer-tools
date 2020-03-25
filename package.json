@@ -39,7 +39,11 @@
     "onCommand:vrdev.open.resource",
     "onCommand:vrdev.run.action",
     "onCommand:vrdev.toggle.typescript",
-    "onCommand:vrdev.blueprint.create"
+    "onCommand:vrdev.vra.auth.configure",
+    "onCommand:vrdev.blueprint.create",
+    "onCommand:vrdev.blueprint.fetch",
+    "onCommand:vrdev.blueprint.upload",
+    "onCommand:vrdev.blueprint.deploy"
   ],
   "main": "./extension/out/extension",
   "icon": "assets/logo.png",
@@ -191,6 +195,11 @@
         "category": "vRealize"
       },
       {
+        "command": "vrdev.vra.auth.configure",
+        "title": "Configure vRA Authentication",
+        "category": "vRealize"
+      },
+      {
         "command": "vrdev.blueprint.create",
         "title": "Create Blueprint",
         "category": "vRealize",
@@ -200,8 +209,8 @@
         }
       },
       {
-        "command": "vrdev.blueprint.save",
-        "title": "Save Blueprint",
+        "command": "vrdev.blueprint.upload",
+        "title": "Upload Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",
@@ -209,8 +218,8 @@
         }
       },
       {
-        "command": "vrdev.blueprint.get",
-        "title": "Get Blueprint",
+        "command": "vrdev.blueprint.fetch",
+        "title": "Fetch Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",
@@ -337,6 +346,16 @@
           "when": "resourceLangId == javascript || resourceLangId == typescript",
           "command": "vrdev.run.action",
           "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.upload",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.deploy",
+          "group": "navigation"
         }
       ],
       "commandPalette": [
@@ -444,10 +463,26 @@
           "description": "A maven profile (i.e. -Pprofile) to be used for maven executions, e.g. pull, push, Maven collection.",
           "scope": "window"
         },
-        "vrdev.auth.profile": {
+        "vrdev.vra.auth.type": {
           "type": "string",
-          "default": "",
-          "description": "Authentication method. Authenticate via refresh token or user-password.",
+          "enum": [
+            "refresh_token",
+            "password"
+          ],
+          "description": "Method for authetication towards vRealize Automation 8",
+          "default": "refresh_token",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.host": {
+          "type": "string",
+          "default": "www.mgmt.cloud.vmware.com",
+          "description": "",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.port": {
+          "type": "integer",
+          "default": "443",
+          "description": "",
           "scope": "window"
         },
         "vrdev.experimental.typescript": {

@@ -59,7 +59,7 @@ const projectTypes: ProjectType[] = [
 ]
 
 @AutoWire
-export class NewProject extends Command {
+export class NewProject extends Command<void> {
     private readonly logger = Logger.get("NewProject")
     private readonly state = {} as State
     private readonly title = "Create New Project"
@@ -110,6 +110,7 @@ export class NewProject extends Command {
             step: 2,
             totalSteps: 3 + (this.state.projectType.containsWorkflows ? 1 : 0),
             value: this.state.groupId || "",
+            password: false,
             prompt: "Choose a group ID for the project - e.g. com.company.department.topic",
             validate: this.validateGroupId
         })
@@ -122,6 +123,7 @@ export class NewProject extends Command {
             step: 3,
             totalSteps: 3 + (this.state.projectType.containsWorkflows ? 1 : 0),
             value: this.state.name || "",
+            password: false,
             prompt:
                 "Choose a name for the project. If the name contains dashes, remember to " +
                 "remove the dash from any folders under src/ to avoid build and test errors.",
@@ -142,6 +144,7 @@ export class NewProject extends Command {
             step: 4,
             totalSteps: 4,
             value: this.state.workflowsPath || "",
+            password: false,
             prompt: "Choose a path for the workflows - e.g. Company/Topic/Project",
             validate: this.validateWorkflowsPath
         })
