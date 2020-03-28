@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AuthGrant, AutoWire, Logger, VraAuthType } from "vrealize-common"
+import { AuthGrant, AutoWire, Logger, validate, VraAuthType, VraNgRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
 import { ConfigurationManager } from "../system"
-import { MultiStepInput, QuickPickParameters } from "../ui/MultiStepInput"
 import { Command } from "./Command"
+import { VraIdentityStore } from "../storage"
+import { MultiStepInput, QuickPickParameters } from "../ui/MultiStepInput"
 
 interface AuthPickState {
     title: string
@@ -29,23 +30,23 @@ interface AuthTypeItem extends vscode.QuickPickItem {
 const authTypes: AuthTypeItem[] = [
     {
         id: "refresh_token",
-        label: "Refresh Token",
+        label: "$(key) Refresh Token",
         description: "A vRO project that contains only actions as JavaScript files."
     },
     {
         id: "password",
-        label: "Username and password",
+        label: "$(account) Username and password",
         description: "A legacy vRO project that can contain any vRO content."
     }
 ]
 
 @AutoWire
-export class ConfigureVraAuth extends Command<AuthGrant> {
+export class ConfigureVraAuth extends Command<void> {
     private readonly logger = Logger.get("ConfigureVraAuth")
-    private title: string
     private pickState = {} as AuthPickState
+    private title: string
 
-    constructor(private config: ConfigurationManager) {
+    constructor(private config: ConfigurationManager, private identity: VraIdentityStore) {
         super()
     }
 
@@ -53,34 +54,70 @@ export class ConfigureVraAuth extends Command<AuthGrant> {
         return Commands.ConfigureVraAuth
     }
 
-    async execute(context: vscode.ExtensionContext, host: string): Promise<AuthGrant> {
+    async execute(context: vscode.ExtensionContext): Promise<void> {
         this.logger.info("Executing command Configure vRA Authentication")
+
+        const providedHost = await this.inputHost()
+        if (!providedHost) {
+            this.logger.info("No host was specified")
+            return
+        }
+
+        const { host, port } = providedHost
+        const restClient = new VraNgRestClient(host, port, this.identity)
+
+        // clear stored identity so the user can re-enter
+        await this.identity.clear(host)
+
         this.pickState = {} as AuthPickState
         this.title = `Configure vRA authentication: ${host}`
-        await MultiStepInput.run(input => this.pickHost(input))
 
-        return {
-            type: this.pickState.grantType,
-            refreshToken: this.pickState.refreshToken,
-            username: this.pickState.username,
-            password: this.pickState.password,
-            orgId: this.pickState.orgId
-        }
+        await MultiStepInput.run(input => this.pickAuthType(input))
+
+        return restClient
+            .login(
+                new AuthGrant(
+                    this.pickState.grantType,
+                    this.pickState.refreshToken,
+                    undefined,
+                    undefined,
+                    this.pickState.username,
+                    this.pickState.password,
+                    this.pickState.orgId
+                )
+            )
+            .then(token => {
+                this.logger.info(`Got access token that expires in ${token.expires_in}s`)
+                return restClient.getLoggedInUser()
+            })
+            .then(user => {
+                const msg = `Sucessfully authenticated at '${host}' as user '${user.username}'`
+                this.logger.info(msg)
+                vscode.window.showInformationMessage(msg, {})
+            })
+            .catch(reason => {
+                const msg = `Could not authenticate towards '${host}'. Reason: ${reason}`
+                this.logger.error(msg)
+                vscode.window.showErrorMessage(msg)
+            })
     }
 
-    private async pickHost(input: MultiStepInput) {
+    private async inputHost(): Promise<{ host: string; port: number } | undefined> {
         const host = this.config.vrdev.vra.auth.host
+        const port = this.config.vrdev.vra.auth.port
 
         if (!host) {
-            const hostAndPort = await input.showInputBox({
-                title: this.title,
-                step: 1,
-                totalSteps: 2,
-                value: "console.cloud.vmware.com",
-                password: false,
+            const hostAndPort = await vscode.window.showInputBox({
+                ignoreFocusOut: true,
+                value: "www.mgmt.cloud.vmware.com",
                 prompt: "Provide a vRA host and optional port",
-                validate: this.isNotEmpty("Host")
+                valueSelection: undefined,
+                validateInput: validate.isNotEmpty("Host")
             })
+
+            if (!hostAndPort) {
+                return undefined
+            }
 
             const [host, port] = hostAndPort.split(":")
 
@@ -91,9 +128,11 @@ export class ConfigureVraAuth extends Command<AuthGrant> {
             await vscode.workspace
                 .getConfiguration("vrdev.vra.auth")
                 .update("port", port, vscode.ConfigurationTarget.Workspace)
+
+            return { host, port: parseInt(port, 10) }
         }
 
-        return (input: MultiStepInput) => this.pickAuthType(input)
+        return { host, port }
     }
 
     private async pickAuthType(input: MultiStepInput) {
@@ -102,8 +141,8 @@ export class ConfigureVraAuth extends Command<AuthGrant> {
         if (!authType) {
             const pick = await input.showQuickPick<AuthTypeItem, QuickPickParameters<AuthTypeItem>>({
                 title: this.title,
-                step: 2,
-                totalSteps: 3,
+                step: 1,
+                totalSteps: 2,
                 placeholder: "Pick an authentication method",
                 items: authTypes,
                 buttons: []
@@ -135,7 +174,7 @@ export class ConfigureVraAuth extends Command<AuthGrant> {
             value: "",
             password: false,
             prompt: "Provide a vRA refresh token",
-            validate: this.isNotEmpty("Refresh Token")
+            validate: validate.isNotEmptyAsync("Refresh Token")
         })
 
         // end of steps
@@ -149,7 +188,7 @@ export class ConfigureVraAuth extends Command<AuthGrant> {
             value: "",
             password: false,
             prompt: "Provide a username",
-            validate: this.isNotEmpty("Username")
+            validate: validate.isNotEmptyAsync("Username")
         })
 
         return (input: MultiStepInput) => this.inputPassword(input)
@@ -163,7 +202,7 @@ export class ConfigureVraAuth extends Command<AuthGrant> {
             value: "",
             password: true,
             prompt: "Provide a password",
-            validate: this.isNotEmpty("Password")
+            validate: validate.isNotEmptyAsync("Password")
         })
 
         return (input: MultiStepInput) => this.inputOrgId(input)
@@ -181,9 +220,5 @@ export class ConfigureVraAuth extends Command<AuthGrant> {
         })
 
         // end of steps
-    }
-
-    private isNotEmpty(name: string) {
-        return async (value: string) => (!value ? `${name} is required` : "")
     }
 }

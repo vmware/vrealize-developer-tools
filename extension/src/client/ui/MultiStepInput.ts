@@ -16,6 +16,11 @@ class InputFlowAction {
 
 type InputStep = (input: MultiStepInput) => Thenable<InputStep | void>
 
+export interface IdentityQuickPickItem extends vscode.QuickPickItem {
+    id: string
+    name: string
+}
+
 export interface QuickPickParameters<T extends vscode.QuickPickItem> {
     title: string
     step: number

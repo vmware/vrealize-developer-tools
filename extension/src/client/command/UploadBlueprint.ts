@@ -1,31 +1,29 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import * as path from 'path'
-import * as fs from 'fs'
+import * as path from "path"
 
-import { AutoWire, Logger, VraNgRestClient } from "vrealize-common"
+import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Commands} from "../constants"
-import { Command } from "./Command"
+import { Commands } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
-
+import { BaseVraCommand } from "./BaseVraCommand"
+import { VraIdentityStore } from "../storage"
+import { IdentityQuickPickItem } from "../ui/MultiStepInput"
 
 @AutoWire
-export class UploadBlueprint extends Command<void> {
+export class UploadBlueprint extends BaseVraCommand {
     private readonly logger = Logger.get("UploadBlueprint")
-    private restClient: VraNgRestClient
 
     get commandId(): string {
         return Commands.UploadBlueprint
     }
 
-    constructor(private env: EnvironmentManager, config: ConfigurationManager) {
-        super()
-        this.restClient = new VraNgRestClient(config, env)
+    constructor(env: EnvironmentManager, config: ConfigurationManager, identity: VraIdentityStore) {
+        super(env, config, identity)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
@@ -42,43 +40,47 @@ export class UploadBlueprint extends Command<void> {
             return
         }
 
-        const activeFilePath = activeTextEditor.document.uri.fsPath
-        const blueprintName: vscode.InputBoxOptions = {
-            prompt: "Enter name of Blueprint you want to save to vRA: ",
-            placeHolder: "(BLUEPRINT NAME)"
-        }
-        const bpName = await vscode.window.showInputBox(blueprintName)
+        const restClient = await this.getRestClient()
 
-        const projectName: vscode.InputBoxOptions = {
-            prompt: "Enter the name of the VRA Project: ",
-            placeHolder: "(PROJECT NAME)"
+        const blueprintContent = activeTextEditor.document.getText()
+        const blueprintName = path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
+        const existingBlueprint = await restClient.getBlueprintByName(blueprintName)
+
+        if (existingBlueprint) {
+            await restClient.updateBlueprint(existingBlueprint.id, {
+                name: existingBlueprint.name,
+                projectId: existingBlueprint.projectId,
+                content: blueprintContent
+            })
+
+            return
         }
-        const projName: string = (await vscode.window.showInputBox(projectName)) || ""
-        const projId = await this.restClient.getProjectId(projName)
-        this.logger.info(`UploadBlueprint:execute() Project=${projName} with projId=${projId}`)
-        const filePath = path.join(this.env.workspaceFolders[0].uri.path, `${bpName}.yaml`)
-        this.logger.info(`UploadBlueprint:execute() filePath = ${filePath}`)
-        try {
-            if (projId === undefined || bpName === undefined) {
-                throw new Error("Missing Input Data")
-            }
-            fs.exists(filePath, (exist: any) => {
-                if (exist) {
-                    const content = fs.readFileSync(filePath).toString()
-                    this.logger.info(`UploadBlueprint:execute() content = ${content}`)
-                    const body = {
-                        name: bpName,
-                        projectId: projId,
-                        content: content
-                    }
-                    this.restClient.saveBlueprint(body)
-                } else {
-                    vscode.window.showWarningMessage("Blueprint not found.")
+
+        const projectsFuture: Thenable<IdentityQuickPickItem[]> = restClient.getProjects().then(result =>
+            result.map(project => {
+                return {
+                    id: project.id,
+                    name: project.name,
+                    label: `$(organization) ${project.name}`,
+                    description: project.description
                 }
             })
-        } catch (err) {
-            this.logger.error(`UploadBlueprint:execute() excp=${err.toString()}`)
-            return Promise.reject()
+        )
+
+        const selectedProject: IdentityQuickPickItem | undefined = await vscode.window.showQuickPick(projectsFuture, {
+            placeHolder: "Pick a project"
+        })
+
+        this.logger.debug("Selected project: ", selectedProject)
+
+        if (!selectedProject) {
+            return Promise.reject("No blueprint selection was made")
         }
+
+        await restClient.createBlueprint({
+            name: blueprintName,
+            projectId: selectedProject.id,
+            content: blueprintContent
+        })
     }
 }

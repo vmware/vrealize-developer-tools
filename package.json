@@ -413,7 +413,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "vRealize configuration",
+      "title": "vRealize Developer Tools",
       "properties": {
         "vrdev.log": {
           "type": "string",
@@ -470,12 +470,10 @@
             "password"
           ],
           "description": "Method for authetication towards vRealize Automation 8",
-          "default": "refresh_token",
           "scope": "window"
         },
         "vrdev.vra.auth.host": {
           "type": "string",
-          "default": "www.mgmt.cloud.vmware.com",
           "description": "",
           "scope": "window"
         },

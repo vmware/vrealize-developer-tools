@@ -16,6 +16,7 @@ import * as lint from "./client/lint"
 import * as system from "./client/system"
 import * as provider from "./client/provider"
 import * as ui from "./client/ui"
+import * as storage from "./client/storage"
 
 const logger = Logger.get("extension")
 let langServices: lang.LanguageServices
@@ -35,7 +36,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const configManager = registry.get(system.ConfigurationManager)
     configManager.forceLoadProfiles() // initial load and send to LS
 
-    registry.registerModules(ui, command, lint, provider)
+    registry.registerModules(ui, storage, command, lint, provider)
 
     const statusBar = registry.get(ui.StatusBarController)
     if (statusBar.verifyConfiguration()) {

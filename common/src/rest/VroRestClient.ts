@@ -21,7 +21,7 @@ import {
     WorkflowLogsResponse,
     WorkflowParam,
     WorkflowState
-} from "./vro-api"
+} from "./vro-model"
 
 import { Logger, MavenCliProxy, promise, sleep } from ".."
 

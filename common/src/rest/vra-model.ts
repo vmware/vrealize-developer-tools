@@ -26,10 +26,10 @@ export type Blueprint = {
 }
 
 export type Project = {
-    description?: string
-    organizationId?: string
-    name?: string
-    id?: string
+    description: string
+    organizationId: string
+    name: string
+    id: string
 }
 
 export interface PagedResult<T> {

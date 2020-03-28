@@ -8,20 +8,21 @@ import * as path from "path"
 import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { AbstractBlueprintCommand } from "./AbstractBlueprintCommand"
 import { Commands } from "../constants"
-import { EnvironmentManager } from "../system"
+import { ConfigurationManager, EnvironmentManager } from "../system"
+import { BaseVraCommand } from "./BaseVraCommand"
+import { VraIdentityStore } from "../storage"
 
 @AutoWire
-export class CreateBlueprint extends AbstractBlueprintCommand {
+export class CreateBlueprint extends BaseVraCommand {
     private readonly logger = Logger.get("CreateBlueprint")
 
     get commandId(): string {
         return Commands.CreateBlueprint
     }
 
-    constructor(env: EnvironmentManager) {
-        super(env)
+    constructor(env: EnvironmentManager, config: ConfigurationManager, identity: VraIdentityStore) {
+        super(env, config, identity)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
@@ -32,7 +33,7 @@ export class CreateBlueprint extends AbstractBlueprintCommand {
             return Promise.reject("There are no workspace folders opened in this window")
         }
 
-        const workspaceFolder = await this.askForWorkspace()
+        const workspaceFolder = await this.askForWorkspace("Select the workspace where a new blueprint will be created")
         const blueprintName = await this.askForBlueprintName()
 
         const newFile = vscode.Uri.parse(`untitled:${path.join(workspaceFolder.uri.path, `${blueprintName}.yaml`)}`)
@@ -54,5 +55,25 @@ export class CreateBlueprint extends AbstractBlueprintCommand {
         } else {
             vscode.window.showErrorMessage(`Could not apply changes on ${document.fileName}`)
         }
+    }
+
+    private async askForBlueprintName(): Promise<string> {
+        const blueprintName = await vscode.window.showInputBox({
+            prompt: "Enter a Blueprint name: ",
+            placeHolder: "(blueprint name)",
+            validateInput: function(value) {
+                if (!value || value.trim() == "") {
+                    return "The name of the blueprint cannot be empty"
+                }
+
+                return "" // it is valid
+            }
+        })
+
+        if (!blueprintName) {
+            return Promise.reject("An empty blueprint name was provided")
+        }
+
+        return blueprintName
     }
 }

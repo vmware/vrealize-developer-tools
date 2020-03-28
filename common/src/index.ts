@@ -7,6 +7,7 @@ import * as di from "./di"
 import * as proc from "./proc"
 import * as promise from "./promise"
 import * as uri from "./uri"
+import * as validate from "./validate"
 
 export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -22,4 +23,4 @@ export * from "./types"
 export * from "./rest"
 export * from "./hierarchy"
 
-export { di, proc, promise, uri }
+export { di, proc, promise, uri, validate }

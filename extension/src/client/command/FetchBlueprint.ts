@@ -1,60 +1,90 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2020 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, VraNgRestClient } from "vrealize-common"
+import * as path from "path"
+
+import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
-import { Command } from "./Command"
 import { ConfigurationManager, EnvironmentManager } from "../system"
-//import * as path from "path"
+import { VraIdentityStore } from "../storage"
+import { BaseVraCommand } from "./BaseVraCommand"
 
+interface BlueprintPickInfo extends vscode.QuickPickItem {
+    id: string
+    name: string
+}
 
 @AutoWire
-export class GetBlueprint extends Command<void> {
+export class GetBlueprint extends BaseVraCommand {
     private readonly logger = Logger.get("FetchBlueprint")
-    private restClient: VraNgRestClient
-    private conf: ConfigurationManager
-    private envMgr: EnvironmentManager
 
     get commandId(): string {
         return Commands.FetchBlueprint
     }
 
-    constructor(environment: EnvironmentManager, config: ConfigurationManager) {
-        super()
-        this.restClient = new VraNgRestClient(config, environment)
-        this.conf = config
-        this.envMgr = environment
+    constructor(env: EnvironmentManager, config: ConfigurationManager, identity: VraIdentityStore) {
+        super(env, config, identity)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
-        const blueprintNameToGet: vscode.InputBoxOptions = {
-            prompt: "Enter the name or ID of the blueprint you want to get: ",
-            placeHolder: "(BLUEPRINT NAME/ID)"
-        }
+        const restClient = await this.getRestClient()
 
-        const bpName = await vscode.window.showInputBox(blueprintNameToGet)
-        const baseUrl = `https://${this.conf.vrdev.auth.host}`
-        this.logger.info(
-            `Executing command FetchBlueprint, authProfile=${this.conf.vrdev.auth.profile} domain=${this.conf.vrdev.auth.domain}`
+        const blueprintsFuture: Thenable<BlueprintPickInfo[]> = restClient.getBlueprints().then(result =>
+            result.map(blueprint => {
+                return {
+                    id: blueprint.id,
+                    name: blueprint.name,
+                    label: `$(circuit-board) ${blueprint.name}`,
+                    description: blueprint.projectName
+                }
+            })
         )
 
-        // get access token first
-        const accessToken = await this.restClient.getAccessToken()
-        this.logger.info(`GetBlueprint: execute() Got AccessToken ${accessToken}`)
+        const selected: BlueprintPickInfo | undefined = await vscode.window.showQuickPick(blueprintsFuture, {
+            placeHolder: "Pick a blueprint"
+        })
 
-        // Now after we have valid access token, lets get the Blueprints for a given Name
-        let bpUrl = `${baseUrl}/blueprint/api/blueprints?name=${bpName}`
-        const id = await this.restClient.getBlueprintByName(bpUrl, accessToken)
-        this.logger.info(`GetBlueprint: execute() blueprintID = ${id}`)
+        this.logger.debug("Selected blueprint: ", selected)
 
-        // At this point we have a blueprintId, lets fetch Blueprint content into a file
-        bpUrl = `${baseUrl}/blueprint/api/blueprints/${id}`
+        if (!selected) {
+            return Promise.reject("No blueprint selection was made")
+        }
 
-        const filePath = `${this.envMgr.workspaceFolders[0].uri.path}/${bpName}.yaml`
-        return this.restClient.getBlueprintById(bpUrl, filePath, accessToken)
-    } //execute
+        let blueprintContent: string = ""
+        await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: `Fetching blueprint '${selected.name}'`,
+                cancellable: false
+            },
+            async () => {
+                const blueprint = await restClient.getBlueprintById(selected.id)
+                blueprintContent = blueprint.content
+            }
+        )
+
+        if (!blueprintContent) {
+            return Promise.reject("Could not fetch blueprint or it has empty content")
+        }
+
+        const workspaceFolder = await this.askForWorkspace("Select the workspace where a new blueprint will be created")
+        const newFile = vscode.Uri.parse(`untitled:${path.join(workspaceFolder.uri.path, `${selected.name}.yaml`)}`)
+        this.logger.debug(`Saving the selected blueprint at ${newFile.toString()}`)
+
+        const document = await vscode.workspace.openTextDocument(newFile)
+        const edit = new vscode.WorkspaceEdit()
+
+        edit.insert(newFile, new vscode.Position(0, 0), blueprintContent)
+
+        const editApplied = await vscode.workspace.applyEdit(edit)
+        if (editApplied) {
+            await vscode.window.showTextDocument(document)
+        } else {
+            await vscode.window.showErrorMessage(`Could not write to ${document.fileName}`)
+        }
+    }
 }

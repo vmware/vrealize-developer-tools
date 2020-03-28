@@ -7,38 +7,57 @@ import * as request from "request-promise-native"
 
 import { VraNgAuth } from "./auth"
 import { VraAuthType } from "../types"
-import { Blueprint, PagedResult, Project, Token } from "./vra-api"
+import { Blueprint, PagedResult, Project, Token } from "./vra-model"
 
 const VMWARE_CLOUD_HOST = "www.mgmt.cloud.vmware.com"
 const VMWARE_CLOUD_CSP = "console.cloud.vmware.com"
 
-export interface AuthGrant {
-    type: VraAuthType
-    accessToken?: string
-
-    // refresh_token
+export interface TokenPair {
+    accessToken?: string // undefined when expired
     refreshToken?: string
-
-    // client_credentials
-    clientId?: string
-    clientSecret?: string
-
-    // password
-    orgId?: string
-    username?: string
-    password?: string
 }
 
-export interface VraIdentityMediator {
+export class AuthGrant implements TokenPair {
+    constructor(
+        public readonly type: VraAuthType,
+        public readonly refreshToken?: string,
+        public readonly clientId?: string,
+        public readonly clientSecret?: string,
+        public readonly username?: string,
+        public readonly password?: string,
+        public readonly orgId?: string
+    ) {
+        // empty
+    }
+
+    static RefreshToken(refreshToken: string) {
+        return new AuthGrant("refresh_token", refreshToken)
+    }
+
+    static Password(username: string, password: string, orgId?: string) {
+        return new AuthGrant("password", undefined, undefined, undefined, username, password, orgId)
+    }
+
+    ClientCredentials(clientId: string, clientSecret: string) {
+        return new AuthGrant("password", undefined, clientId, clientSecret)
+    }
+}
+
+export interface VraIdentityIO {
     write(host: string, token: Token): Promise<void>
-    read(host: string): Promise<AuthGrant | undefined>
+    read(host: string): Promise<TokenPair | undefined>
 }
 
 export class VraNgRestClient {
-    constructor(private host: string,
-                private port: number,
-                private identityMediator: VraIdentityMediator) {
-        // empty
+    constructor(private host: string, private port: number, private identity: VraIdentityIO) {
+        if (host === VMWARE_CLOUD_CSP) {
+            // CSP is only for identity operations, switch to management portal
+            this.host = VMWARE_CLOUD_HOST
+        }
+
+        if (!port || port <= 0) {
+            this.port = 443
+        }
     }
 
     private async send<T = any>(
@@ -47,7 +66,7 @@ export class VraNgRestClient {
         options?: Partial<request.OptionsWithUrl>,
         skipAuth: boolean = false
     ): Promise<T> {
-        const url = route.indexOf("://") > 0 ? route : `https://${this.host}:${this.port}/${route}`
+        const url = route.indexOf("://") > 0 ? route : `https://${this.host}:${this.port}/${route.replace(/^\//, "")}`
         const auth = skipAuth ? undefined : { ...(await this.getAuth()) }
         return request({
             headers: {
@@ -65,17 +84,60 @@ export class VraNgRestClient {
     }
 
     private async getAuth(): Promise<object> {
-        const baseUrl = this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : `https://${this.host}:${this.port}`
-        const grant = await this.identityMediator.read(this.host)
+        const token = await this.identity.read(this.host)
 
-        if (!grant) {
+        if (!token) {
             return Promise.reject("Missing vRA authentication configuration")
         }
 
-        if (grant.accessToken) {
-            return new VraNgAuth(grant.accessToken).toRequestJson()
+        if (token.accessToken) {
+            return new VraNgAuth(token.accessToken).toRequestJson()
         }
 
+        if (!token.refreshToken) {
+            return Promise.reject("Missing refresh token for an expired access token")
+        }
+
+        const tokenResponse: Token = await this.login(AuthGrant.RefreshToken(token.refreshToken))
+        return new VraNgAuth(tokenResponse.access_token).toRequestJson()
+    }
+
+    private async isOnPrem(baseUrl: string): Promise<boolean> {
+        try {
+            const deployment = (await this.send("GET", `${baseUrl}/automation-ui/config.json`, undefined, true))
+                .deployment
+
+            return deployment == "onprem"
+        } catch {
+            return false
+        }
+    }
+
+    private async unwrapPages<A>(payload: PagedResult<A>, uri: string): Promise<A[]> {
+        if (!payload.pageable.paged || payload.numberOfElements < payload.totalElements) {
+            return payload.content
+        }
+
+        if (!uri.endsWith("/")) {
+            uri += "/"
+        }
+
+        const result: A[] = []
+        result.push(...payload.content)
+
+        while (payload.pageable.pageNumber < payload.totalPages) {
+            const nextPage = payload.pageable.pageNumber + 1
+            const skipElements = nextPage * payload.pageable.pageSize
+            payload = await this.send("GET", `${uri}?$skip=${skipElements}`)
+            result.push(...payload.content)
+        }
+
+        return result
+    }
+
+    async login(grant: AuthGrant): Promise<Token> {
+        const baseUrl =
+            this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : `https://${this.host}:${this.port}`
         const cspAuthUrl = `/csp/gateway/am/api/auth/authorize?grant_type=${grant.type}`
         const cspOnPremPassUrl = "/csp/gateway/am/api/login?access_token"
 
@@ -105,42 +167,14 @@ export class VraNgRestClient {
         }
 
         const tokenResponse: Token = await this.send("POST", uri, { body }, true)
-        await this.identityMediator.write(this.host, tokenResponse)
-        return new VraNgAuth(tokenResponse.access_token).toRequestJson()
+        await this.identity.write(this.host, tokenResponse)
+        return tokenResponse
     }
 
-    private async isOnPrem(baseUrl: string): Promise<boolean> {
-        try {
-            const deployment = (
-                await this.send("GET", `${baseUrl}/automation-ui/config.json`, undefined, true)
-            ).deployment
-
-            return deployment == "onprem"
-        } catch {
-            return false
-        }
-    }
-
-    private async unwrapPages<A>(payload: PagedResult<A>, uri: string): Promise<A[]> {
-        if (!payload.pageable.paged) {
-            return payload.content
-        }
-
-        if (!uri.endsWith("/")) {
-            uri += "/"
-        }
-
-        const result: A[] = []
-        result.push(...payload.content)
-
-        while (payload.pageable.pageNumber < payload.totalPages) {
-            const nextPage = payload.pageable.pageNumber + 1
-            const skipElements = nextPage * payload.pageable.pageSize
-            payload = await this.send("GET", `${uri}?$skip=${skipElements}`)
-            result.push(...payload.content)
-        }
-
-        return result
+    async getLoggedInUser(): Promise<any> {
+        const baseUrl = this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : ""
+        const uri = `${baseUrl}/csp/gateway/am/api/loggedin/user`
+        return await this.send("GET", uri)
     }
 
     // -----------------------------------------------------------
@@ -151,20 +185,30 @@ export class VraNgRestClient {
         return await this.send("GET", `/blueprint/api/blueprints/${id}`)
     }
 
+    async getBlueprintByName(name: string): Promise<Blueprint | undefined> {
+        const blueprints: PagedResult<Blueprint> = await this.send("GET", `/blueprint/api/blueprints?name=${name}`)
+        return (await this.unwrapPages(blueprints, ""))[0]
+    }
+
     async getBlueprints(): Promise<Blueprint[]> {
         const blueprints: PagedResult<Blueprint> = await this.send("GET", "/blueprint/api/blueprints")
         return await this.unwrapPages(blueprints, "/blueprint/api/blueprints")
     }
 
-    async createBlueprint(body: {name: string, projectId: string, content: string}): Promise<void> {
-        await this.send("POST", "/blueprint/api/blueprints", {body})
+    async createBlueprint(body: { name: string; projectId: string; content: string }): Promise<any> {
+        return await this.send("POST", "/blueprint/api/blueprints", { body })
     }
 
-    async updateBlueprint(id:string, body: {name: string, projectId: string, content: string}): Promise<void> {
-        await this.send("PUT", `/blueprint/api/blueprints/${id}`, {body})
+    async updateBlueprint(id: string, body: { name: string; projectId: string; content: string }): Promise<void> {
+        await this.send("PUT", `/blueprint/api/blueprints/${id}`, { body })
     }
 
-    async deployBlueprint(body: {deploymentName: string, projectId: string, content: string}): Promise<void> {
+    async deployBlueprint(body: {
+        deploymentName: string
+        projectId: string
+        blueprintId?: string
+        content: string
+    }): Promise<void> {
         await this.send("POST", "/blueprint/api/blueprint-requests", { body })
     }
 

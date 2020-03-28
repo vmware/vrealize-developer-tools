@@ -22,7 +22,7 @@ export interface VraInfo {
 export interface AuthInfo {
     type?: VraAuthType
     host?: string
-    port?: number
+    port: number
 }
 
 export interface TasksInfo {

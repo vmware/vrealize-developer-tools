@@ -3,68 +3,131 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as path from 'path'
-import * as fs from 'fs'
+import * as path from "path"
 
-import { AutoWire, Logger, VraNgRestClient } from "vrealize-common"
+import { AutoWire, Logger, validate, VraNgRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
-import { Commands} from "../constants"
-import { AbstractBlueprintCommand } from "./AbstractBlueprintCommand"
+import { Commands } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
-
-
+import { VraIdentityStore } from "../storage"
+import { BaseVraCommand } from "./BaseVraCommand"
+import { IdentityQuickPickItem, MultiStepInput, QuickPickParameters } from "../ui/MultiStepInput"
 
 @AutoWire
-export class DeployBlueprint extends AbstractBlueprintCommand {
+export class DeployBlueprint extends BaseVraCommand {
     private readonly logger = Logger.get("DeployBlueprint")
-    private restClient: VraNgRestClient
 
     get commandId(): string {
         return Commands.DeployBlueprint
     }
 
-    constructor(env: EnvironmentManager, config: ConfigurationManager) {
-        super(env)
-        this.restClient = new VraNgRestClient(config, env)
+    constructor(env: EnvironmentManager, config: ConfigurationManager, identity: VraIdentityStore) {
+        super(env, config, identity)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
         this.logger.info("Executing command DeployBlueprint")
 
-        const workspaceFolder = await this.askForWorkspace()
-
-        const blueprintName: vscode.InputBoxOptions = {
-            prompt: "Enter the name of the blueprint you want to deploy: ",
-            placeHolder: "(BLUEPRINT NAME)"
+        const activeTextEditor = vscode.window.activeTextEditor
+        if (!activeTextEditor) {
+            vscode.window.showErrorMessage("There is no opened file in the editor")
+            return
         }
-        const bpName = await vscode.window.showInputBox(blueprintName)
 
-        const projectName: vscode.InputBoxOptions = {
-            prompt: "Enter the name of the VRA Project: ",
-            placeHolder: "(PROJECT NAME)"
+        if (activeTextEditor.document.languageId !== "yaml") {
+            vscode.window.showErrorMessage("The currently opened file is not a YAML file")
+            return
         }
-        const projName: string = (await vscode.window.showInputBox(projectName)) || ""
-        const projId: string = await this.restClient.getProjectId(projName)
 
-        this.logger.info(`DeployBlueprint:exec() BP name =${bpName} in project=${projName} with projId=${projId}`)
-        //check to see if BP name they entered exists as a file already
-        const filePath = path.join(this.env.workspaceFolders[0].uri.path, `${bpName}.yaml`)
-        this.logger.info(`DeployBlueprint:exec() filePath = ${filePath}`)
-        fs.exists(filePath, (exist: any) => {
-            if (exist) {
-                const content = fs.readFileSync(filePath).toString()
-                this.logger.info(`DeployBlueprint:exec() content = ${content}`)
-                const body = {
-                    deploymentName: `${bpName}Deploy`,
-                    projectId: projId,
-                    content: content,
-                    plan: false
-                }
-                this.restClient.deployBlueprint(body)
-            } else {
-                vscode.window.showWarningMessage("Blueprint not found.")
+        const restClient = await this.getRestClient()
+
+        const blueprintContent = activeTextEditor.document.getText()
+        const blueprintName = path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
+        const existingBlueprint = await restClient.getBlueprintByName(blueprintName)
+
+        if (existingBlueprint) {
+            const deploymentName = await vscode.window.showInputBox({
+                ignoreFocusOut: true,
+                prompt: "Provide a deployment name",
+                validateInput: validate.isNotEmpty("Host")
+            })
+
+            if (!deploymentName) {
+                this.logger.info("No deployment name was provided")
+                return
+            }
+
+            await restClient.deployBlueprint({
+                blueprintId: existingBlueprint.id,
+                projectId: existingBlueprint.projectId,
+                content: blueprintContent,
+                deploymentName
+            })
+
+            return
+        }
+
+        const state = { projectId: "", deploymentName: "" }
+        await MultiStepInput.run(input => this.pickProject(input, restClient, state))
+
+
+        this.logger.debug("Selected project and deployment name: ", state)
+
+        if (!state.projectId) {
+            return Promise.reject("No project was selected")
+        }
+
+        if (!state.deploymentName) {
+            return Promise.reject("No deployment name was provided")
+        }
+
+        await restClient.deployBlueprint({
+            projectId: state.projectId,
+            content: blueprintContent,
+            deploymentName: state.deploymentName
+        })
+    }
+
+    private async pickProject(
+        input: MultiStepInput,
+        restClient: VraNgRestClient,
+        state: { projectId: string; deploymentName: string }
+    ) {
+        const projects: IdentityQuickPickItem[] = (await restClient.getProjects()).map(project => {
+            return {
+                id: project.id,
+                name: project.name,
+                label: `$(organization) ${project.name}`,
+                description: project.description
             }
         })
-    } //execute
+
+        const pick = await input.showQuickPick<IdentityQuickPickItem, QuickPickParameters<IdentityQuickPickItem>>({
+            title: "Deploy blueprint",
+            step: 1,
+            totalSteps: 2,
+            placeholder: "Pick a project",
+            items: projects,
+            buttons: []
+        })
+
+        state.projectId = pick.id
+
+        return (input: MultiStepInput) => this.inputDeploymentName(input, state)
+    }
+
+    private async inputDeploymentName(input: MultiStepInput, state: { projectId: string; deploymentName: string }) {
+        state.deploymentName = await input.showInputBox({
+            title: "Deploy blueprint",
+            step: 2,
+            totalSteps: 2,
+            value: "",
+            password: false,
+            prompt: "Provide a deployment name",
+            validate: validate.isNotEmptyAsync("Deployment name")
+        })
+
+        // end of steps
+    }
 }
