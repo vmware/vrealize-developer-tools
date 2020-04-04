@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-export function isNotEmpty(name: string) {
-    return (value: string) => (!value || value.trim() === "" ? `${name} is required` : "")
-}
-
-export function isNotEmptyAsync(name: string) {
-    return async (value: string) => (!value || value.trim() === "" ? `${name} is required` : "")
+export function isNotEmpty(name: string): (string) => [boolean, string | undefined] {
+    return (value: string) => (!value || value.trim() === "" ? [false, `${name} is required`] : [true, undefined])
 }

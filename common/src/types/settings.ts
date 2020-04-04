@@ -9,6 +9,9 @@ export type VraAuthType = "refresh_token" | "password"
 
 export interface CommandPaletteInfo {
     useFullyQualifiedNames: boolean
+    multiStep: {
+        pinned: boolean
+    }
 }
 
 export interface MavenInfo {

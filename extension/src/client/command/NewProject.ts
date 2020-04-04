@@ -10,8 +10,9 @@ import * as vscode from "vscode"
 
 import { Commands, Patterns } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
-import { MultiStepInput, QuickPickParameters } from "../ui/MultiStepInput"
+import { MultiStepInput } from "../ui/MultiStepInput"
 import { Command } from "./Command"
+import { QuickInputStep, QuickPickStep, StepState } from "../ui/MultiStepMachine"
 
 interface State extends ProjectPickInfo {
     title: string
@@ -58,11 +59,12 @@ const projectTypes: ProjectType[] = [
     }
 ]
 
+const TITLE = "Create New Project"
+
 @AutoWire
 export class NewProject extends Command<void> {
     private readonly logger = Logger.get("NewProject")
     private readonly state = {} as State
-    private readonly title = "Create New Project"
 
     constructor(private environment: EnvironmentManager, private config: ConfigurationManager) {
         super()
@@ -87,71 +89,23 @@ export class NewProject extends Command<void> {
         }
 
         this.logger.info("Executing command New Project")
-        await MultiStepInput.run(input => this.pickProjectType(input))
-    }
+        const multiStep = new MultiStepInput(TITLE, context, this.config)
+        await multiStep.run(
+            [
+                new ProjectTypePickStep(),
+                new GroupIdInputStep(),
+                new ProjectNameInputStep(),
+                new WorkflowsPathInputStep()
+            ],
+            this.state
+        )
 
-    private async pickProjectType(input: MultiStepInput) {
-        const pick = await input.showQuickPick<ProjectType, QuickPickParameters<ProjectType>>({
-            title: this.title,
-            step: 1,
-            totalSteps: 3,
-            placeholder: "Pick a project type",
-            items: projectTypes,
-            buttons: []
-        })
-
-        this.state.projectType = pick
-        return (input: MultiStepInput) => this.inputGroupId(input)
-    }
-
-    private async inputGroupId(input: MultiStepInput) {
-        this.state.groupId = await input.showInputBox({
-            title: this.title,
-            step: 2,
-            totalSteps: 3 + (this.state.projectType.containsWorkflows ? 1 : 0),
-            value: this.state.groupId || "",
-            password: false,
-            prompt: "Choose a group ID for the project - e.g. com.company.department.topic",
-            validate: this.validateGroupId
-        })
-        return (input: MultiStepInput) => this.inputName(input)
-    }
-
-    private async inputName(input: MultiStepInput) {
-        this.state.name = await input.showInputBox({
-            title: this.title,
-            step: 3,
-            totalSteps: 3 + (this.state.projectType.containsWorkflows ? 1 : 0),
-            value: this.state.name || "",
-            password: false,
-            prompt:
-                "Choose a name for the project. If the name contains dashes, remember to " +
-                "remove the dash from any folders under src/ to avoid build and test errors.",
-            validate: this.validateName
-        })
-        return (input: MultiStepInput) => {
-            if (this.state.projectType.containsWorkflows) {
-                return this.inputWorkflowsPath(input)
-            }
-
-            return this.showSaveDialog(input)
+        if (this.state.completed) {
+            await this.showSaveDialog()
         }
     }
 
-    private async inputWorkflowsPath(input: MultiStepInput) {
-        this.state.workflowsPath = await input.showInputBox({
-            title: this.title,
-            step: 4,
-            totalSteps: 4,
-            value: this.state.workflowsPath || "",
-            password: false,
-            prompt: "Choose a path for the workflows - e.g. Company/Topic/Project",
-            validate: this.validateWorkflowsPath
-        })
-        return (input: MultiStepInput) => this.showSaveDialog(input)
-    }
-
-    private async showSaveDialog(input: MultiStepInput) {
+    private async showSaveDialog() {
         const uri = await vscode.window.showOpenDialog({
             canSelectFolders: true,
             canSelectFiles: false,
@@ -217,28 +171,91 @@ export class NewProject extends Command<void> {
             }
         )
     }
+}
 
-    private async validateName(value: string) {
-        if (!Patterns.PomArtifactId.test(value)) {
-            return "The project name should contain only letters, numbers, dashes and underscores"
-        }
+class ProjectTypePickStep implements QuickPickStep {
+    matchOnDescription?: boolean = false
+    matchOnDetail?: boolean = false
+    multiselect: boolean = false
+    placeholder: string = "Pick a project type"
+    items: ProjectType[] = projectTypes
+    title = TITLE
 
-        return undefined
+    constructor() {
+        // empty
     }
 
-    private async validateGroupId(value: string) {
+    complete(state: StepState<State>, selection: ProjectType[]): void {
+        state.projectType = selection[0]
+    }
+}
+
+class GroupIdInputStep implements QuickInputStep {
+    placeholder = "Choose a group ID for the project - e.g. com.company.department.topic"
+    title = TITLE
+
+    complete(state: StepState<State>, selection: string): void {
+        state.groupId = selection
+    }
+
+    validate(value: string | undefined): [boolean, string | undefined] {
+        if (!value) {
+            return [false, "The project group ID is required"]
+        }
+
         if (!Patterns.PomGroupId.test(value)) {
-            return "The project group ID should contain only letters, numbers, dots, dashes and underscores"
+            return [false, "The project group ID should contain only letters, numbers, dots, dashes and underscores"]
         }
+        return [true, undefined]
+    }
+}
 
-        return undefined
+class ProjectNameInputStep implements QuickInputStep {
+    title = TITLE
+    placeholder =
+        "Choose a name for the project. If the name contains dashes, remember to " +
+        "remove the dash from any folders under src/ to avoid build and test errors."
+
+    complete(state: StepState<State>, selection: string): void {
+        state.name = selection
     }
 
-    private async validateWorkflowsPath(value: string) {
-        if (!value || value.trim() === "" || value.trim() === "/") {
-            return "A workflows path is required when creating an XML or Mixed vRO project"
+    validate(value: string | undefined): [boolean, string | undefined] {
+        if (!value) {
+            return [false, "The project group ID is required"]
         }
 
-        return undefined
+        if (!Patterns.PomArtifactId.test(value)) {
+            return [false, "The project name should contain only letters, numbers, dashes and underscores"]
+        }
+        return [true, undefined]
+    }
+}
+
+class WorkflowsPathInputStep implements QuickInputStep {
+    placeholder = "Choose a path for the workflows - e.g. Company/Topic/Project"
+    title = TITLE
+
+    complete(state: StepState<State>, selection: string): void {
+        state.workflowsPath = selection
+        state.completed = true
+    }
+
+    shouldSkip(state: StepState<State>): boolean {
+        const shouldSkip = !state.projectType?.containsWorkflows
+        if (shouldSkip) {
+            state.completed = true
+            return true
+        }
+
+        return false
+    }
+
+    validate(value: string | undefined): [boolean, string | undefined] {
+        if (!value || value.trim() === "" || value.trim() === "/") {
+            return [false, "A workflows path is required when creating an XML or Mixed vRO project"]
+        }
+
+        return [true, undefined]
     }
 }

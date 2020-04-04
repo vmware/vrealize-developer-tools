@@ -10,12 +10,10 @@ import { Commands } from "../constants"
 import { ConfigurationManager } from "../system"
 import { Command } from "./Command"
 import { VraIdentityStore } from "../storage"
-import { MultiStepInput, QuickPickParameters } from "../ui/MultiStepInput"
+import { MultiStepInput } from "../ui/MultiStepInput"
+import { QuickInputStep, QuickPickStep, StepState } from "../ui/MultiStepMachine"
 
 interface AuthPickState {
-    title: string
-    step: number
-    totalSteps: number
     grantType: VraAuthType
     refreshToken?: string
     orgId?: string
@@ -27,24 +25,9 @@ interface AuthTypeItem extends vscode.QuickPickItem {
     id: VraAuthType
 }
 
-const authTypes: AuthTypeItem[] = [
-    {
-        id: "refresh_token",
-        label: "$(key) Refresh Token",
-        description: "A vRO project that contains only actions as JavaScript files."
-    },
-    {
-        id: "password",
-        label: "$(account) Username and password",
-        description: "A legacy vRO project that can contain any vRO content."
-    }
-]
-
 @AutoWire
 export class ConfigureVraAuth extends Command<void> {
     private readonly logger = Logger.get("ConfigureVraAuth")
-    private pickState = {} as AuthPickState
-    private title: string
 
     constructor(private config: ConfigurationManager, private identity: VraIdentityStore) {
         super()
@@ -69,21 +52,30 @@ export class ConfigureVraAuth extends Command<void> {
         // clear stored identity so the user can re-enter
         await this.identity.clear(host)
 
-        this.pickState = {} as AuthPickState
-        this.title = `Configure vRA authentication: ${host}`
-
-        await MultiStepInput.run(input => this.pickAuthType(input))
+        const title = `Configure vRA authentication: ${host}`
+        const multiStep = new MultiStepInput(title, context, this.config)
+        const state = {} as AuthPickState
+        await multiStep.run(
+            [
+                new AuthTypePickStep(title, this.config),
+                new RefreshTokenInputStep(title),
+                new UsernameInputStep(title),
+                new PasswordInputStep(title),
+                new OrgIdInputStep(title)
+            ],
+            state
+        )
 
         return restClient
             .login(
                 new AuthGrant(
-                    this.pickState.grantType,
-                    this.pickState.refreshToken,
+                    state.grantType,
+                    state.refreshToken,
                     undefined,
                     undefined,
-                    this.pickState.username,
-                    this.pickState.password,
-                    this.pickState.orgId
+                    state.username,
+                    state.password,
+                    state.orgId
                 )
             )
             .then(token => {
@@ -112,7 +104,7 @@ export class ConfigureVraAuth extends Command<void> {
                 value: "www.mgmt.cloud.vmware.com",
                 prompt: "Provide a vRA host and optional port",
                 valueSelection: undefined,
-                validateInput: validate.isNotEmpty("Host")
+                validateInput: val => validate.isNotEmpty("Host")(val)[1]
             })
 
             if (!hostAndPort) {
@@ -134,91 +126,118 @@ export class ConfigureVraAuth extends Command<void> {
 
         return { host, port }
     }
+}
 
-    private async pickAuthType(input: MultiStepInput) {
+class AuthTypePickStep implements QuickPickStep {
+    matchOnDescription?: boolean = false
+    matchOnDetail?: boolean = false
+    multiselect: boolean = false
+    placeholder: string = "Pick an authentication method"
+    selectedItems?: AuthTypeItem[] = undefined
+    items: AuthTypeItem[] = [
+        {
+            id: "refresh_token",
+            label: "$(key) Refresh Token",
+            description: "A vRO project that contains only actions as JavaScript files."
+        },
+        {
+            id: "password",
+            label: "$(account) Username and password",
+            description: "A legacy vRO project that can contain any vRO content."
+        }
+    ]
+
+    constructor(public title: string, private config: ConfigurationManager) {
+        // empty
+    }
+
+    shouldSkip(state: StepState<AuthPickState>): boolean {
         const authType = this.config.vrdev.vra.auth.type
-
-        if (!authType) {
-            const pick = await input.showQuickPick<AuthTypeItem, QuickPickParameters<AuthTypeItem>>({
-                title: this.title,
-                step: 1,
-                totalSteps: 2,
-                placeholder: "Pick an authentication method",
-                items: authTypes,
-                buttons: []
-            })
-
-            this.pickState.grantType = pick.id
-
-            await vscode.workspace
-                .getConfiguration("vrdev.vra.auth")
-                .update("type", pick.id, vscode.ConfigurationTarget.Workspace)
-        } else {
-            this.pickState.grantType = authType
+        if (authType) {
+            state.grantType = authType
+            return true
         }
 
-        return (input: MultiStepInput) => {
-            if (this.pickState.grantType == "password") {
-                return this.inputUsername(input)
-            }
-
-            return this.inputRefreshToken(input)
-        }
+        return false
     }
 
-    private async inputRefreshToken(input: MultiStepInput) {
-        this.pickState.refreshToken = await input.showInputBox({
-            title: this.title,
-            step: 3,
-            totalSteps: 3,
-            value: "",
-            password: false,
-            prompt: "Provide a vRA refresh token",
-            validate: validate.isNotEmptyAsync("Refresh Token")
-        })
+    async complete(state: StepState<AuthPickState>, selection: AuthTypeItem[]): Promise<void> {
+        state.grantType = selection[0].id
 
-        // end of steps
+        await vscode.workspace
+            .getConfiguration("vrdev.vra.auth")
+            .update("type", state.grantType, vscode.ConfigurationTarget.Workspace)
+    }
+}
+
+class RefreshTokenInputStep implements QuickInputStep {
+    placeholder: string = "Provide a vRA refresh token"
+    validate = validate.isNotEmpty("Refresh Token")
+
+    constructor(public title: string) {
+        // empty
     }
 
-    private async inputUsername(input: MultiStepInput) {
-        this.pickState.username = await input.showInputBox({
-            title: this.title,
-            step: 3,
-            totalSteps: 5,
-            value: "",
-            password: false,
-            prompt: "Provide a username",
-            validate: validate.isNotEmptyAsync("Username")
-        })
-
-        return (input: MultiStepInput) => this.inputPassword(input)
+    shouldSkip(state: StepState<AuthPickState>): boolean {
+        return state.grantType != "refresh_token"
     }
 
-    private async inputPassword(input: MultiStepInput) {
-        this.pickState.password = await input.showInputBox({
-            title: this.title,
-            step: 4,
-            totalSteps: 5,
-            value: "",
-            password: true,
-            prompt: "Provide a password",
-            validate: validate.isNotEmptyAsync("Password")
-        })
+    complete(state: StepState<AuthPickState>, selection: string): void {
+        state.refreshToken = selection
+    }
+}
 
-        return (input: MultiStepInput) => this.inputOrgId(input)
+class UsernameInputStep implements QuickInputStep {
+    placeholder: string = "Provide a username"
+    validate = validate.isNotEmpty("Username")
+
+    constructor(public title: string) {
+        // empty
     }
 
-    private async inputOrgId(input: MultiStepInput) {
-        this.pickState.orgId = await input.showInputBox({
-            title: this.title,
-            step: 5,
-            totalSteps: 5,
-            value: "",
-            password: false,
-            prompt: "Provide a vRA organization ID",
-            validate: async () => ""
-        })
+    shouldSkip(state: StepState<AuthPickState>): boolean {
+        return state.grantType != "password"
+    }
 
-        // end of steps
+    complete(state: StepState<AuthPickState>, selection: string): void {
+        state.username = selection
+    }
+}
+
+class PasswordInputStep implements QuickInputStep {
+    placeholder: string = "Provide a password"
+    maskChars = true
+    validate = validate.isNotEmpty("Password")
+
+    constructor(public title: string) {
+        // empty
+    }
+
+    shouldSkip(state: StepState<AuthPickState>): boolean {
+        return state.grantType != "password"
+    }
+
+    complete(state: StepState<AuthPickState>, selection: string): void {
+        state.password = selection
+    }
+}
+
+class OrgIdInputStep implements QuickInputStep {
+    placeholder: string = "Provide a vRA organization ID"
+
+    constructor(public title: string) {
+        // empty
+    }
+
+    validate(value: string | undefined): [boolean, undefined] {
+        return [true, undefined]
+    }
+
+    shouldSkip(state: StepState<AuthPickState>): boolean {
+        return state.grantType != "password"
+    }
+
+    complete(state: StepState<AuthPickState>, selection: string): void {
+        state.orgId = selection
     }
 }

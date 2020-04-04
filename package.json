@@ -440,6 +440,11 @@
           "default": true,
           "description": "Show all vRO elements in the command palette with fully qualified names."
         },
+        "vrdev.commandPalette.multiStep.pinned": {
+          "type": "boolean",
+          "default": true,
+          "description": "Specified whether to dismiss the multi-step commands when focus is lost."
+        },
         "vrdev.tasks.disable": {
           "type": "boolean",
           "required": false,

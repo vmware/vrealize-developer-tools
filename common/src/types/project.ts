@@ -16,4 +16,5 @@ export interface ProjectPickInfo {
     name: string
     workflowsPath?: string
     destination?: vscode.Uri
+    completed: boolean
 }

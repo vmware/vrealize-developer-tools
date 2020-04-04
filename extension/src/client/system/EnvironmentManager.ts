@@ -8,10 +8,13 @@ import * as vscode from "vscode"
 
 import { extensionShortName, ProjectArchetypes } from "../constants"
 import { ConfigurationManager } from "./ConfigurationManager"
+import { Registrable } from "../Registrable"
 
 @AutoWire
-export class EnvironmentManager extends BaseEnvironment {
+export class EnvironmentManager extends BaseEnvironment implements Registrable {
     protected readonly logger = Logger.get("EnvironmentManager")
+
+    context: vscode.ExtensionContext
 
     get workspaceFolders(): WorkspaceFolder[] {
         return (vscode.workspace.workspaceFolders || []).map(folder => WorkspaceFolder.fromVscode(folder))
@@ -21,6 +24,11 @@ export class EnvironmentManager extends BaseEnvironment {
         super()
 
         this.logger.debug("Registering the environment manager...")
+    }
+
+    register(context: vscode.ExtensionContext): void {
+        this.logger.debug("Registering the environment manager")
+        this.context = context
     }
 
     get displayName(): string {
