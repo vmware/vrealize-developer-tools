@@ -41,13 +41,17 @@ export class CreateBlueprint extends BaseVraCommand {
         const document = await vscode.workspace.openTextDocument(newFile)
         const edit = new vscode.WorkspaceEdit()
 
-        //insert necessities of a BP in yaml file for increased chances of validation (name, version, formatVersion, inputs, resources)
         edit.insert(newFile, new vscode.Position(0, 0), `name: ${blueprintName}\ninputs: {}\nresources:\n`)
 
         vscode.window.showInformationMessage(
             "Start editing this file to create your blueprint! " +
-                "Once ready, you can push it to vRA with the `Save Blueprint` command."
-        )
+                "Once ready, you can push it to vRA with the `Upload Blueprint` command.",
+            "Upload Blueprint"
+        ).then(selection => {
+            if (selection === "Upload Blueprint") {
+                vscode.commands.executeCommand(Commands.UploadBlueprint)
+            }
+        })
 
         const editApplied = await vscode.workspace.applyEdit(edit)
         if (editApplied) {

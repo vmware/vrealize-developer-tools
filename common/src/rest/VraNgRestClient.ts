@@ -7,7 +7,7 @@ import * as request from "request-promise-native"
 
 import { VraNgAuth } from "./auth"
 import { VraAuthType } from "../types"
-import { Blueprint, PagedResult, Project, Token } from "./vra-model"
+import { Blueprint, Deployment, PagedResult, Project, Token } from "./vra-model"
 
 const VMWARE_CLOUD_HOST = "www.mgmt.cloud.vmware.com"
 const VMWARE_CLOUD_CSP = "console.cloud.vmware.com"
@@ -114,7 +114,7 @@ export class VraNgRestClient {
     }
 
     private async unwrapPages<A>(payload: PagedResult<A>, uri: string): Promise<A[]> {
-        if (!payload.pageable.paged || payload.numberOfElements < payload.totalElements) {
+        if (!payload.pageable.paged || payload.numberOfElements <= payload.totalElements) {
             return payload.content
         }
 
@@ -174,7 +174,7 @@ export class VraNgRestClient {
     async getLoggedInUser(): Promise<any> {
         const baseUrl = this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : ""
         const uri = `${baseUrl}/csp/gateway/am/api/loggedin/user`
-        return await this.send("GET", uri)
+        return this.send("GET", uri)
     }
 
     // -----------------------------------------------------------
@@ -182,7 +182,7 @@ export class VraNgRestClient {
     // -----------------------------------------------------------
 
     async getBlueprintById(id: string): Promise<Blueprint> {
-        return await this.send("GET", `/blueprint/api/blueprints/${id}`)
+        return this.send("GET", `/blueprint/api/blueprints/${id}`)
     }
 
     async getBlueprintByName(name: string): Promise<Blueprint | undefined> {
@@ -192,24 +192,24 @@ export class VraNgRestClient {
 
     async getBlueprints(): Promise<Blueprint[]> {
         const blueprints: PagedResult<Blueprint> = await this.send("GET", "/blueprint/api/blueprints")
-        return await this.unwrapPages(blueprints, "/blueprint/api/blueprints")
+        return this.unwrapPages(blueprints, "/blueprint/api/blueprints")
     }
 
     async createBlueprint(body: { name: string; projectId: string; content: string }): Promise<any> {
-        return await this.send("POST", "/blueprint/api/blueprints", { body })
+        return this.send("POST", "/blueprint/api/blueprints", { body })
     }
 
     async updateBlueprint(id: string, body: { name: string; projectId: string; content: string }): Promise<void> {
-        await this.send("PUT", `/blueprint/api/blueprints/${id}`, { body })
+        return this.send("PUT", `/blueprint/api/blueprints/${id}`, { body })
     }
 
     async deployBlueprint(body: {
         deploymentName: string
         projectId: string
         blueprintId?: string
-        content: string
-    }): Promise<void> {
-        await this.send("POST", "/blueprint/api/blueprint-requests", { body })
+        content?: string
+    }): Promise<Deployment> {
+        return this.send("POST", "/blueprint/api/blueprint-requests", { body })
     }
 
     async getProjects(): Promise<Project[]> {

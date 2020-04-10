@@ -56,7 +56,7 @@ export class DeployBlueprint extends BaseVraCommand {
             const deploymentName = await vscode.window.showInputBox({
                 ignoreFocusOut: true,
                 prompt: "Provide a deployment name",
-                validateInput: val => validate.isNotEmpty("Host")(val)[1]
+                validateInput: val => validate.isNotEmpty("Deployment name")(val)[1]
             })
 
             if (!deploymentName) {
@@ -64,14 +64,13 @@ export class DeployBlueprint extends BaseVraCommand {
                 return
             }
 
-            await restClient.deployBlueprint({
-                blueprintId: existingBlueprint.id,
+            await restClient.updateBlueprint(existingBlueprint.id, {
+                name: existingBlueprint.name,
                 projectId: existingBlueprint.projectId,
-                content: blueprintContent,
-                deploymentName
+                content: blueprintContent
             })
 
-            return
+            return this.doDeploy(restClient, existingBlueprint.projectId, deploymentName, existingBlueprint.id)
         }
 
         const state = { projectId: "", deploymentName: "" }
@@ -88,11 +87,39 @@ export class DeployBlueprint extends BaseVraCommand {
             return Promise.reject("No deployment name was provided")
         }
 
-        await restClient.deployBlueprint({
-            projectId: state.projectId,
-            content: blueprintContent,
-            deploymentName: state.deploymentName
-        })
+        return this.doDeploy(restClient, state.projectId, state.deploymentName, undefined, blueprintContent)
+    }
+
+    async doDeploy(
+        restClient: VraNgRestClient,
+        projectId: string,
+        deploymentName: string,
+        blueprintId?: string,
+        content?: string
+    ): Promise<void> {
+        const deploymentId = (
+            await restClient.deployBlueprint({
+                blueprintId,
+                projectId,
+                content,
+                deploymentName
+            })
+        ).deploymentId
+
+        vscode.window
+            .showInformationMessage(`Deployment '${deploymentName}' has started`, "Open deployment", "Copy URL")
+            .then(selection => {
+                const host = this.config.vrdev.vra.auth.host
+                const port = this.config.vrdev.vra.auth.port
+                const url = `https://${host}:${port}/automation-ui/#/deployment-ui;ash=%2Fdeployment%2F${deploymentId}`
+
+                if (selection == "Open deployment") {
+                    // bug: https://github.com/microsoft/vscode/issues/85930
+                    vscode.env.openExternal(vscode.Uri.parse(url))
+                } else if (selection == "Copy URL") {
+                    vscode.env.clipboard.writeText(url)
+                }
+            })
     }
 }
 

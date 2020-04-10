@@ -25,6 +25,22 @@ export type Blueprint = {
     contentSourceSyncMessages: string[]
 }
 
+export type Deployment = {
+    blueprintId: string
+    createdAt: Date
+    createdBy: string
+    updatedAt: Date
+    updatedBy: string
+    deploymentId: string
+    deploymentName: string
+    id: string
+    orgId: string
+    projectId: string
+    projectName: string
+    status: string
+    destroy: boolean
+}
+
 export type Project = {
     description: string
     organizationId: string
