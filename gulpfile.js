@@ -16,8 +16,8 @@ const rootPath = __dirname
 const nodeModulesPathPrefix = path.resolve("./node_modules")
 const isWin = /^win/.test(process.platform)
 const jest = path.join(nodeModulesPathPrefix, ".bin", "jest") + (isWin ? ".cmd" : "")
-const pbjs = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbjs")
-const pbts = path.join(nodeModulesPathPrefix, "protobufjs", "bin", "pbts")
+const pbjs = path.join(nodeModulesPathPrefix,  ".bin", "pbjs")
+const pbts = path.join(nodeModulesPathPrefix,  ".bin", "pbts")
 const vsce = path.join(nodeModulesPathPrefix, ".bin", "vsce")
 const tsc = path.join(nodeModulesPathPrefix, ".bin", "tsc")
 
@@ -176,7 +176,7 @@ gulp.task("default", gulp.series("watch"))
 function exec(cmd, args, cwd, stdio = "inherit") {
     var cmdString = `${cmd} ${args.join(" ")}`
     log(cmdString)
-    var result = cp.spawnSync(cmd, args, { stdio, cwd })
+    var result = cp.spawnSync(cmd, args, {shell:true, stdio, cwd })
     if (result.status != 0) {
         throw new Error(`Command "${cmdString}" exited with code ` + result.status)
     }
