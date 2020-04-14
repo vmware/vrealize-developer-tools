@@ -95,6 +95,7 @@ export enum OutputChannels {
 
 export enum ProjectArchetypes {
     TypeScript = "com.vmware.pscoe.o11n:typescript-project",
+    TypeScriptAll = "com.vmware.pscoe.o11n:typescript-project-all",
     Base = "com.vmware.pscoe.o11n:base-package",
     Actions = "com.vmware.pscoe.o11n:actions-package",
     Xml = "com.vmware.pscoe.o11n:xml-package",
