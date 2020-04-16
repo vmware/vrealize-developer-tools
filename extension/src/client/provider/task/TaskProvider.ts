@@ -14,16 +14,13 @@ import * as vscode from "vscode"
 
 import { extensionShortName } from "../../constants"
 import { Registrable } from "../../Registrable"
-import { TASKS_BY_TOOLCHAIN_PARENT } from "./DefaultTasksJson"
+import { TASKS_BY_TOOLCHAIN_PARENT, VrealizeTaskConfiguration } from "./DefaultTasksJson"
 import { EnvironmentManager } from "../../system"
 import { ScopedMemento } from "../../system/ScopedMemento"
 
 interface VrealizeTaskDefinition extends vscode.TaskDefinition {
     command: string
     label: string
-    windows?: { command: string }
-    linux?: { command: string }
-    osx?: { command: string }
 }
 
 @AutoWire
@@ -42,7 +39,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
     async provideTasks(token?: vscode.CancellationToken): Promise<vscode.Task[]> {
         const tasksConf = vscode.workspace.getConfiguration("vrdev").get<TasksInfo>("tasks")
 
-        if (tasksConf && tasksConf.disable === true || !this.env.hasRelevantProject()) {
+        if ((tasksConf && tasksConf.disable === true) || !this.env.hasRelevantProject()) {
             return []
         }
 
@@ -85,7 +82,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
                     })
             }
         }
-
+        
         try {
             this.includeDefaultTasks(folder, undefined, tasks, excludePatterns)
         } catch (e) {
@@ -112,14 +109,13 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         const pomFile = new PomFile(pomFilePath)
 
         if (!micromatch.any(`${pomFile.groupId}:${pomFile.artifactId}`, excludePatterns)) {
-            const defaultTasks = TASKS_BY_TOOLCHAIN_PARENT[pomFile.parentId] || []
+            const defaultTasks: VrealizeTaskConfiguration[] = TASKS_BY_TOOLCHAIN_PARENT[pomFile.parentId] || []
 
             for (const task of defaultTasks) {
-                const clone = JSON.parse(JSON.stringify(task))
-                clone.type = extensionShortName
+                const clone = this.parseTaksDefinition(task)
                 clone.label = `${clone.label} ${subfolder ? subfolder : pomFile.artifactId}`
                 clone.command = subfolder ? `${clone.command} -pl ${subfolder}` : clone.command
-                if (tasks.find(elem => elem.label === clone.label) === undefined) {
+                if (!tasks.find(elem => elem.label === clone.label || elem.label === `${clone.type}: ${clone.label}`)) {
                     tasks.push(clone)
                 }
             }
@@ -133,8 +129,8 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         }
     }
 
-    private newShellTask(taskDef: VrealizeTaskDefinition, workspaceFolder: vscode.WorkspaceFolder): vscode.Task {
-        let command = taskDef.command
+    private parseTaksDefinition(taskDef: VrealizeTaskConfiguration): VrealizeTaskDefinition {
+        let command: string = taskDef.command
         if (process.platform === "win32" && taskDef.windows) {
             command = taskDef.windows.command
         } else if (process.platform === "darwin" && taskDef.osx) {
@@ -142,8 +138,11 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         } else if (taskDef.linux) {
             command = taskDef.linux.command
         }
+        return { type: extensionShortName, label: taskDef.label, command }
+    }
 
-        const shellExec = new vscode.ShellExecution(command, { cwd: workspaceFolder.uri.fsPath })
+    private newShellTask(taskDef: VrealizeTaskDefinition, workspaceFolder: vscode.WorkspaceFolder): vscode.Task {
+        const shellExec = new vscode.ShellExecution(taskDef.command, { cwd: workspaceFolder.uri.fsPath })
 
         const task = new vscode.Task(taskDef, workspaceFolder, taskDef.label, taskDef.type, shellExec, [])
         task.group = vscode.TaskGroup.Build

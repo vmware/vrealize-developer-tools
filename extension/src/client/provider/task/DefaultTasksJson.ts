@@ -7,8 +7,32 @@
 
 import { ProjectArchetypes } from "../../constants"
 
-export const TASKS_BY_TOOLCHAIN_PARENT = {
-    [ProjectArchetypes.TypeScript]: [
+export interface VrealizeTaskConfiguration {
+    label: string
+    command: string
+    windows?: { command: string }
+    linux?: { command: string }
+    osx?: { command: string }
+}
+
+export const TASKS_BY_TOOLCHAIN_PARENT: Record<ProjectArchetypes, VrealizeTaskConfiguration[]> = {
+     [ProjectArchetypes.TypeScript]: [
+        {
+            label: "Push",
+            windows: {
+                command:
+                    'mvn clean package vrealize:push -DincludeDependencies=true -DskipTests -P${config:vrdev.maven.profile} -D"vro.packageImportConfigurationAttributeValues=false"'
+            },
+            command:
+                "mvn clean package vrealize:push -DincludeDependencies=true -DskipTests -P${config:vrdev.maven.profile} -Dvro.packageImportConfigurationAttributeValues=false"
+        },
+        {
+            label: "Build",
+            command: "mvn clean package"
+        }
+    ],
+
+    [ProjectArchetypes.TypeScriptAll]: [
         {
             label: "Push",
             windows: {
