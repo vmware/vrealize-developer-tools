@@ -12,7 +12,7 @@ import { Commands, Patterns } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 import { MultiStepInput } from "../ui/MultiStepInput"
 import { Command } from "./Command"
-import { QuickInputStep, QuickPickStep, StepState } from "../ui/MultiStepMachine"
+import { QuickInputStep, QuickPickStep, StepNode, StepState } from "../ui/MultiStepMachine"
 
 interface State extends ProjectPickInfo {
     title: string
@@ -90,19 +90,40 @@ export class NewProject extends Command<void> {
 
         this.logger.info("Executing command New Project")
         const multiStep = new MultiStepInput(TITLE, context, this.config)
-        await multiStep.run(
-            [
-                new ProjectTypePickStep(),
-                new GroupIdInputStep(),
-                new ProjectNameInputStep(),
-                new WorkflowsPathInputStep()
-            ],
-            this.state
-        )
+        await multiStep.run(this.buildStepTree(), this.state)
 
         if (this.state.completed) {
             await this.showSaveDialog()
         }
+    }
+
+    private buildStepTree(): StepNode<QuickPickStep> {
+        const rootNode: StepNode<QuickPickStep> = {
+            value: new ProjectTypePickStep(),
+            next: () => groupIdNode
+        }
+
+        const groupIdNode: StepNode<QuickInputStep> = {
+            value: new GroupIdInputStep(),
+            parent: rootNode,
+            next: () => projectNameNode
+        }
+
+        const projectNameNode: StepNode<QuickInputStep> = {
+            value: new ProjectNameInputStep(),
+            parent: groupIdNode,
+            next: (state: State, selection?: string) => {
+                return state.projectType.containsWorkflows ? workflowsPathNode : undefined
+            }
+        }
+
+        const workflowsPathNode: StepNode<QuickInputStep> = {
+            value: new WorkflowsPathInputStep(),
+            parent: projectNameNode,
+            next: () => undefined
+        }
+
+        return rootNode
     }
 
     private async showSaveDialog() {
@@ -185,7 +206,7 @@ class ProjectTypePickStep implements QuickPickStep {
         // empty
     }
 
-    complete(state: StepState<State>, selection: ProjectType[]): void {
+    updateState(state: StepState<State>, selection: ProjectType[]): void {
         state.projectType = selection[0]
     }
 }
@@ -194,7 +215,7 @@ class GroupIdInputStep implements QuickInputStep {
     placeholder = "Choose a group ID for the project - e.g. com.company.department.topic"
     title = TITLE
 
-    complete(state: StepState<State>, selection: string): void {
+    updateState(state: StepState<State>, selection: string): void {
         state.groupId = selection
     }
 
@@ -216,7 +237,7 @@ class ProjectNameInputStep implements QuickInputStep {
         "Choose a name for the project. If the name contains dashes, remember to " +
         "remove the dash from any folders under src/ to avoid build and test errors."
 
-    complete(state: StepState<State>, selection: string): void {
+    updateState(state: StepState<State>, selection: string): void {
         state.name = selection
     }
 
@@ -236,7 +257,7 @@ class WorkflowsPathInputStep implements QuickInputStep {
     placeholder = "Choose a path for the workflows - e.g. Company/Topic/Project"
     title = TITLE
 
-    complete(state: StepState<State>, selection: string): void {
+    updateState(state: StepState<State>, selection: string): void {
         state.workflowsPath = selection
         state.completed = true
     }

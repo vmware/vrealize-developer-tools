@@ -11,6 +11,7 @@ import {
     MultiStepMachine,
     QuickInputStep,
     QuickPickStep,
+    StepNode,
     StepSelection,
     StepState
 } from "./MultiStepMachine"
@@ -77,12 +78,15 @@ export class MultiStepInput<TState> {
         // empty
     }
 
-    async run(steps: (QuickPickStep | QuickInputStep)[], state: TState): Promise<StepState<TState> | undefined> {
-        if (!steps || steps.length <= 0) {
+    async run(rootStep: StepNode<QuickPickStep | QuickInputStep>, state: TState): Promise<StepState<TState> | undefined> {
+        if (!rootStep || !rootStep.value) {
             return
         }
 
-        const stepMachine = new MultiStepMachine<TState>(steps, state)
+        // used to hide certain buttons on the first step, like 'back'
+        rootStep.value["isHead"] = true
+
+        const stepMachine = new MultiStepMachine<TState>(rootStep, state)
         let step: QuickPickStep | QuickInputStep | undefined = undefined
 
         const next = await stepMachine.next()
@@ -218,7 +222,7 @@ export class MultiStepInput<TState> {
                     quickpick.onDidChangeActive(() => {
                         if (quickpick.activeItems.length === 0) return
 
-                        quickpick.buttons = this.getButtons(undefined)
+                        quickpick.buttons = this.getButtons(step)
                     }),
                     quickpick.onDidAccept(async () => {
                         let items = quickpick.selectedItems
@@ -306,7 +310,9 @@ export class MultiStepInput<TState> {
                 return buttons
             }
 
-            buttons.push(vscode.QuickInputButtons.Back)
+            if (!step["isHead"]) {
+                buttons.push(vscode.QuickInputButtons.Back)
+            }
 
             if (step.additionalButtons !== undefined) {
                 buttons.push(...step.additionalButtons)

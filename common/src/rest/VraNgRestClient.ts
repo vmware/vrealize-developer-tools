@@ -38,9 +38,9 @@ export class AuthGrant implements TokenPair {
         return new AuthGrant("password", undefined, undefined, undefined, username, password, orgId)
     }
 
-    ClientCredentials(clientId: string, clientSecret: string) {
-        return new AuthGrant("password", undefined, clientId, clientSecret)
-    }
+    // static ClientCredentials(clientId: string, clientSecret: string) {
+    //    return new AuthGrant("client_credentials", undefined, clientId, clientSecret)
+    // }
 }
 
 export interface VraIdentityIO {
@@ -138,26 +138,31 @@ export class VraNgRestClient {
     async login(grant: AuthGrant): Promise<Token> {
         const baseUrl =
             this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : `https://${this.host}:${this.port}`
-        const cspAuthUrl = `/csp/gateway/am/api/auth/authorize?grant_type=${grant.type}`
-        const cspOnPremPassUrl = "/csp/gateway/am/api/login?access_token"
 
         let uri: string
-        let body: any = {}
+        const options: any = {}
+        const isOnPrem = this.isOnPrem(baseUrl)
 
         switch (grant.type) {
             case "refresh_token": {
-                uri = `${baseUrl}${cspAuthUrl}&refresh_token=${grant.refreshToken}`
+                uri = `${baseUrl}/csp/gateway/am/api/auth/api-tokens/authorize?refresh_token=${grant.refreshToken}`
                 break
             }
             case "password": {
-                if (this.isOnPrem(baseUrl)) {
-                    uri = `${baseUrl}${cspOnPremPassUrl}`
-                    body = {
+                if (isOnPrem) {
+                    uri = `${baseUrl}/csp/gateway/am/api/login?access_token`
+                    options.body = {
                         username: grant.username,
-                        password: grant.password
+                        password: grant.password,
+                        domain: grant.orgId || undefined
                     }
                 } else {
-                    uri = `${baseUrl}${cspAuthUrl}&orgId=${grant.orgId}&username=${grant.username}&password=${grant.password}`
+                    uri = `${baseUrl}/am/api/auth/authorize`
+                    options.form = {
+                        username: grant.username,
+                        password: grant.password,
+                        orgId: grant.orgId || undefined
+                    }
                 }
                 break
             }
@@ -166,7 +171,7 @@ export class VraNgRestClient {
             }
         }
 
-        const tokenResponse: Token = await this.send("POST", uri, { body }, true)
+        const tokenResponse: Token = await this.send("POST", uri, options, true)
         await this.identity.write(this.host, tokenResponse)
         return tokenResponse
     }

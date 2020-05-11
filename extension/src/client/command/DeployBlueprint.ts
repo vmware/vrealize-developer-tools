@@ -13,7 +13,7 @@ import { ConfigurationManager, EnvironmentManager } from "../system"
 import { VraIdentityStore } from "../storage"
 import { BaseVraCommand } from "./BaseVraCommand"
 import { IdentityQuickPickItem, MultiStepInput } from "../ui/MultiStepInput"
-import { QuickInputStep, QuickPickStep, StepState } from "../ui/MultiStepMachine"
+import { QuickInputStep, QuickPickStep, StepNode, StepState } from "../ui/MultiStepMachine"
 
 interface State {
     projectId: string
@@ -75,7 +75,7 @@ export class DeployBlueprint extends BaseVraCommand {
 
         const state = { projectId: "", deploymentName: "" }
         const multiStep = new MultiStepInput("Deploy blueprint", context, this.config)
-        await multiStep.run([new VraProjectPickStep(restClient), new DeploymentNameInputStep()], state)
+        await multiStep.run(this.buildStepTree(restClient), state)
 
         this.logger.debug("Selected project and deployment name: ", state)
 
@@ -88,6 +88,21 @@ export class DeployBlueprint extends BaseVraCommand {
         }
 
         return this.doDeploy(restClient, state.projectId, state.deploymentName, undefined, blueprintContent)
+    }
+
+    private buildStepTree(restClient: VraNgRestClient): StepNode<QuickPickStep> {
+        const rootNode: StepNode<QuickPickStep> = {
+            value: new VraProjectPickStep(restClient),
+            next: () => deploymentNameNode
+        }
+
+        const deploymentNameNode: StepNode<QuickInputStep> = {
+            value: new DeploymentNameInputStep(),
+            parent: rootNode,
+            next: () => undefined
+        }
+
+        return rootNode
     }
 
     async doDeploy(
@@ -147,7 +162,7 @@ class VraProjectPickStep implements QuickPickStep {
         })
     }
 
-    complete(state: StepState<State>, selection: IdentityQuickPickItem[]): void {
+    updateState(state: StepState<State>, selection: IdentityQuickPickItem[]): void {
         state.projectId = selection[0].id
     }
 }
@@ -157,7 +172,7 @@ class DeploymentNameInputStep implements QuickInputStep {
     validate = validate.isNotEmpty("Deployment name")
     title = "Deploy blueprint"
 
-    complete(state: StepState<State>, selection: string): void {
+    updateState(state: StepState<State>, selection: string): void {
         state.deploymentName = selection
     }
 }

@@ -11,10 +11,11 @@ import { ConfigurationManager } from "../system"
 import { Command } from "./Command"
 import { VraIdentityStore } from "../storage"
 import { MultiStepInput } from "../ui/MultiStepInput"
-import { QuickInputStep, QuickPickStep, StepState } from "../ui/MultiStepMachine"
+import { QuickInputStep, QuickPickStep, StepNode, StepState } from "../ui/MultiStepMachine"
 
 interface AuthPickState {
     grantType: VraAuthType
+    endpoint?: { host: string; port: number }
     refreshToken?: string
     orgId?: string
     username?: string
@@ -40,31 +41,21 @@ export class ConfigureVraAuth extends Command<void> {
     async execute(context: vscode.ExtensionContext): Promise<void> {
         this.logger.info("Executing command Configure vRA Authentication")
 
-        const providedHost = await this.inputHost()
-        if (!providedHost) {
-            this.logger.info("No host was specified")
+        const title = "Configure vRA authentication"
+        const multiStep = new MultiStepInput(title, context, this.config)
+        const state = {} as AuthPickState
+        await multiStep.run(this.buildStepTree(title, this.config), state)
+
+        if (!state.endpoint) {
+            this.logger.info("No endpoint was specified")
             return
         }
 
-        const { host, port } = providedHost
+        const { host, port } = state.endpoint
         const restClient = new VraNgRestClient(host, port, this.identity)
 
-        // clear stored identity so the user can re-enter
+        // clear stored identity since the user might have provided different credentials
         await this.identity.clear(host)
-
-        const title = `Configure vRA authentication: ${host}`
-        const multiStep = new MultiStepInput(title, context, this.config)
-        const state = {} as AuthPickState
-        await multiStep.run(
-            [
-                new AuthTypePickStep(title, this.config),
-                new RefreshTokenInputStep(title),
-                new UsernameInputStep(title),
-                new PasswordInputStep(title),
-                new OrgIdInputStep(title)
-            ],
-            state
-        )
 
         return restClient
             .login(
@@ -94,37 +85,90 @@ export class ConfigureVraAuth extends Command<void> {
             })
     }
 
-    private async inputHost(): Promise<{ host: string; port: number } | undefined> {
+    private buildStepTree(title: string, config: ConfigurationManager): StepNode<QuickInputStep> {
+        //                        --> refresh token
+        // endpoint --> auth type |
+        //                        --> username --> password --> orgId
+
+        const rootNode: StepNode<QuickInputStep> = {
+            value: new VraHostInputStep(title, config),
+            next: () => authTypeNode
+        }
+
+        const authTypeNode: StepNode<QuickPickStep> = {
+            value: new AuthTypePickStep(title, this.config),
+            parent: rootNode,
+            next: (state: AuthPickState, selection?: AuthTypeItem[]) => {
+                if (selection) {
+                    const selected = selection[0].id
+                    return selected === "refresh_token" ? refreshTokenNode : usernameNode
+                }
+
+                return state.grantType === "refresh_token" ? refreshTokenNode : usernameNode
+            }
+        }
+
+        const refreshTokenNode: StepNode<QuickInputStep> = {
+            value: new RefreshTokenInputStep(title),
+            parent: authTypeNode,
+            next: () => undefined
+        }
+
+        const usernameNode: StepNode<QuickInputStep> = {
+            value: new UsernameInputStep(title),
+            parent: authTypeNode,
+            next: () => passwordNode
+        }
+
+        const passwordNode: StepNode<QuickInputStep> = {
+            value: new PasswordInputStep(title),
+            parent: usernameNode,
+            next: () => orgIdNode
+        }
+
+        const orgIdNode: StepNode<QuickInputStep> = {
+            value: new OrgIdInputStep(title),
+            parent: passwordNode,
+            next: () => undefined
+        }
+
+        return rootNode
+    }
+}
+
+class VraHostInputStep implements QuickInputStep {
+    placeholder = "Provide a vRA host and optional port"
+    value = "www.mgmt.cloud.vmware.com"
+    validate = validate.isNotEmpty("Host")
+
+    constructor(public title: string, private config: ConfigurationManager) {
+        // empty
+    }
+
+    shouldSkip(state: StepState<AuthPickState>): boolean {
         const host = this.config.vrdev.vra.auth.host
         const port = this.config.vrdev.vra.auth.port
 
-        if (!host) {
-            const hostAndPort = await vscode.window.showInputBox({
-                ignoreFocusOut: true,
-                value: "www.mgmt.cloud.vmware.com",
-                prompt: "Provide a vRA host and optional port",
-                valueSelection: undefined,
-                validateInput: val => validate.isNotEmpty("Host")(val)[1]
-            })
-
-            if (!hostAndPort) {
-                return undefined
-            }
-
-            const [host, port] = hostAndPort.split(":")
-
-            await vscode.workspace
-                .getConfiguration("vrdev.vra.auth")
-                .update("host", host, vscode.ConfigurationTarget.Workspace)
-
-            await vscode.workspace
-                .getConfiguration("vrdev.vra.auth")
-                .update("port", port, vscode.ConfigurationTarget.Workspace)
-
-            return { host, port: parseInt(port, 10) }
+        if (host != undefined && host.trim() != "") {
+            state.endpoint = { host, port }
+            return true
         }
 
-        return { host, port }
+        return false
+    }
+
+    async updateState(state: StepState<AuthPickState>, selection: string): Promise<void> {
+        const [host, port] = selection.split(":")
+
+        await vscode.workspace
+            .getConfiguration("vrdev.vra.auth")
+            .update("host", host, vscode.ConfigurationTarget.Workspace)
+
+        await vscode.workspace
+            .getConfiguration("vrdev.vra.auth")
+            .update("port", port, vscode.ConfigurationTarget.Workspace)
+
+        state.endpoint = { host, port: parseInt(port, 10) }
     }
 }
 
@@ -161,7 +205,7 @@ class AuthTypePickStep implements QuickPickStep {
         return false
     }
 
-    async complete(state: StepState<AuthPickState>, selection: AuthTypeItem[]): Promise<void> {
+    async updateState(state: StepState<AuthPickState>, selection: AuthTypeItem[]): Promise<void> {
         state.grantType = selection[0].id
 
         await vscode.workspace
@@ -182,7 +226,7 @@ class RefreshTokenInputStep implements QuickInputStep {
         return state.grantType != "refresh_token"
     }
 
-    complete(state: StepState<AuthPickState>, selection: string): void {
+    updateState(state: StepState<AuthPickState>, selection: string): void {
         state.refreshToken = selection
     }
 }
@@ -199,7 +243,7 @@ class UsernameInputStep implements QuickInputStep {
         return state.grantType != "password"
     }
 
-    complete(state: StepState<AuthPickState>, selection: string): void {
+    updateState(state: StepState<AuthPickState>, selection: string): void {
         state.username = selection
     }
 }
@@ -217,7 +261,7 @@ class PasswordInputStep implements QuickInputStep {
         return state.grantType != "password"
     }
 
-    complete(state: StepState<AuthPickState>, selection: string): void {
+    updateState(state: StepState<AuthPickState>, selection: string): void {
         state.password = selection
     }
 }
@@ -237,7 +281,7 @@ class OrgIdInputStep implements QuickInputStep {
         return state.grantType != "password"
     }
 
-    complete(state: StepState<AuthPickState>, selection: string): void {
+    updateState(state: StepState<AuthPickState>, selection: string): void {
         state.orgId = selection
     }
 }

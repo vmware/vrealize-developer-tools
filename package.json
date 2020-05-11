@@ -141,7 +141,7 @@
       },
       {
         "command": "vrdev.open.action",
-        "title": "Open Action",
+        "title": "Open vRO Action",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -150,7 +150,7 @@
       },
       {
         "command": "vrdev.open.workflow",
-        "title": "Open Workflow",
+        "title": "Open vRO Workflow",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -159,7 +159,7 @@
       },
       {
         "command": "vrdev.open.config",
-        "title": "Open Configuration",
+        "title": "Open vRO Configuration",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -168,7 +168,7 @@
       },
       {
         "command": "vrdev.open.resource",
-        "title": "Open Resource",
+        "title": "Open vRO Resource",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -182,7 +182,7 @@
       },
       {
         "command": "vrdev.run.action",
-        "title": "Run Action",
+        "title": "Run vRO Action",
         "category": "vRealize",
         "icon": {
           "light": "assets/icons/light/zap.svg",
@@ -201,7 +201,7 @@
       },
       {
         "command": "vrdev.blueprint.create",
-        "title": "Create Blueprint",
+        "title": "Create vRA Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",
@@ -210,7 +210,7 @@
       },
       {
         "command": "vrdev.blueprint.upload",
-        "title": "Upload Blueprint",
+        "title": "Upload vRA Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",
@@ -219,7 +219,7 @@
       },
       {
         "command": "vrdev.blueprint.fetch",
-        "title": "Fetch Blueprint",
+        "title": "Fetch vRA Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",
@@ -228,7 +228,7 @@
       },
       {
         "command": "vrdev.blueprint.deploy",
-        "title": "Deploy Blueprint",
+        "title": "Deploy vRA Blueprint",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/circuit-board.svg",

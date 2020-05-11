@@ -29,7 +29,7 @@ export interface QuickInputStep {
     validate?(value: string | undefined): [boolean, string | undefined] | Promise<[boolean, string | undefined]>
 
     shouldSkip?<T>(state: StepState<T>): boolean | Promise<boolean>
-    complete?<T>(state: StepState<T>, selection: string): void | Promise<void>
+    updateState?<T>(state: StepState<T>, selection: string): void | Promise<void>
 }
 
 export function isQuickInputStep(item: QuickPickStep | QuickInputStep): item is QuickInputStep {
@@ -54,7 +54,7 @@ export interface QuickPickStep<T extends QuickPickItem = any> {
     validate?(selection: T[]): boolean
 
     shouldSkip?<S>(state: StepState<S>): boolean | Promise<boolean>
-    complete?<S>(state: StepState<S>, selection: T[]): void | Promise<void>
+    updateState?<S>(state: StepState<S>, selection: T[]): void | Promise<void>
 }
 
 export function isQuickPickStep(item: QuickPickStep | QuickInputStep): item is QuickPickStep {
@@ -62,9 +62,16 @@ export function isQuickPickStep(item: QuickPickStep | QuickInputStep): item is Q
 }
 
 export type StepAsyncGenerator = AsyncGenerator<QuickPickStep | QuickInputStep, undefined, any | undefined>
-type StepItemType<T> = T extends QuickPickStep<infer U> ? U[] : T extends QuickInputStep ? string : never
+
+export type StepItemType<T> = T extends QuickPickStep<infer U> ? U[] : T extends QuickInputStep ? string : never
 export type StepSelection<T> = StepItemType<T> | Directive
 export type StepState<T> = Partial<T>
+
+export interface StepNode<T extends QuickPickStep | QuickInputStep> {
+    value: T
+    parent?: StepNode<QuickPickStep | QuickInputStep>
+    next(state: any, selection: StepItemType<T>|undefined): StepNode<QuickPickStep | QuickInputStep> | undefined
+}
 
 export class MultiStepMachine<TState = any> {
     protected readonly logger: Logger = Logger.get("MultiStepMachine")
@@ -73,45 +80,34 @@ export class MultiStepMachine<TState = any> {
     private _stepsIterator: StepAsyncGenerator
 
     constructor(
-        protected readonly steps: (QuickPickStep | QuickInputStep)[],
+        protected readonly root: StepNode<QuickPickStep | QuickInputStep>,
         public readonly state: StepState<TState> = {}
     ) {
         this._stepsIterator = this.stepsIterator()
     }
 
     protected async *stepsIterator(): StepAsyncGenerator {
-        const steps = this.steps
-        let counter: number = 0
+        let node: StepNode<QuickPickStep | QuickInputStep> | undefined = this.root
         let wentBack: boolean = false
-        let hitTheBottom: boolean = false
         let step: QuickPickStep | QuickInputStep
 
         while (true) {
-            if (counter >= steps.length) break
-            if (counter < 0) {
-                counter = 0
-                hitTheBottom = true
-                wentBack = false
+            if (!node) {
+                break;
             }
 
-            step = steps[counter]
+            step = node.value
 
             try {
-                const shouldSkip = !hitTheBottom && (await step.shouldSkip?.(this.state))
+                const shouldSkip = !wentBack && (await step.shouldSkip?.(this.state))
 
-                if (hitTheBottom) {
-                    hitTheBottom = false
+                if (shouldSkip) {
+                    node = node.next(this.state, undefined)
+                    continue
                 }
 
-                if (shouldSkip && !wentBack) {
-                    counter++
+                if (wentBack) {
                     wentBack = false
-                    continue
-                } else if (shouldSkip && wentBack) {
-                    // go back again
-                    counter--
-                    wentBack = true
-                    continue
                 }
 
                 if (isQuickPickStep(step)) {
@@ -129,20 +125,20 @@ export class MultiStepMachine<TState = any> {
                 }
 
                 if (selection === Directive.Back) {
-                    counter--
+                    node = node.parent
                     wentBack = true
                     continue
                 }
 
                 if (isQuickPickStep(step) && typeof selection !== "string") {
                     if (step.validate === undefined || step.validate(selection)) {
-                        await step.complete?.(this.state, selection)
-                        counter++
+                        await step.updateState?.(this.state, selection)
+                        node = node.next(this.state, selection)
                     }
                 } else if (isQuickInputStep(step) && typeof selection === "string") {
                     if (step.validate === undefined || (await step.validate(selection))) {
-                        await step.complete?.(this.state, selection)
-                        counter++
+                        await step.updateState?.(this.state, selection)
+                        node = node.next(this.state, selection)
                     }
                 }
             } catch (ex) {
