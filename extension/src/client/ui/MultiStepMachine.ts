@@ -21,6 +21,7 @@ export interface QuickInputStep {
     additionalButtons?: QuickInputButton[]
     buttons?: QuickInputButton[]
     placeholder?: string
+    prompt?: string
     title?: string
     maskChars?: boolean
     value?: string
@@ -104,10 +105,6 @@ export class MultiStepMachine<TState = any> {
                 if (shouldSkip) {
                     node = node.next(this.state, undefined)
                     continue
-                }
-
-                if (wentBack) {
-                    wentBack = false
                 }
 
                 if (isQuickPickStep(step)) {

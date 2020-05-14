@@ -15,6 +15,7 @@ import { QuickInputStep, QuickPickStep, StepNode, StepState } from "../ui/MultiS
 
 interface AuthPickState {
     grantType: VraAuthType
+    done: boolean
     endpoint?: { host: string; port: number }
     refreshToken?: string
     orgId?: string
@@ -44,10 +45,10 @@ export class ConfigureVraAuth extends Command<void> {
         const title = "Configure vRA authentication"
         const multiStep = new MultiStepInput(title, context, this.config)
         const state = {} as AuthPickState
-        await multiStep.run(this.buildStepTree(title, this.config), state)
+        await multiStep.run(this.buildStepTree(title), state)
 
-        if (!state.endpoint) {
-            this.logger.info("No endpoint was specified")
+        if (!state.endpoint || !state.done) {
+            this.logger.info("No endpoint was specified or command was canceled")
             return
         }
 
@@ -57,41 +58,46 @@ export class ConfigureVraAuth extends Command<void> {
         // clear stored identity since the user might have provided different credentials
         await this.identity.clear(host)
 
-        return restClient
-            .login(
-                new AuthGrant(
-                    state.grantType,
-                    state.refreshToken,
-                    undefined,
-                    undefined,
-                    state.username,
-                    state.password,
-                    state.orgId
-                )
-            )
-            .then(token => {
-                this.logger.info(`Got access token that expires in ${token.expires_in}s`)
-                return restClient.getLoggedInUser()
-            })
-            .then(user => {
-                const msg = `Sucessfully authenticated at '${host}' as user '${user.username}'`
-                this.logger.info(msg)
-                vscode.window.showInformationMessage(msg, {})
-            })
-            .catch(reason => {
-                const msg = `Could not authenticate towards '${host}'. Reason: ${reason}`
-                this.logger.error(msg)
-                vscode.window.showErrorMessage(msg)
-            })
+        await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: `Authenticating against ${host}...`,
+                cancellable: false
+            },
+            async () => {
+                try {
+                    const token = await restClient.login(
+                        new AuthGrant(
+                            state.grantType,
+                            state.refreshToken,
+                            undefined,
+                            undefined,
+                            state.username,
+                            state.password,
+                            state.orgId
+                        )
+                    )
+                    this.logger.info(`Got access token that expires in ${token.expires_in}s`)
+                    const user = await restClient.getLoggedInUser()
+                    const msg = `Sucessfully authenticated against '${host}' as user '${user.username}'`
+                    this.logger.info(msg)
+                    vscode.window.showInformationMessage(msg)
+                } catch (reason) {
+                    const errorMessage = `Could not authenticate against '${host}'. Reason: ${reason}`
+                    this.logger.error(errorMessage)
+                    throw new Error(errorMessage)
+                }
+            }
+        )
     }
 
-    private buildStepTree(title: string, config: ConfigurationManager): StepNode<QuickInputStep> {
+    private buildStepTree(title: string): StepNode<QuickInputStep> {
         //                        --> refresh token
         // endpoint --> auth type |
         //                        --> username --> password --> orgId
 
         const rootNode: StepNode<QuickInputStep> = {
-            value: new VraHostInputStep(title, config),
+            value: new VraHostInputStep(title, this.config),
             next: () => authTypeNode
         }
 
@@ -149,6 +155,8 @@ class VraHostInputStep implements QuickInputStep {
         const host = this.config.vrdev.vra.auth.host
         const port = this.config.vrdev.vra.auth.port
 
+        this.value = `${host}${port != 443 ? `:${port}` : ""}`
+
         if (host != undefined && host.trim() != "") {
             state.endpoint = { host, port }
             return true
@@ -169,6 +177,7 @@ class VraHostInputStep implements QuickInputStep {
             .update("port", port, vscode.ConfigurationTarget.Workspace)
 
         state.endpoint = { host, port: parseInt(port, 10) }
+        this.value = `${host}${state.endpoint.port ? `:${state.endpoint.port}` : ""}`
     }
 }
 
@@ -182,12 +191,12 @@ class AuthTypePickStep implements QuickPickStep {
         {
             id: "refresh_token",
             label: "$(key) Refresh Token",
-            description: "A vRO project that contains only actions as JavaScript files."
+            description: "An API Token issued by vRA Cloud or vRA v8.x on-prem"
         },
         {
             id: "password",
             label: "$(account) Username and password",
-            description: "A legacy vRO project that can contain any vRO content."
+            description: "User credentials to authenticate towards vRA Cloud or vRA 8.x on-prem."
         }
     ]
 
@@ -215,8 +224,12 @@ class AuthTypePickStep implements QuickPickStep {
 }
 
 class RefreshTokenInputStep implements QuickInputStep {
-    placeholder: string = "Provide a vRA refresh token"
+    prompt: string =
+        "A token is obtained using the vRA Cloud portal (go to My Account -> API Tokens) " +
+        "or through the vRA On-Prem (v8.x) REST API."
+    placeholder = "Provide a vRA refresh token."
     validate = validate.isNotEmpty("Refresh Token")
+    maskChars = true
 
     constructor(public title: string) {
         // empty
@@ -228,6 +241,7 @@ class RefreshTokenInputStep implements QuickInputStep {
 
     updateState(state: StepState<AuthPickState>, selection: string): void {
         state.refreshToken = selection
+        state.done = true
     }
 }
 
@@ -267,7 +281,10 @@ class PasswordInputStep implements QuickInputStep {
 }
 
 class OrgIdInputStep implements QuickInputStep {
-    placeholder: string = "Provide a vRA organization ID"
+    prompt: string =
+        "Provide a vRA organization ID for vRA Cloud or domain for vRA On-Prem (v8.x)." +
+        " Leave empty to use the default organization/domain."
+    placeholder: string = "Provide an Organization ID or Domain"
 
     constructor(public title: string) {
         // empty
@@ -283,5 +300,6 @@ class OrgIdInputStep implements QuickInputStep {
 
     updateState(state: StepState<AuthPickState>, selection: string): void {
         state.orgId = selection
+        state.done = true
     }
 }

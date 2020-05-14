@@ -78,7 +78,10 @@ export class MultiStepInput<TState> {
         // empty
     }
 
-    async run(rootStep: StepNode<QuickPickStep | QuickInputStep>, state: TState): Promise<StepState<TState> | undefined> {
+    async run(
+        rootStep: StepNode<QuickPickStep | QuickInputStep>,
+        state: TState
+    ): Promise<StepState<TState> | undefined> {
         if (!rootStep || !rootStep.value) {
             return
         }
@@ -164,6 +167,7 @@ export class MultiStepInput<TState> {
                 input.title = step.title
                 input.password = step.maskChars ?? false
                 input.placeholder = step.placeholder
+                input.prompt = step.prompt
                 if (step.value !== undefined) {
                     input.value = step.value
                 }
