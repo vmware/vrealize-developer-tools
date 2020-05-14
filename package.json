@@ -572,6 +572,7 @@
     "vsce": "^1.69.0"
   },
   "dependencies": {
+    "@types/keytar": "^4.4.2",
     "adm-zip": "^0.4.13",
     "chokidar": "~2.0.4",
     "fast-xml-parser": "3.12.20",

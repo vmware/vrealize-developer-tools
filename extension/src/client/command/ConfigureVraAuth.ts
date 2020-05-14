@@ -27,6 +27,8 @@ interface AuthTypeItem extends vscode.QuickPickItem {
     id: VraAuthType
 }
 
+const URL_SCHEME_RE = /^[a-z-]+:\/?\/?/
+
 @AutoWire
 export class ConfigureVraAuth extends Command<void> {
     private readonly logger = Logger.get("ConfigureVraAuth")
@@ -166,6 +168,7 @@ class VraHostInputStep implements QuickInputStep {
     }
 
     async updateState(state: StepState<AuthPickState>, selection: string): Promise<void> {
+        selection = this.toCanonical(selection)
         const [host, port] = selection.split(":")
 
         await vscode.workspace
@@ -178,6 +181,20 @@ class VraHostInputStep implements QuickInputStep {
 
         state.endpoint = { host, port: parseInt(port, 10) }
         this.value = `${host}${state.endpoint.port ? `:${state.endpoint.port}` : ""}`
+    }
+
+    private toCanonical(host: string): string {
+        host = host.toLocaleLowerCase()
+        if (host.endsWith("/")) {
+            host = host.slice(0, -1)
+        }
+
+        const schemeMatch = URL_SCHEME_RE.exec(host)
+        if (schemeMatch) {
+            host = host.slice(schemeMatch[0].length)
+        }
+
+        return host
     }
 }
 

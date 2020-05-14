@@ -5,6 +5,8 @@
 
 import { ExtensionContext, Memento } from "vscode"
 
+import { systemKeychain } from "../system/Keychain"
+
 export class ScopedMemento {
     private memento: Memento
     private namespace: string
@@ -29,7 +31,7 @@ export class ScopedMemento {
         return ScopedMemento.from(memento, namespace)
     }
 
-    set(key: string, value?: any, expiration?: number): Thenable<void> {
+    async set(key: string, value?: any, expiration?: number): Promise<void> {
         if (typeof key !== "string" || typeof value === "undefined") {
             return Promise.resolve(void 0)
         }
@@ -45,6 +47,15 @@ export class ScopedMemento {
 
         this.state[key] = obj
         return this.memento.update(this.namespace, this.state)
+    }
+
+    async setSecure(key: string, value?: any, expiration?: number): Promise<void> {
+        if (typeof key !== "string" || typeof value === "undefined") {
+            return Promise.resolve(void 0)
+        }
+
+        await this.set(key, "- encrypted -", expiration)
+        return systemKeychain.setPassword(`vrdt:${this.namespace}`, key, value)
     }
 
     get<T>(key: string, defaultValue?: T): T | undefined {
@@ -63,6 +74,14 @@ export class ScopedMemento {
         return this.state[key].value
     }
 
+    async getSecure(key: string): Promise<string | null | undefined> {
+        if (this.isExpired(key)) {
+            return undefined
+        }
+
+        return systemKeychain.getPassword(`vrdt:${this.namespace}`, key)
+    }
+
     has(key: string): boolean {
         if (this.state[key] === undefined) {
             return false
@@ -71,13 +90,18 @@ export class ScopedMemento {
         return !this.isExpired(key)
     }
 
-    remove(key: string): Thenable<void> {
+    async remove(key: string): Promise<void> {
         if (this.state[key] === undefined) {
             return Promise.resolve(void 0)
         }
 
         delete this.state[key]
         return this.memento.update(this.namespace, this.state)
+    }
+
+    async removeSecure(key: string): Promise<boolean> {
+        await this.remove(key)
+        return systemKeychain.deletePassword(`vrdt:${this.namespace}`, key)
     }
 
     keys(): string[] {
@@ -93,7 +117,7 @@ export class ScopedMemento {
         return items
     }
 
-    clear(): Thenable<void> {
+    async clear(): Promise<void> {
         this.state = {}
         return this.memento.update(this.namespace, undefined)
     }

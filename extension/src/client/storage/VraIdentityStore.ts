@@ -25,22 +25,22 @@ export class VraIdentityStore implements VraIdentityIO, Registrable {
     }
 
     async clear(host: string): Promise<void> {
-        await this.storedTokens.remove(`access:${host}`)
-        await this.storedTokens.remove(`refresh:${host}`)
+        await this.storedTokens.removeSecure(`access:${host}`)
+        await this.storedTokens.removeSecure(`refresh:${host}`)
     }
 
     async write(host: string, token: Token): Promise<void> {
-        await this.storedTokens.set(`access:${host}`, token.access_token, token.expires_in)
-        await this.storedTokens.set(`refresh:${host}`, token.refresh_token)
+        await this.storedTokens.setSecure(`access:${host}`, token.access_token, token.expires_in)
+        await this.storedTokens.setSecure(`refresh:${host}`, token.refresh_token)
     }
 
     async read(host: string): Promise<TokenPair | undefined> {
-        const access = this.storedTokens.get<string>(`access:${host}`)
-        const refresh = this.storedTokens.get<string>(`refresh:${host}`)
+        const access = await this.storedTokens.getSecure(`access:${host}`)
+        const refresh = await this.storedTokens.getSecure(`refresh:${host}`)
 
         if ((access && refresh) || (!access && refresh)) {
             return {
-                accessToken: access,
+                accessToken: access ?? undefined,
                 refreshToken: refresh
             }
         }
