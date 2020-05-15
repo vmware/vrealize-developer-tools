@@ -523,7 +523,11 @@
     "snippets": [
       {
         "language": "javascript",
-        "path": "./extension/snippets/vrealize.json"
+        "path": "./extension/snippets/vro.json"
+      },
+      {
+        "language": "yaml",
+        "path": "./extension/snippets/vra-blueprint.json"
       }
     ]
   },
