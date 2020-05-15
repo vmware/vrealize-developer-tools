@@ -36,29 +36,31 @@ export class CreateBlueprint extends BaseVraCommand {
         const workspaceFolder = await this.askForWorkspace("Select the workspace where a new blueprint will be created")
         const blueprintName = await this.askForBlueprintName()
 
-        const newFile = vscode.Uri.parse(`untitled:${path.join(workspaceFolder.uri.path, `${blueprintName}.yaml`)}`)
-
-        const document = await vscode.workspace.openTextDocument(newFile)
-        const edit = new vscode.WorkspaceEdit()
-
-        edit.insert(newFile, new vscode.Position(0, 0), `name: ${blueprintName}\ninputs: {}\nresources:\n`)
-
-        vscode.window.showInformationMessage(
-            "Start editing this file to create your blueprint! " +
-                "Once ready, you can push it to vRA with the `Upload Blueprint` command.",
-            "Upload Blueprint"
-        ).then(selection => {
-            if (selection === "Upload Blueprint") {
-                vscode.commands.executeCommand(Commands.UploadBlueprint)
+        const newFile = await vscode.window.showSaveDialog({
+            defaultUri: vscode.Uri.parse(path.join(workspaceFolder.uri.fsPath, `${blueprintName}.yaml`)),
+            filters: {
+                YAML: ["yaml", "yml"]
             }
         })
 
-        const editApplied = await vscode.workspace.applyEdit(edit)
-        if (editApplied) {
-            vscode.window.showTextDocument(document)
-        } else {
-            vscode.window.showErrorMessage(`Could not apply changes on ${document.fileName}`)
+        if (!newFile) {
+            return Promise.reject("Save dialog was canceled")
         }
+
+        await vscode.workspace.fs.writeFile(newFile, Buffer.from(`name: ${blueprintName}\ninputs: {}\nresources:\n`))
+        await vscode.window.showTextDocument(newFile, { preview: false })
+
+        vscode.window
+            .showInformationMessage(
+                "Start editing this file to create your blueprint! " +
+                    "Once ready, you can push it to vRA with the `Upload Blueprint` command.",
+                "Upload Blueprint"
+            )
+            .then(selection => {
+                if (selection === "Upload Blueprint") {
+                    vscode.commands.executeCommand(Commands.UploadBlueprint)
+                }
+            })
     }
 
     private async askForBlueprintName(): Promise<string> {

@@ -72,19 +72,20 @@ export class GetBlueprint extends BaseVraCommand {
         }
 
         const workspaceFolder = await this.askForWorkspace("Select the workspace where a new blueprint will be created")
-        const newFile = vscode.Uri.parse(`untitled:${path.join(workspaceFolder.uri.path, `${selected.name}.yaml`)}`)
-        this.logger.debug(`Saving the selected blueprint at ${newFile.toString()}`)
 
-        const document = await vscode.workspace.openTextDocument(newFile)
-        const edit = new vscode.WorkspaceEdit()
+        const newFile = await vscode.window.showSaveDialog({
+            defaultUri: vscode.Uri.parse(path.join(workspaceFolder.uri.fsPath, `${selected.name}.yaml`)),
+            filters: {
+                YAML: ["yaml", "yml"]
+            }
+        })
 
-        edit.insert(newFile, new vscode.Position(0, 0), blueprintContent)
-
-        const editApplied = await vscode.workspace.applyEdit(edit)
-        if (editApplied) {
-            await vscode.window.showTextDocument(document)
-        } else {
-            await vscode.window.showErrorMessage(`Could not write to ${document.fileName}`)
+        if (!newFile) {
+            return Promise.reject("Save dialog was canceled")
         }
+
+        this.logger.debug(`Saving the selected blueprint at ${newFile.toString()}`)
+        await vscode.workspace.fs.writeFile(newFile, Buffer.from(blueprintContent))
+        await vscode.window.showTextDocument(newFile, { preview: false })
     }
 }
