@@ -212,7 +212,8 @@ export class VraNgRestClient {
         deploymentName: string
         projectId: string
         blueprintId?: string
-        content?: string
+        content?: string,
+        inputs?: object
     }): Promise<Deployment> {
         return this.send("POST", "/blueprint/api/blueprint-requests", { body })
     }

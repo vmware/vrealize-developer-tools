@@ -7,11 +7,13 @@ import * as path from "path"
 
 import { AutoWire, Logger, validate, VraNgRestClient } from "vrealize-common"
 import * as vscode from "vscode"
+import { parse as parseYaml } from "yaml"
 
 import { Commands } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 import { VraIdentityStore } from "../storage"
 import { BaseVraCommand } from "./BaseVraCommand"
+import { BlueprintInputsMultiStep } from "../ui/BlueprintInputsMultiStep"
 import { IdentityQuickPickItem, MultiStepInput } from "../ui/MultiStepInput"
 import { QuickInputStep, QuickPickStep, StepNode, StepState } from "../ui/MultiStepMachine"
 
@@ -70,7 +72,14 @@ export class DeployBlueprint extends BaseVraCommand {
                 content: blueprintContent
             })
 
-            return this.doDeploy(restClient, existingBlueprint.projectId, deploymentName, existingBlueprint.id)
+            return this.doDeploy(
+                context,
+                restClient,
+                existingBlueprint.projectId,
+                deploymentName,
+                blueprintContent,
+                existingBlueprint.id
+            )
         }
 
         const state = { projectId: "", deploymentName: "" }
@@ -87,7 +96,7 @@ export class DeployBlueprint extends BaseVraCommand {
             return Promise.reject("No deployment name was provided")
         }
 
-        return this.doDeploy(restClient, state.projectId, state.deploymentName, undefined, blueprintContent)
+        return this.doDeploy(context, restClient, state.projectId, state.deploymentName, blueprintContent, undefined)
     }
 
     private buildStepTree(restClient: VraNgRestClient): StepNode<QuickPickStep> {
@@ -106,18 +115,35 @@ export class DeployBlueprint extends BaseVraCommand {
     }
 
     async doDeploy(
+        context: vscode.ExtensionContext,
         restClient: VraNgRestClient,
         projectId: string,
         deploymentName: string,
-        blueprintId?: string,
-        content?: string
+        content: string,
+        blueprintId?: string
     ): Promise<void> {
+        const blueprintJson = parseYaml(content)
+        let inputs =
+            typeof blueprintJson.inputs === "object" && Object.keys(blueprintJson.inputs).length > 0
+                ? blueprintJson.inputs
+                : undefined
+
+        if (inputs) {
+            inputs = await new BlueprintInputsMultiStep(deploymentName, context, this.config).run(inputs)
+
+            if (!inputs) {
+                this.logger.info("Multi-step for blueprint inputs was cancelled")
+                return
+            }
+        }
+
         const deploymentId = (
             await restClient.deployBlueprint({
                 blueprintId,
                 projectId,
-                content,
-                deploymentName
+                deploymentName,
+                inputs,
+                content: !blueprintId ? content : undefined
             })
         ).deploymentId
 

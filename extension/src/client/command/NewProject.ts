@@ -112,9 +112,7 @@ export class NewProject extends Command<void> {
         const projectNameNode: StepNode<QuickInputStep> = {
             value: new ProjectNameInputStep(),
             parent: groupIdNode,
-            next: (state: State, selection?: string) => {
-                return state.projectType.containsWorkflows ? workflowsPathNode : undefined
-            }
+            next: () =>workflowsPathNode
         }
 
         const workflowsPathNode: StepNode<QuickInputStep> = {
@@ -263,7 +261,7 @@ class WorkflowsPathInputStep implements QuickInputStep {
     }
 
     shouldSkip(state: StepState<State>): boolean {
-        const shouldSkip = !state.projectType?.containsWorkflows
+        const shouldSkip = !(state.projectType?.containsWorkflows)
         if (shouldSkip) {
             state.completed = true
             return true
