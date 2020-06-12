@@ -20,7 +20,7 @@ module.exports = {
         jest: true
     },
     rules: {
-        "@typescript-eslint/array-type": ["error", { "default": "array" }],
+        "@typescript-eslint/array-type": ["error", { default: "array" }],
         "@typescript-eslint/member-ordering": "off",
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/no-parameter-properties": "off",
@@ -112,7 +112,10 @@ module.exports = {
 
         "import/export": "off",
         "import/named": "off",
-        "import/no-unresolved": ["warn", { ignore: ["vscode", "vrealize-common", "vro-language-server"] }],
+        "import/no-unresolved": [
+            "warn",
+            { ignore: ["vscode", "vrealize-common", "vro-language-server", "../../proto"] }
+        ],
         "import/namespace": "off",
         "import/newline-after-import": "warn",
         "import/extensions": ["error", "never"],

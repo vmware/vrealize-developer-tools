@@ -1,0 +1,81 @@
+name: Draft Release
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build_release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    needs: check
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: echo github.ref
+        run: echo ${{ github.ref }}
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Get version number
+        id: version_step
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          echo "::set-output name=version::${VERSION_STRING}"
+
+      - name: Install dependencies
+        run: "yarn install --frozen-lockfile"
+
+      - name: Build VSIX package
+        run: "node node_modules/gulp/bin/gulp.js package"
+
+      - name: Publish code coverage report
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: "**/coverage/*.json"
+          yml: ./codecov.yml
+          flags: unittest
+          name: codecov
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
+          path: "*.vsix"
+
+      - name: Get previous tag
+        run: |
+          PREV_TAG=$(git describe --abbrev=0 --tags "${{ github.ref }}^")
+          echo "::set-env name=baseRef::$PREV_TAG"
+
+      - name: Generate release notes
+        id: generate_changelog
+        uses: nblagoev/pull-release-notes-action@v1
+        with:
+          base-ref: ${{ env.baseRef }}
+          head-ref: ${{ github.ref }}
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: ${{steps.generate_changelog.outputs.result}}
+          draft: true
+          prerelease: false
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
+          asset_name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
+          asset_content_type: application/octet-stream

@@ -1,0 +1,29 @@
+name: Publish Release
+on:
+  release:
+    types: [released]
+jobs:
+  publish:
+    name: Publish to Visual Studio Marketplace
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download release asset
+        id: release_asset
+        env:
+          RELEASE_ASSETS: ${{ toJSON(github.event.release.assets) }}
+          TAG_NAME: ${{ github.event.tag_name }}
+        run: |
+          VERSION=$(echo -n $TAG_NAME | sed 's/^v//')
+          FILE_NAME="vrealize-developer-tools-${VERSION}.vsix"
+          DOWNLOAD_URL=$(echo -n $RELEASE_ASSETS | jq '.[] | select(.name == "$FILE_NAME") | .browser_download_url' | tr -d '"')
+
+          wget $DOWNLOAD_URL
+          echo "::set-output name=file_name::$FILE_NAME"
+
+      - name: Publish
+        env:
+          MARKETPLACE_SECRET: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+          FILE_NAME: ${{ steps.release_asset.outputs.file_name }}
+        run: "node node_modules/.bin/vsce publish -p $MARKETPLACE_SECRET --packagePath $FILE_NAME"

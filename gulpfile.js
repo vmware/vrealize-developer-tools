@@ -9,8 +9,6 @@ const fs = require("fs-extra")
 const minimist = require("minimist")
 const log = require("fancy-log")
 const eslint = require("gulp-eslint")
-const release = require("./build/release")
-const bumpVersion = require("./build/bump-version")
 
 const rootPath = __dirname
 const nodeModulesPathPrefix = path.resolve("./node_modules")
@@ -162,14 +160,6 @@ gulp.task(
         done()
     })
 )
-
-gulp.task("release", () => {
-    return release()
-})
-
-gulp.task("bump-version", () => {
-    return bumpVersion()
-})
 
 gulp.task("default", gulp.series("watch"))
 
