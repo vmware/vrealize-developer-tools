@@ -11,7 +11,7 @@ import { Command } from "./Command"
 import { ContentLocation } from "../provider/content/ContentLocation"
 import { ActionNode, ConfigurationNode, ResourceNode, WorkflowNode } from "../provider/explorer/model"
 
-export class FetchRemoteElement extends Command {
+export class FetchRemoteElement extends Command<void> {
     private readonly logger = Logger.get("FetchRemoteElement")
 
     get commandId(): string {

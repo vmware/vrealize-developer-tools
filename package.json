@@ -38,7 +38,12 @@
     "onCommand:vrdev.open.config",
     "onCommand:vrdev.open.resource",
     "onCommand:vrdev.run.action",
-    "onCommand:vrdev.toggle.typescript"
+    "onCommand:vrdev.toggle.typescript",
+    "onCommand:vrdev.vra.auth.configure",
+    "onCommand:vrdev.blueprint.create",
+    "onCommand:vrdev.blueprint.fetch",
+    "onCommand:vrdev.blueprint.upload",
+    "onCommand:vrdev.blueprint.deploy"
   ],
   "main": "./extension/out/extension",
   "icon": "assets/logo.png",
@@ -136,7 +141,7 @@
       },
       {
         "command": "vrdev.open.action",
-        "title": "Open Action",
+        "title": "Open vRO Action",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -145,7 +150,7 @@
       },
       {
         "command": "vrdev.open.workflow",
-        "title": "Open Workflow",
+        "title": "Open vRO Workflow",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -154,7 +159,7 @@
       },
       {
         "command": "vrdev.open.config",
-        "title": "Open Configuration",
+        "title": "Open vRO Configuration",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -163,7 +168,7 @@
       },
       {
         "command": "vrdev.open.resource",
-        "title": "Open Resource",
+        "title": "Open vRO Resource",
         "category": "vRealize",
         "icon": {
           "dark": "assets/icons/dark/search.svg",
@@ -177,7 +182,7 @@
       },
       {
         "command": "vrdev.run.action",
-        "title": "Run Action",
+        "title": "Run vRO Action",
         "category": "vRealize",
         "icon": {
           "light": "assets/icons/light/zap.svg",
@@ -188,6 +193,47 @@
         "command": "vrdev.toggle.typescript",
         "title": "Toggle TypeScript Support (Experimental)",
         "category": "vRealize"
+      },
+      {
+        "command": "vrdev.vra.auth.configure",
+        "title": "Configure vRA Authentication",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.blueprint.create",
+        "title": "Create vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.upload",
+        "title": "Upload vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.fetch",
+        "title": "Fetch vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.deploy",
+        "title": "Deploy vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
       }
     ],
     "menus": {
@@ -283,12 +329,32 @@
           "command": "vrdev.views.properties.copy",
           "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
           "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.blueprint.create",
+          "when": "viewItem =~ /vrdev:element:kind:blueprint\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.blueprint.create",
+          "when": "viewItem =~ /vrdev:element:kind:blueprint\\b/",
+          "group": "1_vrdevs@1"
         }
       ],
       "editor/title": [
         {
           "when": "resourceLangId == javascript || resourceLangId == typescript",
           "command": "vrdev.run.action",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.upload",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.deploy",
           "group": "navigation"
         }
       ],
@@ -347,7 +413,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "vRealize configuration",
+      "title": "vRealize Developer Tools",
       "properties": {
         "vrdev.log": {
           "type": "string",
@@ -374,6 +440,11 @@
           "default": true,
           "description": "Show all vRO elements in the command palette with fully qualified names."
         },
+        "vrdev.commandPalette.multiStep.pinned": {
+          "type": "boolean",
+          "default": true,
+          "description": "Specified whether to dismiss the multi-step commands when focus is lost."
+        },
         "vrdev.tasks.disable": {
           "type": "boolean",
           "required": false,
@@ -395,6 +466,26 @@
           "type": "string",
           "default": "",
           "description": "A maven profile (i.e. -Pprofile) to be used for maven executions, e.g. pull, push, Maven collection.",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.type": {
+          "type": "string",
+          "enum": [
+            "refresh_token",
+            "password"
+          ],
+          "description": "Method for authetication towards vRealize Automation 8",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.host": {
+          "type": "string",
+          "description": "",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.port": {
+          "type": "integer",
+          "default": "443",
+          "description": "",
           "scope": "window"
         },
         "vrdev.experimental.typescript": {
@@ -432,7 +523,11 @@
     "snippets": [
       {
         "language": "javascript",
-        "path": "./extension/snippets/vrealize.json"
+        "path": "./extension/snippets/vro.json"
+      },
+      {
+        "language": "yaml",
+        "path": "./extension/snippets/vra-blueprint.json"
       }
     ]
   },
@@ -481,6 +576,7 @@
     "vsce": "^1.69.0"
   },
   "dependencies": {
+    "@types/keytar": "^4.4.2",
     "adm-zip": "^0.4.13",
     "chokidar": "~2.0.4",
     "fast-xml-parser": "3.12.20",
@@ -502,7 +598,8 @@
     "vscode-languageserver": "^5.2.1",
     "vscode-languageserver-protocol": "^3.14.1",
     "vscode-languageserver-types": "^3.14.0",
-    "vscode-uri": "^2.0.0"
+    "vscode-uri": "^2.0.0",
+    "yaml": "^1.10.0"
   },
   "optionalDependencies": {
     "fsevents": "1.2.7"

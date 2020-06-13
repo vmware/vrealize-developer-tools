@@ -12,7 +12,7 @@ import { LanguageServices } from "../lang"
 import { Command } from "./Command"
 
 @AutoWire
-export class TriggerCollection extends Command {
+export class TriggerCollection extends Command<void> {
     private readonly logger = Logger.get("TriggerCollection")
     private languageServices: LanguageServices
 

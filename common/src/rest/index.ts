@@ -4,5 +4,7 @@
  */
 
 export * from "./auth"
-export * from "./api"
+export * from "./vro-model"
+export * from "./vra-model"
 export * from "./VroRestClient"
+export * from "./VraNgRestClient"

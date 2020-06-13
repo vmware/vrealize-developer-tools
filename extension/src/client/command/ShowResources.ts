@@ -12,7 +12,7 @@ import { ContentLocation } from "../provider/content/ContentLocation"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 
 @AutoWire
-export class ShowResources extends Command {
+export class ShowResources extends Command<void> {
     private readonly logger = Logger.get("ShowResources")
     private restClient: VroRestClient
 

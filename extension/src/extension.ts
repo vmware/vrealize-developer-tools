@@ -16,8 +16,10 @@ import * as lint from "./client/lint"
 import * as system from "./client/system"
 import * as provider from "./client/provider"
 import * as ui from "./client/ui"
+import * as storage from "./client/storage"
 
 const logger = Logger.get("extension")
+const outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel(OutputChannels.ExtensionLogs)
 let langServices: lang.LanguageServices
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -35,7 +37,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const configManager = registry.get(system.ConfigurationManager)
     configManager.forceLoadProfiles() // initial load and send to LS
 
-    registry.registerModules(ui, command, lint, provider)
+    registry.registerModules(ui, storage, command, lint, provider)
 
     const statusBar = registry.get(ui.StatusBarController)
     if (statusBar.verifyConfiguration()) {
@@ -45,12 +47,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
 export async function deactivate() {
     await langServices.dispose()
+    outputChannel.dispose()
     logger.info("\n\n=== Deactivated vRealize Developer Tools ===\n")
 }
 
 function getLoggingChannel(): LogChannel {
-    const outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel(OutputChannels.ExtensionLogs)
-
     return {
         debug(message: string) {
             outputChannel.appendLine(message)

@@ -8,7 +8,7 @@ import * as vscode from "vscode"
 
 import { Registrable } from "../Registrable"
 
-export abstract class Command implements Registrable {
+export abstract class Command<T> implements Registrable {
     register(context: vscode.ExtensionContext): void {
         Logger.get("Command").debug(`Registering command '${this.commandId}'`)
 
@@ -21,5 +21,5 @@ export abstract class Command implements Registrable {
 
     abstract get commandId(): string
 
-    abstract execute(context: vscode.ExtensionContext, ...args: any[]): Promise<void> | void
+    abstract execute(context: vscode.ExtensionContext, ...args: any[]): Promise<T> | T
 }

@@ -16,7 +16,7 @@ const LABEL_DELETE_KEEP_SHARED = "Delete (Keep Shared)"
 const LABEL_DELETE_WITH_CONTENT = "Delete (With Content)"
 
 @AutoWire
-export class DeletePackage extends Command {
+export class DeletePackage extends Command<void> {
     private readonly logger = Logger.get("DeletePackage")
     private readonly restClient: VroRestClient
 

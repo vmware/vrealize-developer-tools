@@ -6,7 +6,7 @@
 import { ExtensionContext, Memento } from "vscode"
 import { sleep } from "vrealize-common"
 
-import { ScopedMemento } from "../client/system/ScopedMemento"
+import { ScopedMemento } from "../client/storage/ScopedMemento"
 
 import "jest-extended"
 
