@@ -12,12 +12,11 @@ jobs:
       - name: Download release asset
         id: release_asset
         env:
-          RELEASE_ASSETS: ${{ toJSON(github.event.release.assets) }}
           TAG_NAME: ${{ github.event.tag_name }}
         run: |
           VERSION=$(echo -n $TAG_NAME | sed 's/^v//')
           FILE_NAME="vrealize-developer-tools-${VERSION}.vsix"
-          DOWNLOAD_URL=$(echo -n $RELEASE_ASSETS | jq '.[] | select(.name == "$FILE_NAME") | .browser_download_url' | tr -d '"')
+          DOWNLOAD_URL=$(jq --raw-output ".release.assets.[] | select(.name == "$FILE_NAME") | .browser_download_url" "$GITHUB_EVENT_PATH")
 
           wget $DOWNLOAD_URL
           echo "::set-output name=file_name::$FILE_NAME"

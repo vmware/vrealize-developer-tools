@@ -46,13 +46,12 @@ jobs:
         id: version_step
         if: runner.os == 'Linux'
         env:
-          GH_EVENT: ${{ toJSON(github.event) }}
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           echo "version=$PACKAGE_VERSION"
 
-          PR_NUMBER=$(echo -n $GH_EVENT | jq ".pull_request.number")
+          PR_NUMBER=$(jq --raw-output ".pull_request.number" "$GITHUB_EVENT_PATH")
           echo "prNumber=$PR_NUMBER"
 
           if [ "$PR_NUMBER" != "null" ]; then
