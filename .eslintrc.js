@@ -134,7 +134,7 @@ module.exports = {
                 "!",
                 {
                     pattern: " * Copyright \\d{4}-\\d{4} VMware, Inc\\.",
-                    template: " * Copyright 2018-2019 VMware, Inc."
+                    template: " * Copyright 2018-2020 VMware, Inc."
                 },
                 " * SPDX-License-Identifier: MIT",
                 " "

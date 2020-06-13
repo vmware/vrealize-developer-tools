@@ -126,6 +126,6 @@ Please see the file [open_source_licenses.txt](open_source_licenses.txt).
 
 ## License
 
-Copyright 2018-2019 VMware, Inc.
+Copyright 2018-2020 VMware, Inc.
 
 Licensed under the [MIT](LICENSE) License.
