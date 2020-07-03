@@ -117,4 +117,20 @@ export abstract class BaseEnvironment {
 
         return this.config.activeProfile.getOptional("vro.host", "")
     }
+
+    getVroUsername(): string {
+        if (!this.config.hasActiveProfile()) {
+            return ""
+        }
+
+        return this.config.activeProfile.getOptional("vro.username", "")
+    }
+
+    getVroTenant(): string {
+        if (!this.config.hasActiveProfile()) {
+            return ""
+        }
+
+        return this.config.activeProfile.getOptional("vro.tenant", "")
+    }
 }
