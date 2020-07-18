@@ -571,7 +571,7 @@
     "prettier": "^1.19.1",
     "ts-jest": "^25.0.0",
     "typescript": "~3.7.2",
-    "vsce": "^1.69.0"
+    "vsce": "^1.77.0"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
