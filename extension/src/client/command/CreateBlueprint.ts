@@ -44,10 +44,11 @@ export class CreateBlueprint extends BaseVraCommand {
         })
 
         if (!newFile) {
-            return Promise.reject("Save dialog was canceled")
+            this.logger.warn("Save dialog was canceled")
+            return
         }
 
-        await vscode.workspace.fs.writeFile(newFile, Buffer.from(`name: ${blueprintName}\ninputs: {}\nresources:\n`))
+        await vscode.workspace.fs.writeFile(newFile, Buffer.from(`name: ${blueprintName}\ndescription: ""\ncontent:\n  formatVersion: 1\n  inputs: {}\n  resources:\n`))
         await vscode.window.showTextDocument(newFile, { preview: false })
 
         vscode.window

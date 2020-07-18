@@ -5,7 +5,7 @@
 > and [vRealize Automation](https://www.vmware.com/products/vrealize-automation.html) content.
 
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/vmware-pscoe.vrealize-developer-tools.svg?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=vmware-pscoe.vrealize-developer-tools)
-[![Build Status](https://img.shields.io/github/workflow/status/vmware/vrealize-developer-tools/Build/master.svg?logo=github)](https://github.com/vmware/vrealize-developer-tools/actions)
+[![Build Status](https://github.com/vmware/vrealize-developer-tools/workflows/Build/badge.svg)](https://github.com/vmware/vrealize-developer-tools/actions)
 [![Dependencies Status](https://david-dm.org/vmware/vrealize-developer-tools/status.svg)](https://david-dm.org/vmware/vrealize-developer-tools)
 [![Coverage Status](https://codecov.io/gh/vmware/vrealize-developer-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/vmware/vrealize-developer-tools/)
 
