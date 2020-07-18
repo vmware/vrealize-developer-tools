@@ -9,7 +9,7 @@ import { VraNgAuth } from "./auth"
 import { VraAuthType } from "../types"
 import { Blueprint, Deployment, PagedResult, Project, Token } from "./vra-model"
 
-const VMWARE_CLOUD_HOST = "www.mgmt.cloud.vmware.com"
+const VMWARE_CLOUD_API = "api.mgmt.cloud.vmware.com"
 const VMWARE_CLOUD_CSP = "console.cloud.vmware.com"
 
 export interface TokenPair {
@@ -51,8 +51,12 @@ export interface VraIdentityIO {
 export class VraNgRestClient {
     constructor(private host: string, private port: number, private identity: VraIdentityIO) {
         if (host === VMWARE_CLOUD_CSP) {
-            // CSP is only for identity operations, switch to management portal
-            this.host = VMWARE_CLOUD_HOST
+            // CSP is only for identity operations, switch to management api
+            this.host = VMWARE_CLOUD_API
+        }
+
+        if (host === "cloud.vmware.com" || host === "mgmt.cloud.vmware.com" || host === "www.mgmt.cloud.vmware.com") {
+            this.host = VMWARE_CLOUD_API
         }
 
         if (!port || port <= 0) {
@@ -137,7 +141,7 @@ export class VraNgRestClient {
 
     async login(grant: AuthGrant): Promise<Token> {
         const baseUrl =
-            this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : `https://${this.host}:${this.port}`
+            this.host === VMWARE_CLOUD_API ? `https://${VMWARE_CLOUD_CSP}` : `https://${this.host}:${this.port}`
 
         let uri: string
         const options: any = {}
@@ -177,7 +181,7 @@ export class VraNgRestClient {
     }
 
     async getLoggedInUser(): Promise<any> {
-        const baseUrl = this.host === VMWARE_CLOUD_HOST ? `https://${VMWARE_CLOUD_CSP}` : ""
+        const baseUrl = this.host === VMWARE_CLOUD_API ? `https://${VMWARE_CLOUD_CSP}` : ""
         const uri = `${baseUrl}/csp/gateway/am/api/loggedin/user`
         return this.send("GET", uri)
     }
@@ -212,7 +216,7 @@ export class VraNgRestClient {
         deploymentName: string
         projectId: string
         blueprintId?: string
-        content?: string,
+        content?: string
         inputs?: object
     }): Promise<Deployment> {
         return this.send("POST", "/blueprint/api/blueprint-requests", { body })
