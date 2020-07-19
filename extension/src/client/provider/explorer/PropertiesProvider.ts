@@ -58,8 +58,12 @@ export class PropertiesProvider implements vscode.TreeDataProvider<AbstractNode>
         return element.asTreeItem()
     }
 
-    async getChildren(element?: AbstractNode): Promise<AbstractNode[]> {
+    async getChildren(element?: AbstractNode): Promise<AbstractNode[] | undefined> {
         if (!element) {
+            if (!this.rootNode) {
+                return undefined // show Welcome view
+            }
+
             const properties = this.rootNode ? await this.rootNode.getProperties() : []
             vscode.commands.executeCommand(
                 BuiltInCommands.SetContext,
