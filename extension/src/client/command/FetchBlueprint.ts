@@ -7,6 +7,7 @@ import * as path from "path"
 
 import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
+import { parse as parseYaml, Document as YamlDocument } from "yaml"
 
 import { Commands } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
@@ -45,16 +46,18 @@ export class GetBlueprint extends BaseVraCommand {
         )
 
         const selected: BlueprintPickInfo | undefined = await vscode.window.showQuickPick(blueprintsFuture, {
-            placeHolder: "Pick a blueprint"
+            placeHolder: "Pick a blueprint",
+            matchOnDescription: true
         })
 
         this.logger.debug("Selected blueprint: ", selected)
 
         if (!selected) {
-            return Promise.reject("No blueprint selection was made")
+            this.logger.warn("No blueprint selection was made")
+            return
         }
 
-        let blueprintContent: string = ""
+        const blueprintYaml = new YamlDocument()
         await vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
@@ -63,11 +66,18 @@ export class GetBlueprint extends BaseVraCommand {
             },
             async () => {
                 const blueprint = await restClient.getBlueprintById(selected.id)
-                blueprintContent = blueprint.content
+
+                blueprintYaml.contents = {
+                    id: blueprint.id,
+                    name: blueprint.name,
+                    description: blueprint.description,
+                    requestScopeOrg: blueprint.requestScopeOrg,
+                    content: parseYaml(blueprint.content)
+                }
             }
         )
 
-        if (!blueprintContent) {
+        if (!blueprintYaml.contents) {
             return Promise.reject("Could not fetch blueprint or it has empty content")
         }
 
@@ -81,11 +91,12 @@ export class GetBlueprint extends BaseVraCommand {
         })
 
         if (!newFile) {
-            return Promise.reject("Save dialog was canceled")
+            this.logger.warn("Save dialog was canceled")
+            return
         }
 
         this.logger.debug(`Saving the selected blueprint at ${newFile.toString()}`)
-        await vscode.workspace.fs.writeFile(newFile, Buffer.from(blueprintContent))
+        await vscode.workspace.fs.writeFile(newFile, Buffer.from(blueprintYaml.toString()))
         await vscode.window.showTextDocument(newFile, { preview: false })
     }
 }

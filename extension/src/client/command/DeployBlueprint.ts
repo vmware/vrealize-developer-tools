@@ -7,7 +7,7 @@ import * as path from "path"
 
 import { AutoWire, Logger, validate, VraNgRestClient } from "vrealize-common"
 import * as vscode from "vscode"
-import { parse as parseYaml } from "yaml"
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml"
 
 import { Commands } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
@@ -50,9 +50,13 @@ export class DeployBlueprint extends BaseVraCommand {
 
         const restClient = await this.getRestClient()
 
-        const blueprintContent = activeTextEditor.document.getText()
-        const blueprintName = path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
-        const existingBlueprint = await restClient.getBlueprintByName(blueprintName)
+        const blueprintYaml = parseYaml(activeTextEditor.document.getText())
+        const blueprintName = blueprintYaml.name || path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
+        const blueprintDescription = blueprintYaml.description || ""
+        const blueprintContent = stringifyYaml(blueprintYaml.content)
+        const existingBlueprint = blueprintYaml.id
+            ? await restClient.getBlueprintById(blueprintYaml.id)
+            : await restClient.getBlueprintByName(blueprintName)
 
         if (existingBlueprint) {
             const deploymentName = await vscode.window.showInputBox({
@@ -68,6 +72,7 @@ export class DeployBlueprint extends BaseVraCommand {
 
             await restClient.updateBlueprint(existingBlueprint.id, {
                 name: existingBlueprint.name,
+                description: blueprintDescription,
                 projectId: existingBlueprint.projectId,
                 content: blueprintContent
             })
@@ -77,7 +82,7 @@ export class DeployBlueprint extends BaseVraCommand {
                 restClient,
                 existingBlueprint.projectId,
                 deploymentName,
-                blueprintContent,
+                stringifyYaml(blueprintYaml.content),
                 existingBlueprint.id
             )
         }
@@ -89,11 +94,13 @@ export class DeployBlueprint extends BaseVraCommand {
         this.logger.debug("Selected project and deployment name: ", state)
 
         if (!state.projectId) {
-            return Promise.reject("No project was selected")
+            this.logger.warn("No project was selected")
+            return
         }
 
         if (!state.deploymentName) {
-            return Promise.reject("No deployment name was provided")
+            this.logger.warn("No deployment name was provided")
+            return
         }
 
         return this.doDeploy(context, restClient, state.projectId, state.deploymentName, blueprintContent, undefined)

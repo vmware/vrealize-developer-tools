@@ -204,11 +204,11 @@ export class VraNgRestClient {
         return this.unwrapPages(blueprints, "/blueprint/api/blueprints")
     }
 
-    async createBlueprint(body: { name: string; projectId: string; content: string }): Promise<any> {
+    async createBlueprint(body: { name: string; projectId: string; content: string, description: string }): Promise<any> {
         return this.send("POST", "/blueprint/api/blueprints", { body })
     }
 
-    async updateBlueprint(id: string, body: { name: string; projectId: string; content: string }): Promise<void> {
+    async updateBlueprint(id: string, body: { name: string; projectId: string; content: string, description: string }): Promise<void> {
         return this.send("PUT", `/blueprint/api/blueprints/${id}`, { body })
     }
 

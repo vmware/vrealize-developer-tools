@@ -7,6 +7,7 @@ import * as path from "path"
 
 import { AutoWire, Logger } from "vrealize-common"
 import * as vscode from "vscode"
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml"
 
 import { Commands } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
@@ -42,17 +43,22 @@ export class UploadBlueprint extends BaseVraCommand {
 
         const restClient = await this.getRestClient()
 
-        const blueprintContent = activeTextEditor.document.getText()
-        const blueprintName = path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
-        const existingBlueprint = await restClient.getBlueprintByName(blueprintName)
+        const blueprintYaml = parseYaml(activeTextEditor.document.getText())
+        const blueprintName = blueprintYaml.name || path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
+        const blueprintDescription = blueprintYaml.description || ""
+        const existingBlueprint = blueprintYaml.id
+            ? await restClient.getBlueprintById(blueprintYaml.id)
+            : await restClient.getBlueprintByName(blueprintName)
 
         if (existingBlueprint) {
             await restClient.updateBlueprint(existingBlueprint.id, {
                 name: existingBlueprint.name,
+                description: blueprintDescription,
                 projectId: existingBlueprint.projectId,
-                content: blueprintContent
+                content: stringifyYaml(blueprintYaml.content)
             })
 
+            vscode.window.showInformationMessage(`Blueprint '${blueprintName}' has been updated`)
             return
         }
 
@@ -74,13 +80,17 @@ export class UploadBlueprint extends BaseVraCommand {
         this.logger.debug("Selected project: ", selectedProject)
 
         if (!selectedProject) {
-            return Promise.reject("No blueprint selection was made")
+            this.logger.warn("No project selection was made")
+            return
         }
 
         await restClient.createBlueprint({
             name: blueprintName,
+            description: blueprintDescription,
             projectId: selectedProject.id,
-            content: blueprintContent
+            content: stringifyYaml(blueprintYaml.content)
         })
+
+        vscode.window.showInformationMessage(`Blueprint '${blueprintName}' has been created`)
     }
 }
