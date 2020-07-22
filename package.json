@@ -69,6 +69,16 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "vrdev.views.explorer",
+        "contents": "Connect to vRealize Orchetsrator by selecting a maven profile.\n\n[Select Profile](command:vrdev.change.profile)"
+      },
+      {
+        "view": "vrdev.views.properties",
+        "contents": "Select a node in the Explorer to view its properties."
+      }
+    ],
     "commands": [
       {
         "command": "vrdev.views.explorer.refresh",

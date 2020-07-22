@@ -23,7 +23,6 @@ import { Registrable } from "../Registrable"
 
 @AutoWire
 export class ConfigurationManager extends BaseConfiguration implements Registrable {
-
     private homeDir = process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"] || "~"
     private readonly logger = Logger.get("ConfigurationManager")
 
