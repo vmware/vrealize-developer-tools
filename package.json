@@ -69,6 +69,16 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "vrdev.views.explorer",
+        "contents": "Connect to vRealize Orchetsrator by selecting a maven profile.\n\n[Select Profile](command:vrdev.change.profile)"
+      },
+      {
+        "view": "vrdev.views.properties",
+        "contents": "Select a node in the Explorer to view its properties."
+      }
+    ],
     "commands": [
       {
         "command": "vrdev.views.explorer.refresh",
@@ -553,7 +563,7 @@
     "@types/vscode": "1.40.0",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
-    "codecov": "^3.6.5",
+    "codecov": "^3.7.1",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-header": "^3.0.0",
@@ -581,7 +591,7 @@
     "glob": "^7.1.6",
     "jsonc-parser": "^2.1.0",
     "jwt-decode": "^2.2.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "micromatch": "^4.0.2",
     "module-alias": "^2.2.2",
     "moment": "^2.24.0",

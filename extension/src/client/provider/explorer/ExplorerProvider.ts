@@ -52,6 +52,8 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
         )
 
         context.subscriptions.push(this, this.tree, refreshCommand, revealItem, onDidChangeSelection)
+
+        this.config.onDidChangeConfig(this.onConfigurationChanged, this, context.subscriptions)
     }
 
     dispose() {
@@ -59,20 +61,25 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
     }
 
     refresh(): void {
-        // TODO: refresh on `vrdev.views.explorer.*` configuration change
-        this.rootNodes.forEach(node => this.onDidChangeTreeDataEmitter.fire(node))
+        this.onDidChangeTreeDataEmitter.fire(undefined) // trigger on root
     }
 
     getTreeItem(element: AbstractNode): Promise<vscode.TreeItem> {
         return element.asTreeItem()
     }
 
-    getChildren(element?: AbstractNode): Promise<AbstractNode[]> {
+    getChildren(element?: AbstractNode): Promise<AbstractNode[] | undefined> {
         return element ? element.getChildren() : this.getRootNodes()
     }
 
     getParent(element: AbstractNode): AbstractNode | undefined {
         return element.parent
+    }
+
+    private onConfigurationChanged(event: vscode.ConfigurationChangeEvent) {
+        if (event.affectsConfiguration("vrdev.maven.profile") || event.affectsConfiguration("vrdev.views.explorer")) {
+            this.refresh()
+        }
     }
 
     private onDidChangeSelection(event: vscode.TreeViewSelectionChangeEvent<AbstractNode>): void {
@@ -93,7 +100,11 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
         }
     }
 
-    private async getRootNodes(): Promise<AbstractNode[]> {
+    private async getRootNodes(): Promise<AbstractNode[] | undefined> {
+        if (!this.config.hasActiveProfile()) {
+            return undefined // show Welcome view
+        }
+
         this.rootNodes = [
             new CategoriesRootNode(
                 "Workflows",
