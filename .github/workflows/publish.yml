@@ -16,7 +16,7 @@ jobs:
         run: |
           VERSION=$(echo -n $TAG_NAME | sed 's/^v//')
           FILE_NAME="vrealize-developer-tools-${VERSION}.vsix"
-          DOWNLOAD_URL=$(jq --raw-output ".release.assets.[] | select(.name == "$FILE_NAME") | .browser_download_url" "$GITHUB_EVENT_PATH")
+          DOWNLOAD_URL=$(jq --raw-output '.release.assets[] | select(.name == "$FILE_NAME") | .browser_download_url' "$GITHUB_EVENT_PATH")
 
           wget $DOWNLOAD_URL
           echo "::set-output name=file_name::$FILE_NAME"
