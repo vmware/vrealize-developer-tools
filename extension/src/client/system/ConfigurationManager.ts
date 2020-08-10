@@ -106,7 +106,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         }
 
         const settingsJson = xmlParser.parse(settingsXmlContent.toString("utf8"))
-        const allProfiles = settingsJson.settings.profiles.profile
+        const allProfiles = settingsJson?.settings?.profiles?.profile
         const vroProfiles: MavenProfilesMap = {}
 
         if (!allProfiles) {
