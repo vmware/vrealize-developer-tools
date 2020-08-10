@@ -7,7 +7,6 @@ jobs:
   build_release:
     name: Build and Release
     runs-on: ubuntu-latest
-    needs: check
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -27,7 +26,7 @@ jobs:
         id: version_step
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "::set-output name=version::${VERSION_STRING}"
+          echo "::set-output name=version::${PACKAGE_VERSION}"
 
       - name: Install dependencies
         run: "yarn install --frozen-lockfile"

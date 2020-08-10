@@ -3,7 +3,7 @@
   "name": "vrealize-developer-tools",
   "displayName": "vRealize Developer Tools",
   "description": "Provides code intelligence features and enables a more developer-friendly experience when creating VMware vRealize Orchestrator and VMware vRealize Automation content.",
-  "version": "2.1.6",
+  "version": "2.2.0",
   "publisher": "vmware-pscoe",
   "license": "MIT",
   "homepage": "https://github.com/vmware/vrealize-developer-tools",
