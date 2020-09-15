@@ -7,7 +7,6 @@ jobs:
   build_release:
     name: Build and Release
     runs-on: ubuntu-latest
-    needs: check
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -27,7 +26,7 @@ jobs:
         id: version_step
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "::set-output name=version::${VERSION_STRING}"
+          echo "::set-output name=version::${PACKAGE_VERSION}"
 
       - name: Install dependencies
         run: "yarn install --frozen-lockfile"
@@ -44,11 +43,29 @@ jobs:
           flags: unittest
           name: codecov
 
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v2
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.RELEASE_GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.RELEASE_GPG_PASSPHRASE }}
+
+      - name: Checksum and sign
+        run: |
+          sha256sum --tag vrealize-developer-tools-${version}.vsix > vrealize-developer-tools-${version}.vsix.sha256
+          gpg --default-key ${keyid} --armor --detach-sig vrealize-developer-tools-${version}.vsix.sha256
+        with:
+          version: ${{steps.version_step.outputs.version}}
+          keyid: ${{steps.import_gpg.outputs.keyid}}
+
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
-          path: "*.vsix"
+          name: vrealize-developer-tools-${{steps.version_step.outputs.version}}
+          path: |
+            vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
+            vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256
+            vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.asc
 
       - name: Get previous tag
         run: |
@@ -78,4 +95,20 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
           asset_name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
+          asset_content_type: application/octet-stream
+
+      - name: Upload release checksum
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256
+          asset_name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256
+          asset_content_type: application/octet-stream
+
+      - name: Upload release signature
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.asc
+          asset_name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.asc
           asset_content_type: application/octet-stream
