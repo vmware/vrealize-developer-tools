@@ -28,7 +28,7 @@ labels: type:bug
 
 -   vRealize Developer Tools Version:
 -   vRealize Build Tools Version:
--   VSCode Version:
+-   Visual Studio Code Version:
 -   OS Version:
 
 #### Server
@@ -39,8 +39,10 @@ labels: type:bug
 ### Failure Logs
 
 <!--
-Please enable output channel logging by setting `"vrdev.log": "debug"` in your settings.json. This will enable logging to the `vRealize Developer Tools` & `vRO - Language Server` channels in the Output pane.
-Once enabled, please attempt to reproduce the issue (if possible) and attach any relevant log lines from both channels.
+Please enable output channel logging by setting `"vrdev.log": "debug"` in your settings.json.
+Once enabled, please attempt to reproduce the issue and attach any relevant log lines from the following places.
+  - Logs from the `vRealize Developer Tools` & `vRO - Language Server` channels in the Output pane.
+  - Errors from the Dev Tools Console (open from the menu: Help > Toggle Developer Tools)
 -->
 
 ### Related issues and PRs

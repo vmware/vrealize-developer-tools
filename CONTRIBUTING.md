@@ -1,102 +1,34 @@
 # Contributing
 
-**Thanks for taking the time to contribute!** 👍
+Welcome, and thank you for your interest in contributing to vRealize Developer Tools!
 
-When contributing to this project, please first discuss the changes you wish to make via an issue before making changes.
+There are many ways in which you can contribute, beyond writing code. The goal of this document is to provide a high-level overview of how you can get involved.
 
-## Certificate of Origin
+## Questions and Feedback
 
-By contributing to this project you agree to the [Developer Certificate of Origin](https://cla.vmware.com/dco). All contributions to this repository must be signed as described on that page. Your signature certifies that you wrote the patch or have the right to pass it on as an open-source patch.
+Have a question? Rather than opening an issue, please ask away on our [Slack](https://bit.ly/vmware-vrdt-slack).
 
-## Getting Started
+## Reporting Issues
 
-Looking for places to contribute to the codebase? You can start by looking through the [`good-first-issue`](https://github.com/vmware/vrealize-developer-tools/labels/good-first-issue) and [`help-wanted`](https://github.com/vmware/vrealize-developer-tools/labels/status:help-wanted) issues.
+If you have identified a reproducible problem or have a feature request, please [open an Issue](https://github.com/vmware/vrealize-developer-tools/issues/new/choose).
 
-### Getting the code
+### Look For an Existing Issue
 
-```
-git clone https://github.com/vmware/vrealize-developer-tools.git
-```
+Before you create a new issue, please do a search in [open issues](https://github.com/vmware/vrealize-developer-tools/issues) to see if the issue or feature request has already been filed.
 
-#### Prerequisites
+If you find your issue already exists, make relevant comments and add your [reaction](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments). Use a reaction in place of a "+1" comment (👍 for upvote or 👎 for downvote).
 
--   [Git](https://git-scm.com/)
--   [Node.js](https://nodejs.org/en/), `>= 10.0.0`
--   [yarn](https://yarnpkg.com/en/), `>= 1.10.1`
--   [gulp CLI](https://gulpjs.com/), `>= 2.0.1`
--   [Visual Studio Code](https://code.visualstudio.com/), `>= 1.30.0`
+If you cannot find an existing issue that describes your bug or feature, create a new issue using the guidelines below.
 
-### Dependencies
+### Writing Good Issue Reports
 
-From a terminal, where you have cloned the repository, execute the following command to install the required dependencies:
+-   File a single issue per problem and feature request. Do not enumerate multiple bugs or feature requests in the same issue.
+-   Do not add your issue as a comment to an existing issue unless it's related. Many issues look similar, but have different causes.
+-   When filing bugs, please follow the [bug template](https://github.com/vmware/vrealize-developer-tools/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) and include as much information as possible. The more information you can provide, the more likely someone will be successful at reproducing the issue and finding a fix.
 
-```
-yarn install
-```
+## Contributing Fixes
 
-### Building
+If you are interested in writing code to fix issues,
+please see [How to Contribute](https://github.com/vmware/vrealize-developer-tools/wiki/How-to-Contribute) in the wiki.
 
-During development you can use a watcher to make builds on changes quick and easy. From a terminal, where you have cloned the repository, execute the following command:
-
-```
-gulp watch
-```
-
-This will first do an initial full build and then watch for file changes, compiling those changes incrementally, enabling a fast, iterative coding experience.
-
-:bulb:**Tip!** You can press <kbd>CMD+SHIFT+B</kbd> (<kbd>CTRL+SHIFT+B</kbd> on Windows, Linux) to start the watch task.
-
-:bulb:**Tip!** You don't need to stop and restart the development version of VS Code after each change. You can just execute `Reload Window` from the command palette.
-
-To do a complete rebuild, from a terminal, where you have cloned the repository, execute the following command:
-
-```
-gulp compile
-```
-
-### Linting
-
-This project uses [eslint](https://eslint.org/) for code linting. You can run eslint across the code by calling `gulp lint` from a terminal. Warnings from eslint show up in the `Errors and Warnings` panel and you can navigate to them from inside VS Code.
-
-To lint the code as you make changes you can install the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension.
-
-:scroll:**NOTE!** Linting rules that have auto-fixes available will be automatically applied on file save and during compilation.
-
-### Testing
-
-To run the tests execute the following from a terminal:
-
-```
-gulp test
-```
-
-### Bundling
-
-To generate a VSIX (installation package) run the following from a terminal:
-
-```
-gulp package
-```
-
-### Debugging
-
-#### Using VS Code
-
-1. Open the `vrealize-developer-tools` folder
-2. Ensure the required [dependencies](#dependencies) are installed
-3. Start the [`watch`](#building) task
-4. Choose the `Launch Extension` launch configuration from the launch dropdown in the Debug viewlet and press `F5`.
-
-:scroll:**NOTE!** In the _[Extension Development Host]_ instance, the extension will be activated when any folder with vRO JavaScript code is opened **AND** one of the following events occurs.
-
--   a `.o11n/` folder is located at the root of the opened project
--   a JavaScript file is opened in the editor
--   a `vRealize: ...` action is executed from the command palette
-
-> Make sure the `window.openFoldersInNewWindow` setting is not `"on"`, otherwise a new, _non-[Extension Development Host]_, window may be opened.
-
-:bulb:**Tip!** If you make edits to the code, just execute `Reload Window` from the command palette and the debugger will reattach.
-
-## Submitting a Pull Request
-
-Please follow the instructions in the [PR template](.github/PULL_REQUEST_TEMPLATE.md).
+# Thank You!
