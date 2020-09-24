@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8" ?><dunes-policy name="Policy Template Amqp" id="32e857f3-e231-332a-921d-267c9d8d5185" version="1.0.0" api-version="6.0.0" type="0" allowed-operations="vef"><item tag="AMQP Subscription" type="0" sdkType="AMQP:Subscription"><event type="OnMessage" kind="trigger" active="false"><script encoded="false"><![CDATA[System.log("onMessage");
+]]></script></event></item></dunes-policy>

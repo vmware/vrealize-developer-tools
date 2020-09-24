@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig-noncomposite-base",
+  "compilerOptions": {
+    "outDir": "../../built",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "include": ["**/*.ts"]
+}

@@ -1,0 +1,23 @@
+vropkg creates a vRealize Orchestrator package out of the expand to folder package
+
+Syntax: vropkg OPTIONS
+
+TYPE
+
+tree                     vRealize Orchestrator native expand to folder structure
+flat                     vRealize Orchestrator native package
+js                       vRealize Orchestrator actions source where each action is represented as anotated `.js` file.
+
+OPTIONS
+
+in               TYPE    vRealize Orchestrator native input TYPE [tree, flat]
+out              TYPE    vRealize Orchestrator native output type [tree, flat]
+srcPath          path    The path to the vRealize Orchestrator expand to package folder.
+destPath         path    The path to the output (target) directory.
+privateKeyPEM    pem     The string of PEM encoded private key, used to sign the flat package in case of `--out flat`.
+certificatesPEM  pem     The string of PEM encoded certificate chine. The last certificate in this chain has to be the corresponding to the privateKeyPEM.
+keyPass          string  The password for decoding the private key specified in privateKeyPEM
+
+Example:
+vropkg --in tree --out flat --srcPath "com.vmware.pscoe.toolchain-expand"  --destPath "target" --privateKeyPEM "$(cat private_key.pem)" --certificatesPEM "$(cat cert.pem)"
+vropkg --in flat --out tree --srcPath "com.vmware.pscoe.toolchain.package" --destPath "target" --privateKeyPEM "$(cat private_key.pem)" --certificatesPEM "$(cat cert.pem)"

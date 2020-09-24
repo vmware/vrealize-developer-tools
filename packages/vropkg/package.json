@@ -1,0 +1,78 @@
+{
+  "name": "@vmware-pscoe/vropkg",
+  "version": "2.2.0",
+  "description": "Used to build vRealize Orchestrator signed package out of it source code (expand to package XML)",
+  "author": "VMware PSCoE",
+  "license": "MIT",
+  "private": false,
+  "keywords": [
+    "vRealize Orchestrator",
+    "npm",
+    "package"
+  ],
+  "engines": {
+    "node": ">=11.15.0",
+    "npm": ">=6.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vmware/vrealize-developer-tools.git",
+    "directory": "packages/vropkg"
+  },
+  "main": "./dist/cli.js",
+  "bin": {
+    "vropkg": "./bin/vropkg"
+  },
+  "scripts": {
+    "build": "npm run build-prod",
+    "build-prod": "gulp build-prod",
+    "build-dev": "gulp build-dev",
+    "clean": "gulp clean",
+    "test": "gulp test-e2e"
+  },
+  "devDependencies": {
+    "@types/archiver": "^3.1.0",
+    "@types/command-line-args": "^5.0.0",
+    "@types/fs-extra": "^5.0.5",
+    "@types/glob": "^7.1.1",
+    "@types/gulp": "^4.0.6",
+    "@types/gulp-jasmine": "^2.4.2",
+    "@types/iconv": "^2.1.16",
+    "@types/jasmine": "^3.3.9",
+    "@types/node-forge": "^0.8.7",
+    "@types/npm": "^2.0.31",
+    "@types/unzipper": "^0.8.1",
+    "@types/uuid": "3.4.3",
+    "@types/xmlbuilder": "0.0.33",
+    "@types/xmldoc": "^1.1.4",
+    "gulp": "^4.0.2",
+    "gulp-cli": "^2.2.0",
+    "gulp-jasmine": "^4.0.0",
+    "gulp-typescript": "^5.0.1",
+    "jasmine": "^3.3.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "abstract-syntax-tree": "^2.5.0",
+    "archive": "^0.0.2",
+    "archiver": "^3.1.1",
+    "command-line-args": "^5.1.1",
+    "crc-32": "^1.2.0",
+    "crypto-js": "^3.3.0",
+    "download-git-repo": "^2.0.0",
+    "fs-extra": "^7.0.1",
+    "glob": "^7.1.6",
+    "iconv": "^3.0.0",
+    "node-forge": "^0.9.1",
+    "parse-comments": "^1.0.0",
+    "source-map-support": "^0.5.16",
+    "unzipper": "^0.10.10",
+    "uuid": "^3.4.0",
+    "uuid-by-string": "^3.0.2",
+    "winston": "^3.2.1",
+    "xmlbuilder": "^9.0.7",
+    "xmlbuilder2": "^1.3.0",
+    "xmldoc": "^1.1.2"
+  }
+}

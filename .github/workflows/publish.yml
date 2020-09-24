@@ -26,3 +26,35 @@ jobs:
           MARKETPLACE_SECRET: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           FILE_NAME: ${{ steps.release_asset.outputs.file_name }}
         run: "node node_modules/.bin/vsce publish -p $MARKETPLACE_SECRET --packagePath $FILE_NAME"
+
+  publish-vropkg-ghp:
+    name: Publish vropkg to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.14.1"
+          registry-url: "https://npm.pkg.github.com"
+      - run: |
+          yarn
+          yarn workspace @vmware-pscoe/vropkg build
+          yarn publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-vrotsc-ghp:
+    name: Publish vrotsc to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.14.1"
+          registry-url: "https://npm.pkg.github.com"
+      - run: |
+          yarn
+          yarn workspace @vmware-pscoe/vrotsc build
+          yarn publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

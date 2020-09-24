@@ -1,0 +1,10 @@
+.o11n/
+.vscode/
+target
+pom.xml
+**/.DS_Store
+package-lock.json
+**/*.tgz
+.settings/
+.classpath
+.project

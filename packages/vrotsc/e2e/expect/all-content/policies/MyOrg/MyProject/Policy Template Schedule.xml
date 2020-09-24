@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8" ?><dunes-policy name="Policy Template Schedule" id="2ba12090-11d4-3e8e-8e9c-f0b23f65d740" version="1.0.0" api-version="6.0.0" type="0" allowed-operations="vef"><item tag="Schedule" type="0" periode="every-days" when="11:12:00,12:00:00" timezone="Europe/Sofia"><event type="OnExecute" kind="trigger" active="false"><script encoded="false"><![CDATA[System.log("onMessage");
+]]></script></event></item></dunes-policy>

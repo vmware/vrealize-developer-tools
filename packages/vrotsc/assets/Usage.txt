@@ -1,0 +1,15 @@
+Syntax: vrotsc [SRC_DIR] {OPTIONS}
+
+Options:
+  -h, --help                           Print this message.
+  -v, --version                        Print the compiler's version.
+  -p, --project                        Path to the tsconfig.json file to use.
+  --emitHeader                         Emit auto-generated header on top of each file.
+  --actionsOut                         Specify the output directory for actions.
+  --workflowsOut                       Specify the output directory for workflows.
+  --configsOut                         Specify the output directory for configuration elements.
+  --resourcesOut                       Specify the output directory for resource elements.
+  --testsOut                           Specify the output directory for tests.
+  --typesOut                           Specify the output directory for types.
+  --actionsNamespace                   Specify actions namespace.
+  --workflowsNamespace                 Specify workflows namespace.

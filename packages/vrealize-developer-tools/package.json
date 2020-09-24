@@ -1,0 +1,618 @@
+{
+  "name": "vrealize-developer-tools",
+  "displayName": "vRealize Developer Tools",
+  "description": "Provides code intelligence features and enables a more developer-friendly experience when creating VMware vRealize Orchestrator and VMware vRealize Automation content.",
+  "version": "2.2.0",
+  "publisher": "vmware-pscoe",
+  "license": "MIT",
+  "homepage": "https://github.com/vmware/vrealize-developer-tools",
+  "bugs": {
+    "url": "https://github.com/vmware/vrealize-developer-tools/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vmware/vrealize-developer-tools.git",
+    "directory": "packages/vrealize-developer-tools"
+  },
+  "engines": {
+    "node": ">=10.0.0",
+    "vscode": "^1.40.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "vRealize",
+    "vRO",
+    "vRA"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "workspaceContains:.o11n/",
+    "onView:vrdev.views.explorer",
+    "onCommand:vrdev.new.project",
+    "onCommand:vrdev.change.profile",
+    "onCommand:vrdev.open.action",
+    "onCommand:vrdev.open.workflow",
+    "onCommand:vrdev.open.config",
+    "onCommand:vrdev.open.resource",
+    "onCommand:vrdev.run.action",
+    "onCommand:vrdev.toggle.typescript",
+    "onCommand:vrdev.vra.auth.configure",
+    "onCommand:vrdev.blueprint.create",
+    "onCommand:vrdev.blueprint.fetch",
+    "onCommand:vrdev.blueprint.upload",
+    "onCommand:vrdev.blueprint.deploy"
+  ],
+  "main": "./extension/out/extension",
+  "icon": "assets/logo.png",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vro-explorer",
+          "title": "vRealize Developer Tools",
+          "icon": "assets/icons/explorer.svg"
+        }
+      ]
+    },
+    "views": {
+      "vro-explorer": [
+        {
+          "id": "vrdev.views.explorer",
+          "name": "Explorer"
+        },
+        {
+          "id": "vrdev.views.properties",
+          "name": "Properties"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "vrdev.views.explorer",
+        "contents": "Connect to vRealize Orchetsrator by selecting a maven profile.\n\n[Select Profile](command:vrdev.change.profile)"
+      },
+      {
+        "view": "vrdev.views.properties",
+        "contents": "Select a node in the Explorer to view its properties."
+      }
+    ],
+    "commands": [
+      {
+        "command": "vrdev.views.explorer.refresh",
+        "title": "Refresh",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/refresh.svg",
+          "dark": "assets/icons/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "vrdev.views.explorer.revealItem",
+        "title": "Reveal Item in Explorer",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.views.properties.show",
+        "title": "Show Properties",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.views.properties.copy",
+        "title": "Copy Value",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/clipboard.svg",
+          "dark": "assets/icons/dark/clipboard.svg"
+        }
+      },
+      {
+        "command": "vrdev.views.properties.locateItem",
+        "title": "Locate Item in Explorer",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/location.svg",
+          "dark": "assets/icons/dark/location.svg"
+        }
+      },
+      {
+        "command": "vrdev.fetchRemoteElement",
+        "title": "Fetch from Remote",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/link-external.svg",
+          "light": "assets/icons/light/link-external.svg"
+        }
+      },
+      {
+        "command": "vrdev.workflow.fetchSchema",
+        "title": "Open Workflow Schema",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.package.delete",
+        "title": "Delete",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/trash.svg",
+          "light": "assets/icons/light/trash.svg"
+        }
+      },
+      {
+        "command": "vrdev.change.profile",
+        "title": "Change Active Profile",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.open.action",
+        "title": "Open vRO Action",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.open.workflow",
+        "title": "Open vRO Workflow",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.open.config",
+        "title": "Open vRO Configuration",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.open.resource",
+        "title": "Open vRO Resource",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/search.svg",
+          "light": "assets/icons/light/search.svg"
+        }
+      },
+      {
+        "command": "vrdev.new.project",
+        "title": "New Project",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.run.action",
+        "title": "Run vRO Action",
+        "category": "vRealize",
+        "icon": {
+          "light": "assets/icons/light/zap.svg",
+          "dark": "assets/icons/dark/zap.svg"
+        }
+      },
+      {
+        "command": "vrdev.toggle.typescript",
+        "title": "Toggle TypeScript Support (Experimental)",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.vra.auth.configure",
+        "title": "Configure vRA Authentication",
+        "category": "vRealize"
+      },
+      {
+        "command": "vrdev.blueprint.create",
+        "title": "Create vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.upload",
+        "title": "Upload vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.fetch",
+        "title": "Fetch vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      },
+      {
+        "command": "vrdev.blueprint.deploy",
+        "title": "Deploy vRA Blueprint",
+        "category": "vRealize",
+        "icon": {
+          "dark": "assets/icons/dark/circuit-board.svg",
+          "light": "assets/icons/light/circuit-board.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "when": "view =~ /^vrdev\\.views\\.explorer/",
+          "command": "vrdev.views.explorer.refresh",
+          "group": "navigation@1"
+        },
+        {
+          "when": "!vrdev:properties:empty && view =~ /^vrdev\\.views\\.properties/",
+          "command": "vrdev.views.properties.locateItem",
+          "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vrdev.fetchRemoteElement",
+          "when": "viewItem =~ /vrdev:element:kind:(action|workflow|config|resource)\\b/",
+          "group": "inline@98"
+        },
+        {
+          "command": "vrdev.fetchRemoteElement",
+          "when": "viewItem =~ /vrdev:element:kind:(action|workflow|config|resource)\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "viewItem =~ /vrdev:element:kind:workflow\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "viewItem =~ /vrdev:element:kind:workflow\\b/",
+          "group": "1_vrdevs@2"
+        },
+        {
+          "command": "vrdev.package.delete",
+          "when": "viewItem =~ /vrdev:element:kind:package\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.package.delete",
+          "when": "viewItem =~ /vrdev:element:kind:package\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.action",
+          "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.action",
+          "when": "viewItem =~ /vrdev:element:kind:actions\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.workflow",
+          "when": "viewItem =~ /vrdev:element:kind:workflows\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.workflow",
+          "when": "viewItem =~ /vrdev:element:kind:workflows\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.config",
+          "when": "viewItem =~ /vrdev:element:kind:configs\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.config",
+          "when": "viewItem =~ /vrdev:element:kind:configs\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.open.resource",
+          "when": "viewItem =~ /vrdev:element:kind:resources\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.open.resource",
+          "when": "viewItem =~ /vrdev:element:kind:resources\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "viewItem =~ /vrdev:element:kind:property\\b(?!.*?\\+multi\\b)\\b/",
+          "group": "1_vrdevs@1"
+        },
+        {
+          "command": "vrdev.blueprint.create",
+          "when": "viewItem =~ /vrdev:element:kind:blueprint\\b/",
+          "group": "inline@95"
+        },
+        {
+          "command": "vrdev.blueprint.create",
+          "when": "viewItem =~ /vrdev:element:kind:blueprint\\b/",
+          "group": "1_vrdevs@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceLangId == javascript || resourceLangId == typescript",
+          "command": "vrdev.run.action",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.upload",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == yaml",
+          "command": "vrdev.blueprint.deploy",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vrdev.fetchRemoteElement",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.workflow.fetchSchema",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.package.delete",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.show",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.copy",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.properties.locateItem",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.explorer.revealItem",
+          "when": "false"
+        },
+        {
+          "command": "vrdev.views.explorer.refresh",
+          "when": "false"
+        }
+      ]
+    },
+    "taskDefinitions": [
+      {
+        "type": "vRealize",
+        "required": [
+          "label",
+          "command"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string",
+            "description": "The command to execute"
+          }
+        }
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "vRealize Developer Tools",
+      "properties": {
+        "vrdev.log": {
+          "type": "string",
+          "enum": [
+            "off",
+            "info",
+            "debug"
+          ],
+          "default": "info",
+          "description": "Enables logging of the vRealize Developer Tools to the OUTPUT panel. This log can be used to diagnose vRealize Developer Tools issues. The log may contain file paths, source code, and other potentially sensitive information from your project."
+        },
+        "vrdev.trace": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Enables tracing of messages exchanged between the vRealize Developer Tools extension and the vRO language server. This trace can be used to diagnose extension issues. The trace may contain file paths, source code, and other potentially sensitive information from your project."
+        },
+        "vrdev.commandPalette.useFullyQualifiedNames": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show all vRO elements in the command palette with fully qualified names."
+        },
+        "vrdev.commandPalette.multiStep.pinned": {
+          "type": "boolean",
+          "default": true,
+          "description": "Specified whether to dismiss the multi-step commands when focus is lost."
+        },
+        "vrdev.tasks.disable": {
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Disable all tasks contributed by the vRealize Developer Tools extension.",
+          "scope": "window"
+        },
+        "vrdev.tasks.exclude": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "Configure glob patterns of project IDs to exclude from tasks palette. Patterns are matched against `{groupId}:{artifactId}`",
+          "scope": "window"
+        },
+        "vrdev.maven.profile": {
+          "type": "string",
+          "default": "",
+          "description": "A maven profile (i.e. -Pprofile) to be used for maven executions, e.g. pull, push, Maven collection.",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.type": {
+          "type": "string",
+          "enum": [
+            "refresh_token",
+            "password"
+          ],
+          "description": "Method for authetication towards vRealize Automation 8",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.host": {
+          "type": "string",
+          "description": "",
+          "scope": "window"
+        },
+        "vrdev.vra.auth.port": {
+          "type": "integer",
+          "default": "443",
+          "description": "",
+          "scope": "window"
+        },
+        "vrdev.experimental.typescript": {
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "Enables experimental vRO TypeScript support.",
+          "scope": "application"
+        },
+        "vrdev.buildTools.defaultVersion": {
+          "type": "string",
+          "required": false,
+          "default": "1.7.1",
+          "description": "The version of vRealize Build Tools to be used outside the context of a project (e.g. when onboarding project and running untitled actions).",
+          "scope": "application"
+        },
+        "vrdev.views.explorer.actions.layout": {
+          "type": "string",
+          "default": "compact",
+          "enum": [
+            "tree",
+            "compact",
+            "flat"
+          ],
+          "enumDescriptions": [
+            "Displays action packages as a tree",
+            "Displays action packages as a tree, but flattens any folders that have no children",
+            "Displays action packages as a list"
+          ],
+          "markdownDescription": "Specifies how the _Explorer_ view will display vRO action packages",
+          "scope": "window"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "javascript",
+        "path": "./extension/snippets/vro.json"
+      },
+      {
+        "language": "yaml",
+        "path": "./extension/snippets/vra-blueprint.json"
+      }
+    ]
+  },
+  "_moduleAliases": {
+    "vrealize-common": "common/out",
+    "vro-language-server": "language-server/out/public"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.4.32",
+    "@types/chokidar": "~1.7.5",
+    "@types/fs-extra": "~5.0.4",
+    "@types/glob": "7.1.1",
+    "@types/jest": "^24.9.1",
+    "@types/jwt-decode": "^2.2.1",
+    "@types/keytar": "^4.4.2",
+    "@types/lodash": "^4.14.149",
+    "@types/micromatch": "^3.1.1",
+    "@types/node": "^10.5.6",
+    "@types/request": "^2.48.3",
+    "@types/request-promise-native": "^1.0.17",
+    "@types/semver": "^6.0.0",
+    "@types/tmp": "^0.1.0",
+    "@types/vscode": "1.40.0",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
+    "codecov": "^3.7.1",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.5.0",
+    "eslint-plugin-header": "^3.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.1.2",
+    "fancy-log": "^1.3.3",
+    "gulp": "^4.0.0",
+    "gulp-eslint": "^6.0.0",
+    "gulp-if": "^3.0.0",
+    "jest": "^25.1.0",
+    "jest-create-mock-instance": "^1.1.0",
+    "jest-extended": "0.11.2",
+    "merge-stream": "^2.0.0",
+    "minimist": "^1.2.5",
+    "prettier": "^1.19.1",
+    "ts-jest": "^25.0.0",
+    "typescript": "~3.7.2",
+    "vsce": "^1.77.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.4.13",
+    "chokidar": "~2.0.4",
+    "fast-xml-parser": "3.12.20",
+    "fs-extra": "~7.0.0",
+    "glob": "^7.1.6",
+    "jsonc-parser": "^2.1.0",
+    "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.19",
+    "micromatch": "^4.0.2",
+    "module-alias": "^2.2.2",
+    "moment": "^2.24.0",
+    "protobufjs": "^6.8.9",
+    "reflect-metadata": "^0.1.13",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.7",
+    "semver": "^6.1.1",
+    "tmp": "^0.1.0",
+    "vscode-jsonrpc": "^4.0.0",
+    "vscode-languageclient": "^5.2.1",
+    "vscode-languageserver": "^5.2.1",
+    "vscode-languageserver-protocol": "^3.14.1",
+    "vscode-languageserver-types": "^3.14.0",
+    "vscode-uri": "^2.0.0",
+    "yaml": "^1.10.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "1.2.13"
+  },
+  "scripts": {
+    "preinstall": "node build/preinstall.js"
+  }
+}

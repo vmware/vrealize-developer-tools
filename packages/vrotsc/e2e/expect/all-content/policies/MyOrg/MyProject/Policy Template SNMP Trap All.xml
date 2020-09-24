@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8" ?><dunes-policy name="Policy Template SNMP Trap All" id="30832054-b5df-35e8-8cac-a927b83fc9ef" version="1.0.0" api-version="6.0.0" type="0" allowed-operations="vef"><item tag="SNMP TrapHost" type="0" sdkType="SNMP:TrapHost"><event type="OnTrapAll" kind="trigger" active="false"><script encoded="false"><![CDATA[System.log("onTrapAll");
+]]></script></event></item></dunes-policy>

@@ -1,0 +1,38 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "command": "gulp",
+  "type": "shell",
+  "args": ["--simple-tasks --no-color"],
+  "isBackground": true,
+  "tasks": [
+    {
+      "type": "gulp",
+      "task": "watch",
+      "problemMatcher": ["$tsc-watch"],
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "gulp",
+      "task": "lint",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "type": "gulp",
+      "task": "test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    }
+  ]
+}

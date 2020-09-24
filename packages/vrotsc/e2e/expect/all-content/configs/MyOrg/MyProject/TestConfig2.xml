@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config-element id="d83e26b8-1fed-4fa6-ab2c-02d613f5b916" version="1.0.0">
+	<display-name><![CDATA[Test Config 2]]></display-name>
+	<atts>
+		<att name="strField" type="string" read-only="false">
+			<value encoded="n"><![CDATA[test]]></value>
+		</att>
+		<att name="strField2" type="string" read-only="false">
+			<value encoded="n"><![CDATA[test]]></value>
+		</att>
+		<att name="numField" type="number" read-only="false">
+			<value encoded="n"><![CDATA[5]]></value>
+		</att>
+		<att name="boolField" type="boolean" read-only="false">
+			<value encoded="n"><![CDATA[true]]></value>
+		</att>
+	</atts>
+</config-element>

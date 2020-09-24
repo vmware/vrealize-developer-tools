@@ -1,0 +1,13 @@
+.o11n/
+.vscode/
+gulpfile.ts
+tsconfig.json
+src/
+built/
+target/
+e2e/
+**/.DS_Store
+package-lock.json
+yarn.lock
+**/*.tgz
+

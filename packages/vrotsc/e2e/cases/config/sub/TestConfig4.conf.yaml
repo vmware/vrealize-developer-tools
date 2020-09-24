@@ -1,0 +1,8 @@
+---
+name: Test Config 4
+attributes:
+  field1: string
+  field2: Any
+  field3:
+    type: number
+    value: 5

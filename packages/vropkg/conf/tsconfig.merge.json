@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "@target": "es5",
+    "@module": "esnext",
+    "@lib": ["es2015"],
+
+    "-types": 0,
+    "-typeRoots": 0,
+
+    "removeComments": false,
+    "noImplicitAny": false,
+    "typeRoots": ["./node_modules/@types"]
+  },
+
+  "-files": 0
+}

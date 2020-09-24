@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig-base",
+  "compilerOptions": {
+    "outFile": "../../built/compiler.js"
+  },
+  "include": ["**/*.ts"]
+}

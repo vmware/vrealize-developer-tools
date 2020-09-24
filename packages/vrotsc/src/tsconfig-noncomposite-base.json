@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig-base",
+  "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
+    "composite": false,
+    "incremental": true,
+    "typeRoots": ["./node_modules/@types"]
+  }
+}

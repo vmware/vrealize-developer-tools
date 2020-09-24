@@ -1,0 +1,13 @@
+.o11n/
+.vscode/
+.settings/
+.classpath
+.project
+node_modules/
+build
+lib
+e2e/out/
+**/.DS_Store
+dist
+test/target*
+test/com.vmware.pscoe.toolchain-expand

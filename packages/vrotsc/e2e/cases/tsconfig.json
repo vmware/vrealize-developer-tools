@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES5", "ES2015.Core", "ES2015.Collection", "ES2015.Iterable", "ES2015.Promise", "ES2017.String"],
+    "experimentalDecorators": true,
+    "types": []
+  },
+  "include": ["../../node_modules/@types"]
+}

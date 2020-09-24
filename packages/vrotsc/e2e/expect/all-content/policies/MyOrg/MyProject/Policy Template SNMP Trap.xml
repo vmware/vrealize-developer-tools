@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8" ?><dunes-policy name="Policy Template SNMP Trap" id="1d258a62-e38b-3fd8-8d66-6beb1b4dd515" version="1.0.0" api-version="6.0.0" type="0" allowed-operations="vef"><item tag="SNMP SnmpDevice" type="0" sdkType="SNMP:SnmpDevice"><event type="OnTrap" kind="trigger" active="false"><script encoded="false"><![CDATA[System.log("onTrap");
+]]></script></event></item></dunes-policy>
