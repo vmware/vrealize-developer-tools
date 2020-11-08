@@ -15,7 +15,7 @@ module.exports = {
     coveragePathIgnorePatterns: [".*/__tests__/.*", ".*/src/proto/.*", ".*/common/src/rest/.*"],
     globals: {
         "ts-jest": {
-            "tsConfig": "<rootDir>/tsconfig.json",
+            "tsconfig": "<rootDir>/tsconfig.json",
             "diagnostics": {
                 "warnOnly": true
             }

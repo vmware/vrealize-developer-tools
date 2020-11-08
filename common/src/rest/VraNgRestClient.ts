@@ -87,7 +87,7 @@ export class VraNgRestClient {
         })
     }
 
-    private async getAuth(): Promise<object> {
+    private async getAuth(): Promise<Record<string, unknown>> {
         const token = await this.identity.read(this.host)
 
         if (!token) {
@@ -217,7 +217,7 @@ export class VraNgRestClient {
         projectId: string
         blueprintId?: string
         content?: string
-        inputs?: object
+        inputs?: Record<string, unknown>
     }): Promise<Deployment> {
         return this.send("POST", "/blueprint/api/blueprint-requests", { body })
     }

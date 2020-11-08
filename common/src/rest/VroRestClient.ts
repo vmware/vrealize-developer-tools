@@ -22,7 +22,6 @@ import {
     WorkflowParam,
     WorkflowState
 } from "./vro-model"
-
 import { Logger, MavenCliProxy, promise, sleep } from ".."
 
 export class VroRestClient {
@@ -44,7 +43,7 @@ export class VroRestClient {
         return this.settings.activeProfile.getOptional("vro.auth", "basic")
     }
 
-    private async getAuth(): Promise<object> {
+    private async getAuth(): Promise<Record<string, unknown>> {
         let auth: Auth
         switch (this.authMethod.toLowerCase()) {
             case "vra":

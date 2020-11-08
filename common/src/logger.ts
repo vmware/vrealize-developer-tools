@@ -27,7 +27,7 @@ export default class Logger {
         return new Logger(className)
     }
 
-    static setup(channel?: LogChannel, logLevel?: LogLevel) {
+    static setup(channel?: LogChannel, logLevel?: LogLevel): void {
         if (channel) {
             Logger.logChannel = channel
         }

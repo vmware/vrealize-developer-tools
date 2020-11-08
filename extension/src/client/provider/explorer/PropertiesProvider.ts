@@ -15,11 +15,11 @@ import { PropertyNode } from "./model/leaf/PropertyNode"
 export class PropertiesProvider implements vscode.TreeDataProvider<AbstractNode>, Registrable, vscode.Disposable {
     private readonly logger = Logger.get("PropertiesProvider")
 
-    private onDidChangeTreeDataEmitter: vscode.EventEmitter<AbstractNode> = new vscode.EventEmitter<AbstractNode>()
+    private onDidChangeTreeDataEmitter = new vscode.EventEmitter<AbstractNode|undefined>()
     private rootNode: AbstractNode
     private tree: vscode.TreeView<AbstractNode>
 
-    readonly onDidChangeTreeData: vscode.Event<AbstractNode> = this.onDidChangeTreeDataEmitter.event
+    readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event
 
     register(context: vscode.ExtensionContext): void {
         this.logger.debug("Registering the properties provider")
@@ -51,7 +51,7 @@ export class PropertiesProvider implements vscode.TreeDataProvider<AbstractNode>
 
     refresh(node: AbstractNode): void {
         this.rootNode = node
-        this.onDidChangeTreeDataEmitter.fire()
+        this.onDidChangeTreeDataEmitter.fire(undefined)
     }
 
     getTreeItem(element: AbstractNode): Promise<vscode.TreeItem> {

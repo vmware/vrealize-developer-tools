@@ -10,7 +10,7 @@ import { systemKeychain } from "../system/Keychain"
 export class ScopedMemento {
     private memento: Memento
     private namespace: string
-    private state: {}
+    private state: Record<string, any>
 
     private constructor(memento: Memento, namespace: string) {
         if (!memento) {
