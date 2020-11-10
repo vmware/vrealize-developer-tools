@@ -7,7 +7,7 @@ export type AuthMethod = "basic" | "vra" | "vc" | "vrang"
 
 export interface Auth {
     readonly method: AuthMethod
-    toRequestJson(): object
+    toRequestJson(): Record<string, unknown>
 }
 
 export class Credentials {
@@ -31,7 +31,7 @@ export class BasicAuth implements Auth {
         this.credentials = { username, password }
     }
 
-    toRequestJson(): object {
+    toRequestJson(): Record<string, unknown> {
         return {
             user: this.credentials.username,
             pass: this.credentials.password
@@ -47,7 +47,7 @@ export class VraSsoAuth implements Auth {
         this.token = token
     }
 
-    toRequestJson(): object {
+    toRequestJson(): Record<string, unknown> {
         return {
             bearer: this.token
         }
@@ -62,7 +62,7 @@ export class VraNgAuth implements Auth {
         this.token = token
     }
 
-    toRequestJson(): object {
+    toRequestJson(): Record<string, unknown> {
         return {
             bearer: this.token
         }

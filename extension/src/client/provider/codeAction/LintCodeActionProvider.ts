@@ -39,7 +39,10 @@ export abstract class LintCodeActionProvider implements vscode.CodeActionProvide
             .filter(diagnostic => diagnostic.source === this.environment.displayName)
             .forEach(diagnostic => {
                 const ruleName = diagnostic.message.split(":")[0]
-                const ruleCode = diagnostic.code || "unknown-code"
+                let ruleCode: string = "unknown-code"
+                if (typeof (diagnostic.code) === "string" || typeof (diagnostic.code) === "number") {
+                    ruleCode = diagnostic.code.toString()
+                }
 
                 if (diagnostic.range.isSingleLine && this.linter.rules[ruleCode]) {
                     const fixTitle = `Fix: ${ruleName}`

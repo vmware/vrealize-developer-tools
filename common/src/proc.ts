@@ -13,7 +13,7 @@ export interface CmdResult {
     stdout?: string
     stderr?: string
 }
-export function spawn(command: string, args?: string[], options?: cp.SpawnOptions): cp.ChildProcess {
+export function spawn(command: string, args: readonly string[], options: cp.SpawnOptions): cp.ChildProcess {
     return cp.spawn(command, args, options)
 }
 

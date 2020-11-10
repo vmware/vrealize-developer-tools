@@ -6,11 +6,10 @@
 import * as path from "path"
 
 import * as fs from "fs-extra"
-import * as jwtDecode from "jwt-decode"
+import jwt_decode from "jwt-decode"
 
 import { BaseEnvironment } from "../platform"
 import { MavenInfo } from "../types"
-
 import { Logger, proc } from ".."
 
 const archetypeIdByProjectType: { [key: string]: string } = {
@@ -148,7 +147,7 @@ export class MavenCliProxy {
     private isDiffUserOrTenant(token: { value: string; expirationDate: string }): boolean {
         let decodedToken
         try {
-            decodedToken = jwtDecode(token.value)
+            decodedToken = jwt_decode(token.value)
         } catch (e) {
             this.logger.warn(`Invalid local SSO authentication token format!`)
             return true;
@@ -175,8 +174,8 @@ export class MavenCliProxy {
         // Maven active profile details
         const vroUsername = this.environment.getVroUsername() // user@domain
         const vroTenant = this.environment.getVroTenant()
-        
-        return (`${tokenUsername[0]}@${tokenDomain}`.toUpperCase() != vroUsername.toUpperCase() || 
+
+        return (`${tokenUsername[0]}@${tokenDomain}`.toUpperCase() != vroUsername.toUpperCase() ||
          tokenTenant[0].toUpperCase() != vroTenant.toUpperCase());
     }
 }
