@@ -612,6 +612,9 @@
   "optionalDependencies": {
     "fsevents": "1.2.13"
   },
+  "resolutions": {
+    "gulp/gulp-cli/yargs/yargs-parser": "5.0.0-security.0"
+  },
   "scripts": {
     "preinstall": "node build/preinstall.js"
   }
