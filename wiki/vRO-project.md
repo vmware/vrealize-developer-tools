@@ -321,7 +321,7 @@ will result in **local.corp.it.cloud.dns-1.0.0-SNAPSHOT.package** generated in t
 
 In case you want to produce a bundle.zip containing the package and all its dependencies, you use:
 ```bash
-mvn clean pacakge -Pbundle
+mvn clean package -Pbundle
 ```
 
 In case you want to include only a subset of the project tree you can use the "include" property specifying list of project relative locations to the files to include during packaging. Currently suported for both JS and XML type projects as well as for TS files producing actions (i.e. base .ts files).
@@ -402,7 +402,7 @@ mvn package vrealize:push -Pcorp-env -DincludeDependencies=false
 
 Note that dependencies will not be deployed if the server has a newer version of the same package deployed. For example,
 if the current project depends on ```com.vmware.pscoe.example-2.4.0``` and on the server there is ```com.vmware.pscoe.example-2.4.2```,
-the package will not be downgraded. You can force that by adding the ````-Dvro.importOldVersions``` flag:
+the package will not be downgraded. You can force that by adding the ```-Dvro.importOldVersions``` flag:
 ```bash
 mvn package vrealize:push -Pcorp-env -Dvro.importOldVersions
 ```
@@ -463,12 +463,14 @@ To clean up a version of vRO package from the server use:
     mvn vrealize:clean -DcleanUpLastVersion=false -DcleanUpOldVersions=true -DincludeDependencies=true
     ```
 
+Note that you can't have both ```-DcleanUpLastVersion=true``` and  ```-DcleanUpOldVersions=true``` in a single command.
+
 ## Troubleshooting
 * If Maven error does not contain enough information rerun it with *-X* debug flag.
 ```Bash
 mvn -X <rest of the command>
 ```
-* Sometimes Maven might cache old artifats. Force fetching new artifacts with *-U*. Alternativelly remove *<home>/.m2/repository* folder.
+* Sometimes Maven might cache old artifacts. Force fetching new artifacts with *-U*. Alternativelly remove *<home>/.m2/repository* folder.
 ```Bash
 mvn -U <rest of the command>
 ```
