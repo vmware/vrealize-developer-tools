@@ -17,19 +17,20 @@ jobs:
           echo "::set-output name=author::$(git log -1 --pretty=format:'%an <%ae>')"
           echo "::set-output name=message::$(git show -s --format=%B)"
 
-      - run: git clone https://$GITHUB_TOKEN@github.com/vmware/vrealize-developer-tools.wiki.git wiki-repo
+      - run: git clone https://$GITHUB_TOKEN@github.com/vmware/vrealize-developer-tools.wiki.git /tmp/wiki-repo
         env:
           GITHUB_TOKEN: ${{ secrets.WIKI_BOT_GITHUB_TOKEN }}
 
-      - run: rsync -avzr --delete --exclude=".git/" "./wiki" "./wiki-repo"
+      - run: rsync -avzr --delete --exclude=".git/" "./wiki/" "/tmp/wiki-repo"
 
-      - run: cd ./wiki-repo
-      - run: git config user.name "vmware-bot"
-      - run: git config user.email "bot@vmware.com"
-      - run: git add .
-      - run: git commit -m "$COMMIT_MESSAGE" --author="$COMMIT_AUTHOR"
+      - name: Commit changes to the .wiki.git repository
+        run: |
+          git config user.name "vmware-bot"
+          git config user.email "bot@vmware.com"
+          git add .
+          git commit -m "$COMMIT_MESSAGE" --author="$COMMIT_AUTHOR"
+          git push -f origin HEAD:master
+        working-directory: /tmp/wiki-repo
         env:
           COMMIT_AUTHOR: ${{ steps.get-commit-info.outputs.author }}
           COMMIT_MESSAGE: ${{ steps.get-commit-info.outputs.message }}
-
-      - run: git push -f origin HEAD:master
