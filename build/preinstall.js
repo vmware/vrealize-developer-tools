@@ -5,8 +5,8 @@
 
 const major = parseInt(/^(\d+)\./.exec(process.versions.node)[1]);
 
-if (major < 10) {
-    console.error('\033[1;31m*** Please use node >=10.0.0.\033[0;0m');
+if (major < 12) {
+    console.error('\033[1;31m*** Please use node >=12.0.0.\033[0;0m');
     process.exit(1);
 }
 
@@ -17,10 +17,9 @@ const yarnVersion = cp.execSync('yarn -v', {
 
 const parsedYarnVersion = /^(\d+)\.(\d+)\./.exec(yarnVersion);
 const majorYarnVersion = parseInt(parsedYarnVersion[1]);
-const minorYarnVersion = parseInt(parsedYarnVersion[2]);
 
-if (majorYarnVersion < 1 || minorYarnVersion < 10) {
-    console.error('\033[1;31m*** Please use yarn >=1.10.1.\033[0;0m');
+if (majorYarnVersion < 2) {
+    console.error('\033[1;31m*** Please use yarn >=2.0.0.\033[0;0m');
     process.exit(1);
 }
 
