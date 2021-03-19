@@ -238,7 +238,7 @@ class ActionRunner {
                     location: vscode.ProgressLocation.Window
                 },
                 progress => {
-                    return new Promise(async (resolve, reject) => {
+                    return new Promise<void>(async (resolve, reject) => {
                         try {
                             this.logger.debug(`Error: ${e.message}`)
                             progress.report({ message: "Downloading exec package" })
@@ -362,8 +362,8 @@ abstract class FetchLogsStrategy {
         protected readonly restClient: VroRestClient
     ) {}
 
-    abstract async printMessages(): Promise<void>
-    abstract async finalize(): Promise<void>
+    abstract printMessages(): Promise<void>
+    abstract finalize(): Promise<void>
 }
 
 class FetchLogsPre74 extends FetchLogsStrategy {

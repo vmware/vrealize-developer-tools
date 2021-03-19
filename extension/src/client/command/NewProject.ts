@@ -151,7 +151,7 @@ export class NewProject extends Command<void> {
                     canceled = true
                 })
 
-                return new Promise(async (resolve, reject) => {
+                return new Promise<void>(async (resolve, reject) => {
                     if (!this.state.destination) {
                         reject("Destination folder was not selected")
                         return
@@ -168,7 +168,7 @@ export class NewProject extends Command<void> {
                                 this.state.projectType.containsWorkflows,
                                 this.state.workflowsPath
                             )
-                            .catch(reason => {
+                            .catch((reason) => {
                                 this.logger.error("An error occurred while generating the project.", reason)
                                 reject(reason.message)
                                 canceled = true
@@ -184,7 +184,7 @@ export class NewProject extends Command<void> {
                         )
                     }
                     resolve()
-                }).catch(reason => {
+                }).catch((reason) => {
                     vscode.window.showErrorMessage(`Could not create a new project. \n\n${reason}`)
                 })
             }

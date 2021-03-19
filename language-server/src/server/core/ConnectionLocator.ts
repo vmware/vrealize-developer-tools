@@ -4,7 +4,7 @@
  */
 
 import { AutoWire } from "vrealize-common"
-import * as server from "vscode-languageserver"
+import * as server from "vscode-languageserver/node"
 
 @AutoWire
 export class ConnectionLocator {
@@ -18,5 +18,5 @@ export class ConnectionLocator {
      *
      * @see https://github.com/Microsoft/vscode-languageserver-node/issues/299
      */
-    readonly connection: server.IConnection = server.createConnection()
+    readonly connection: server.Connection = server.createConnection()
 }

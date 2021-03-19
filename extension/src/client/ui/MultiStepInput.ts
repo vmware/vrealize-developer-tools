@@ -122,7 +122,7 @@ export class MultiStepInput<TState> {
         try {
             return await new Promise<QuickPickStep | QuickInputStep | undefined>(resolve => {
                 disposables.push(
-                    input.onDidHide(() => resolve()),
+                    input.onDidHide(() => resolve(undefined)),
                     input.onDidTriggerButton(async button => {
                         if (button === vscode.QuickInputButtons.Back) {
                             resolve(await this.goBack(input, stepMachine))
@@ -194,7 +194,7 @@ export class MultiStepInput<TState> {
         try {
             return await new Promise<QuickPickStep | QuickInputStep | undefined>(async resolve => {
                 disposables.push(
-                    quickpick.onDidHide(() => resolve()),
+                    quickpick.onDidHide(() => resolve(undefined)),
                     quickpick.onDidTriggerButton(async button => {
                         if (button === vscode.QuickInputButtons.Back) {
                             resolve(await this.goBack(quickpick, stepMachine))

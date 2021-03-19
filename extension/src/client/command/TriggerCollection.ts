@@ -42,7 +42,7 @@ export class TriggerCollection extends Command<void> {
                 title: "vRO hint collection"
             },
             progress => {
-                return new Promise(async (resolve, reject) => {
+                return new Promise<void>(async (resolve, reject) => {
                     await languageClient.sendRequest(remote.server.triggerVroCollection, false)
                     let status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
 

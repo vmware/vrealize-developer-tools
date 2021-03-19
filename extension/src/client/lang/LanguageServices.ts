@@ -8,7 +8,7 @@ import * as path from "path"
 import { AutoWire, Logger, MavenProfilesMap } from "vrealize-common"
 import { remote } from "vro-language-server"
 import * as vscode from "vscode"
-import * as client from "vscode-languageclient"
+import * as client from "vscode-languageclient/node"
 
 import { OutputChannels, ProjectArchetypes } from "../constants"
 import { Registrable } from "../Registrable"
