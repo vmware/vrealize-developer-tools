@@ -1,5 +1,5 @@
 vRealize Developer Tools
-Copyright (c) 2018-2019 VMware, Inc.
+Copyright (c) 2018-2021 VMware, Inc.
 
 The MIT license (the "License") set forth below applies to all parts of the vRealize Developer Tools project.
 You may not use this file except in compliance with the License.
