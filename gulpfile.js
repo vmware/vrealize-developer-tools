@@ -149,7 +149,6 @@ gulp.task(
             vsce,
             [
                 "package",
-                "--yarn",
                 "--baseContentUrl",
                 "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/",
                 "--baseImagesUrl",

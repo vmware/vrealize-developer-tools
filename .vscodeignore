@@ -18,7 +18,7 @@ tools/**
 .editorconfig
 .gitignore
 .gitattributes
-.yarnrc
+.npmrc
 .eslintignore
 .eslintrc*
 .prettierrc*
@@ -29,8 +29,6 @@ CONTRIBUTING.md
 *.vsix
 **/tsconfig.json
 gulpfile.js
-yarn.lock
-yarn-debug.log
-yarn-error.log
+package-lock.json
 
 !node_modules/**
