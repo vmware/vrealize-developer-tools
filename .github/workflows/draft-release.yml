@@ -70,7 +70,7 @@ jobs:
       - name: Get previous tag
         run: |
           PREV_TAG=$(git describe --abbrev=0 --tags "${{ github.ref }}^")
-          echo "::set-env name=baseRef::$PREV_TAG"
+          echo "baseRef=$PREV_TAG" >> $GITHUB_ENV
 
       - name: Generate release notes
         id: generate_changelog
