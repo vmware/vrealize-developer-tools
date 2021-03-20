@@ -52,10 +52,13 @@ describe("ScopedMemento", () => {
     })
 
     it("can be instantiated from extension context", () => {
-        const ExtensionmementoMock = jest.fn<ExtensionContext, any[]>(() => ({
-            workspaceState: new MementoMock(),
-            globalState: new MementoMock()
-        } as ExtensionContext))
+        const ExtensionmementoMock = jest.fn<ExtensionContext, any[]>(
+            () =>
+                ({
+                    workspaceState: new MementoMock(),
+                    globalState: new MementoMock()
+                } as ExtensionContext)
+        )
 
         const context: ExtensionContext = new ExtensionmementoMock()
 

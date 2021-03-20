@@ -82,7 +82,7 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
                     })
             }
         }
-        
+
         try {
             this.includeDefaultTasks(folder, undefined, tasks, excludePatterns)
         } catch (e) {

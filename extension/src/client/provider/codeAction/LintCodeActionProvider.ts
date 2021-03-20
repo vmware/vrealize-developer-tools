@@ -40,7 +40,7 @@ export abstract class LintCodeActionProvider implements vscode.CodeActionProvide
             .forEach(diagnostic => {
                 const ruleName = diagnostic.message.split(":")[0]
                 let ruleCode: string = "unknown-code"
-                if (typeof (diagnostic.code) === "string" || typeof (diagnostic.code) === "number") {
+                if (typeof diagnostic.code === "string" || typeof diagnostic.code === "number") {
                     ruleCode = diagnostic.code.toString()
                 }
 

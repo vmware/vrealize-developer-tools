@@ -112,7 +112,7 @@ export class NewProject extends Command<void> {
         const projectNameNode: StepNode<QuickInputStep> = {
             value: new ProjectNameInputStep(),
             parent: groupIdNode,
-            next: () =>workflowsPathNode
+            next: () => workflowsPathNode
         }
 
         const workflowsPathNode: StepNode<QuickInputStep> = {
@@ -168,7 +168,7 @@ export class NewProject extends Command<void> {
                                 this.state.projectType.containsWorkflows,
                                 this.state.workflowsPath
                             )
-                            .catch((reason) => {
+                            .catch(reason => {
                                 this.logger.error("An error occurred while generating the project.", reason)
                                 reject(reason.message)
                                 canceled = true
@@ -184,7 +184,7 @@ export class NewProject extends Command<void> {
                         )
                     }
                     resolve()
-                }).catch((reason) => {
+                }).catch(reason => {
                     vscode.window.showErrorMessage(`Could not create a new project. \n\n${reason}`)
                 })
             }
@@ -261,7 +261,7 @@ class WorkflowsPathInputStep implements QuickInputStep {
     }
 
     shouldSkip(state: StepState<State>): boolean {
-        const shouldSkip = !(state.projectType?.containsWorkflows)
+        const shouldSkip = !state.projectType?.containsWorkflows
         if (shouldSkip) {
             state.completed = true
             return true

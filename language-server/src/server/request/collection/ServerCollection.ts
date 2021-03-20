@@ -175,10 +175,7 @@ export class ServerCollection {
             }
 
             const response = await this.restClient.getResource(this.currentStatus.data.vpkResourceId)
-            const stream = response.pipe(
-                fs.createWriteStream(vpkFilePath),
-                { end: true }
-            )
+            const stream = response.pipe(fs.createWriteStream(vpkFilePath), { end: true })
             await promise.streamPromise(stream)
 
             this.currentStatus.message = "Unpacking hints..."

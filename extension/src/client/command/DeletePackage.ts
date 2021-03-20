@@ -11,7 +11,7 @@ import { Commands } from "../constants"
 import { PackageNode } from "../provider/explorer/model"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 
-const LABEL_DELETE = "Delete";
+const LABEL_DELETE = "Delete"
 const LABEL_DELETE_KEEP_SHARED = "Delete (Keep Shared)"
 const LABEL_DELETE_WITH_CONTENT = "Delete (With Content)"
 

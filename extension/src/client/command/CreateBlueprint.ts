@@ -48,7 +48,12 @@ export class CreateBlueprint extends BaseVraCommand {
             return
         }
 
-        await vscode.workspace.fs.writeFile(newFile, Buffer.from(`name: ${blueprintName}\ndescription: ""\ncontent:\n  formatVersion: 1\n  inputs: {}\n  resources:\n`))
+        await vscode.workspace.fs.writeFile(
+            newFile,
+            Buffer.from(
+                `name: ${blueprintName}\ndescription: ""\ncontent:\n  formatVersion: 1\n  inputs: {}\n  resources:\n`
+            )
+        )
         await vscode.window.showTextDocument(newFile, { preview: false })
 
         vscode.window
@@ -68,7 +73,7 @@ export class CreateBlueprint extends BaseVraCommand {
         const blueprintName = await vscode.window.showInputBox({
             prompt: "Enter a Blueprint name: ",
             placeHolder: "(blueprint name)",
-            validateInput: function(value) {
+            validateInput: function (value) {
                 if (!value || value.trim() == "") {
                     return "The name of the blueprint cannot be empty"
                 }

@@ -150,32 +150,34 @@ export class MavenCliProxy {
             decodedToken = jwt_decode(token.value)
         } catch (e) {
             this.logger.warn(`Invalid local SSO authentication token format!`)
-            return true;
+            return true
         }
 
         // token (stored locally) details
         const tokenUserQualifier = decodedToken.prn // user@TENANT
         if (!tokenUserQualifier) {
-            return true;
+            return true
         }
         const tokenUsername = tokenUserQualifier.match(/.+?(?=@)/)
         if (!tokenUsername) {
-            return true;
+            return true
         }
         const tokenTenant = tokenUserQualifier.match(/(?<=@).+[^\s]/)
         if (!tokenTenant) {
-            return true;
+            return true
         }
         const tokenDomain = decodedToken.domain
         if (!tokenDomain) {
-            return true;
+            return true
         }
 
         // Maven active profile details
         const vroUsername = this.environment.getVroUsername() // user@domain
         const vroTenant = this.environment.getVroTenant()
 
-        return (`${tokenUsername[0]}@${tokenDomain}`.toUpperCase() != vroUsername.toUpperCase() ||
-         tokenTenant[0].toUpperCase() != vroTenant.toUpperCase());
+        return (
+            `${tokenUsername[0]}@${tokenDomain}`.toUpperCase() != vroUsername.toUpperCase() ||
+            tokenTenant[0].toUpperCase() != vroTenant.toUpperCase()
+        )
     }
 }

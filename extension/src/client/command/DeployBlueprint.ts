@@ -51,7 +51,8 @@ export class DeployBlueprint extends BaseVraCommand {
         const restClient = await this.getRestClient()
 
         const blueprintYaml = parseYaml(activeTextEditor.document.getText())
-        const blueprintName = blueprintYaml.name || path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
+        const blueprintName =
+            blueprintYaml.name || path.basename(activeTextEditor.document.fileName).replace(".yaml", "")
         const blueprintDescription = blueprintYaml.description || ""
         const blueprintContent = stringifyYaml(blueprintYaml.content)
         const existingBlueprint = blueprintYaml.id

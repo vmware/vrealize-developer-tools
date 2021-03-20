@@ -16,7 +16,7 @@ export interface VrealizeTaskConfiguration {
 }
 
 export const TASKS_BY_TOOLCHAIN_PARENT: Record<ProjectArchetypes, VrealizeTaskConfiguration[]> = {
-     [ProjectArchetypes.TypeScript]: [
+    [ProjectArchetypes.TypeScript]: [
         {
             label: "Push",
             windows: {
