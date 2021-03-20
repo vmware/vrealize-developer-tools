@@ -1,13 +1,14 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import * as vscode from "vscode"
-import { HierarchicalNode, VroRestClient } from "vrealize-common"
+import { VroRestClient } from "vrealize-common"
 
 import { ActionNode } from "../leaf/ActionNode"
 import { ElementKinds } from "../../../../constants"
+import { HierarchicalNode } from "../../../../util"
 import { AbstractNode } from "../AbstractNode"
 
 interface ModuleInfo {

@@ -9,16 +9,7 @@ import * as fs from "fs-extra"
 import * as moment from "moment"
 import * as semver from "semver"
 import * as tmp from "tmp"
-import {
-    AutoWire,
-    Logger,
-    LogMessage,
-    MavenCliProxy,
-    PomFile,
-    sleep,
-    VroRestClient,
-    VrotscCliProxy
-} from "vrealize-common"
+import { AutoWire, Logger, LogMessage, MavenCliProxy, PomFile, proc, sleep, VroRestClient } from "vrealize-common"
 import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"
@@ -32,7 +23,6 @@ const RUN_SCRIPT_WORKFLOW_ID = "98568979-76ed-4a4a-854b-1e730e2ef4f1"
 @AutoWire
 export class RunAction extends Command<void> {
     private readonly logger = Logger.get("RunAction")
-    private readonly vrotsc: VrotscCliProxy
     private readonly outputChannel = vscode.window.createOutputChannel(OutputChannels.RunActionLogs)
     private runtimeExceptionDecoration: vscode.TextEditorDecorationType
 
@@ -44,7 +34,6 @@ export class RunAction extends Command<void> {
 
     constructor(private config: ConfigurationManager, private environment: EnvironmentManager) {
         super()
-        this.vrotsc = new VrotscCliProxy(this.logger)
     }
 
     register(context: vscode.ExtensionContext): void {
@@ -197,7 +186,7 @@ export class RunAction extends Command<void> {
             this.outputChannel.appendLine(`# Compiling ${inputFileName}`)
             const tsFileRelativePath = path.relative(srcPath, inputFilePath)
             this.logger.debug(`Input TS file: ${inputFilePath}`)
-            const outputFilePath = await this.vrotsc.compileFile(tsFileRelativePath, rootPath, tsNamespace)
+            const outputFilePath = await this.compileFile(tsFileRelativePath, rootPath, tsNamespace)
             this.logger.debug(`Output JS file: ${outputFilePath}`)
             const scriptContent = fs.readFileSync(outputFilePath, { encoding: "utf8" })
 
@@ -205,6 +194,26 @@ export class RunAction extends Command<void> {
         }
 
         return Promise.reject(`Unsupported language ID: ${document.languageId}`)
+    }
+
+    /**
+     *
+     * @param inputFile - path relative to the src folder of the project dir
+     * @param projectDirPath - absolute path to the project dir
+     * @param namespace - project's namespace (<groupId>.<artifactId> from pom.xml)
+     *
+     * @returns absolute path to the output JS file
+     */
+    private async compileFile(inputFile: string, projectDirPath: string, namespace?: string): Promise<string> {
+        const outputDir = tmp.dirSync({ prefix: "o11n-ts-" }).name
+        const vrotscBin = path.join(".", "node_modules", "@vmware-pscoe", "vrotsc", "bin", "vrotsc")
+        let command = `${vrotscBin} src/ --actionsOut ${outputDir} --files ${inputFile}`
+
+        if (namespace) {
+            command += ` -n ${namespace}`
+        }
+        await proc.exec(command, { cwd: projectDirPath }, this.logger)
+        return path.join(outputDir, inputFile.replace(/\.ts$/, ".js"))
     }
 }
 

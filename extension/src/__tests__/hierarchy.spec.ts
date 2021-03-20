@@ -1,9 +1,9 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { makeHierarchical } from "../hierarchy"
+import { makeHierarchical } from "../client/util/hierarchy"
 
 describe("hierarchy", () => {
     const categories = ["com.vmware.pscoe.prj", "com.vmware.pscoe.prj.feature", "com.vmware.pscoe.prj.feature2"]
