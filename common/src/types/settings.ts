@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -32,11 +32,6 @@ export interface TasksInfo {
     disable: boolean
     exclude: string[]
 }
-
-export interface ExperimentalFlags {
-    typescript: boolean
-}
-
 export interface BuildTools {
     defaultVersion: string
 }
@@ -59,7 +54,6 @@ export interface VrealizeSettings {
     commandPalette: CommandPaletteInfo
     tasks: TasksInfo
     maven: MavenInfo
-    experimental: ExperimentalFlags
     buildTools: BuildTools
     views: Views
     vra: VraInfo

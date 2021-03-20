@@ -155,7 +155,6 @@ services
                 └── dunes-meta-inf.xml
 ```
 ### TypeScript-Based Project
-**EXPERIMENTAL**
 
 This project contains actions as *.ts, workflows as *.wf.ts, configuration elements as *.config.ts and resource files.
 
