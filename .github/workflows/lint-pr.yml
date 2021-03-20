@@ -11,6 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Use Node.js 12
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+
+      - name: Use NPM 7
+        run: npm install -g npm@7
+
       - name: reviewdog
         uses: reviewdog/action-eslint@v1
         with:

@@ -100,7 +100,11 @@ export class RemoteDocument {
     }
 
     private toJavaScript(source: string): string {
-        interface ParamInfo { "@n": string; "@t": string; "#text": string }
+        interface ParamInfo {
+            "@n": string
+            "@t": string
+            "#text": string
+        }
         let xml = xmlParser.parse(source, { ignoreAttributes: false, attributeNamePrefix: "@" })
         xml = xml["dunes-script-module"]
         let js = "/**\n"

@@ -18,7 +18,7 @@ jobs:
         run: echo ${{ github.ref }}
 
       - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: 12.x
 
@@ -29,7 +29,7 @@ jobs:
           echo "::set-output name=version::${PACKAGE_VERSION}"
 
       - name: Install dependencies
-        run: "yarn install --frozen-lockfile"
+        run: "npm ci"
 
       - name: Build VSIX package
         run: "node node_modules/gulp/bin/gulp.js package"
@@ -70,7 +70,7 @@ jobs:
       - name: Get previous tag
         run: |
           PREV_TAG=$(git describe --abbrev=0 --tags "${{ github.ref }}^")
-          echo "::set-env name=baseRef::$PREV_TAG"
+          echo "baseRef=$PREV_TAG" >> $GITHUB_ENV
 
       - name: Generate release notes
         id: generate_changelog

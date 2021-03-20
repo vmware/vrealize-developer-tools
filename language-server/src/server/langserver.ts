@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /*!
  * Copyright 2018-2019 VMware, Inc.
  * SPDX-License-Identifier: MIT
@@ -8,7 +7,7 @@
 require("module-alias/register")
 
 import { di, LogChannel, Logger } from "vrealize-common"
-import { IConnection } from "vscode-languageserver"
+import { Connection } from "vscode-languageserver"
 
 import { ConnectionLocator } from "./core"
 import * as document from "./document"
@@ -34,7 +33,7 @@ function registerModule(mod: any) {
     }
 }
 
-function getLoggingChannel(connection: IConnection): LogChannel {
+function getLoggingChannel(connection: Connection): LogChannel {
     return {
         debug(message: string) {
             connection.console.log(message)

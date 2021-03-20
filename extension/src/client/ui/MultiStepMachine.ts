@@ -71,7 +71,7 @@ export type StepState<T> = Partial<T>
 export interface StepNode<T extends QuickPickStep | QuickInputStep> {
     value: T
     parent?: StepNode<QuickPickStep | QuickInputStep>
-    next(state: any, selection: StepItemType<T>|undefined): StepNode<QuickPickStep | QuickInputStep> | undefined
+    next(state: any, selection: StepItemType<T> | undefined): StepNode<QuickPickStep | QuickInputStep> | undefined
 }
 
 export class MultiStepMachine<TState = any> {
@@ -94,7 +94,7 @@ export class MultiStepMachine<TState = any> {
 
         while (true) {
             if (!node) {
-                break;
+                break
             }
 
             step = node.value

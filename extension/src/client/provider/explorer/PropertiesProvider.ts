@@ -15,7 +15,7 @@ import { PropertyNode } from "./model/leaf/PropertyNode"
 export class PropertiesProvider implements vscode.TreeDataProvider<AbstractNode>, Registrable, vscode.Disposable {
     private readonly logger = Logger.get("PropertiesProvider")
 
-    private onDidChangeTreeDataEmitter = new vscode.EventEmitter<AbstractNode|undefined>()
+    private onDidChangeTreeDataEmitter = new vscode.EventEmitter<AbstractNode | undefined>()
     private rootNode: AbstractNode
     private tree: vscode.TreeView<AbstractNode>
 

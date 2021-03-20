@@ -33,7 +33,7 @@ export class FetchRemoteElement extends Command<void> {
         if (node.kind == ElementKinds.Action) {
             extension = "js"
         } else if (node.kind == ElementKinds.Resource) {
-            [name, extension] = node.name.split(".")
+            ;[name, extension] = node.name.split(".")
         }
 
         const url = ContentLocation.with({

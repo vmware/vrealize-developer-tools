@@ -51,7 +51,7 @@ export type Project = {
 export interface PagedResult<T> {
     content: T[]
     pageable: {
-        sort: {sorted: boolean; unsorted: boolean; empty: boolean}
+        sort: { sorted: boolean; unsorted: boolean; empty: boolean }
         offset: number
         pageSize: number
         pageNumber: number

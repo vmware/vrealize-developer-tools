@@ -16,7 +16,7 @@ export default class Logger {
     private static logLevel: LogLevel = "info"
     private static logChannel: LogChannel
 
-    constructor(private className: string) { }
+    constructor(private className: string) {}
 
     /**
      * Get a logger instance.

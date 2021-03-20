@@ -46,7 +46,7 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
         })
 
         const refreshCommand = vscode.commands.registerCommand(Commands.RefreshExplorer, () => this.refresh())
-        const onDidChangeSelection = this.tree.onDidChangeSelection((e) => this.onDidChangeSelection(e))
+        const onDidChangeSelection = this.tree.onDidChangeSelection(e => this.onDidChangeSelection(e))
         const revealItem = vscode.commands.registerCommand(Commands.RevealItemInExplorer, (node: AbstractNode) =>
             this.tree.reveal(node)
         )

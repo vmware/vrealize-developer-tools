@@ -2,11 +2,10 @@ module.exports = {
     parser: "@typescript-eslint/parser",
     extends: [
         "plugin:@typescript-eslint/recommended",
-        "prettier/@typescript-eslint", // Disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
         "plugin:import/errors",
         "plugin:import/warnings",
         "plugin:import/typescript",
-        "prettier" // Make sure this is always the last configuration in the extends array.
+        "plugin:prettier/recommended" // Make sure this is always the last configuration in the extends array.
     ],
     plugins: ["prettier", "@typescript-eslint", "header", "import"],
     parserOptions: {
@@ -70,6 +69,7 @@ module.exports = {
             }
         ],
 
+        "arrow-parens": ["warn", "as-needed"],
         "no-constant-condition": ["warn", { checkLoops: false }],
         "no-else-return": "warn",
         "no-empty": ["warn", { allowEmptyCatch: true }],
@@ -95,7 +95,6 @@ module.exports = {
         "no-var": "error",
         "no-with": "error",
         "prefer-const": "error",
-        "prefer-arrow-callback": "error",
         "prefer-numeric-literals": "error",
         "prefer-object-spread": "error",
         "prefer-rest-params": "error",

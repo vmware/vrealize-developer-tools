@@ -217,9 +217,7 @@ export class VroRestClient {
         for (const log of response.logs) {
             const e = log.entry
             const description = e["long-description"] ? e["long-description"] : e["short-description"]
-            if (description.indexOf("*** End of execution stack.") > 0 ||
-                description.startsWith("__item_stack:/")
-            ) {
+            if (description.indexOf("*** End of execution stack.") > 0 || description.startsWith("__item_stack:/")) {
                 continue
             }
 

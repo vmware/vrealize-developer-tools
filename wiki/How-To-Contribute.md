@@ -34,10 +34,10 @@ git clone https://github.com/vmware/vrealize-developer-tools.git
 ### Prerequisites
 
 -   [Git](https://git-scm.com/)
--   [Node.js](https://nodejs.org/en/), `>= 10.0.0`
--   [yarn](https://yarnpkg.com/en/), `>= 1.10.1`
+-   [Node.js](https://nodejs.org/), `>= 12.0.0`
+-   [npm](https://npmjs.com/), `>= 7.0.0`
 -   [gulp CLI](https://gulpjs.com/), `>= 2.0.1`
--   [Visual Studio Code](https://code.visualstudio.com/), `>= 1.40.0`
+-   [Visual Studio Code](https://code.visualstudio.com/), `>= 1.54.0`
 -   For building any of the maven cli tools
     -   [Maven](https://maven.apache.org/), `>= 3.5`
     -   [JDK](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html), `1.8.0_xxx`
@@ -49,7 +49,7 @@ git clone https://github.com/vmware/vrealize-developer-tools.git
 From a terminal, where you have cloned the repository, execute the following command to install the required dependencies:
 
 ```
-yarn install
+npm install
 ```
 
 ### Building

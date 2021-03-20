@@ -10,7 +10,6 @@ import { TextDocument } from "vscode-languageserver-textdocument"
 import { ConnectionLocator } from "../core"
 import { TextDocumentWrapper } from "./TextDocumentWrapper"
 
-
 @AutoWire
 export class Synchronizer {
     private readonly logger = Logger.get("Synchronizer")
