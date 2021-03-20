@@ -5,6 +5,7 @@ logs
 *.tsbuildinfo
 
 out/
+dist/
 coverage/
 node_modules/
 

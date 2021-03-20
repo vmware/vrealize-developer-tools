@@ -11,9 +11,14 @@ wiki/**
 tools/**
 **/src/**
 **/out/__tests__/**
+**/coverage
 
 **/*.ts
 **/*.map
+**/*.config.js
+**/*.eslint.json
+**/*.tsbuildinfo
+**/tsconfig.json
 
 .editorconfig
 .gitignore
@@ -27,7 +32,6 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 
 *.vsix
-**/tsconfig.json
 gulpfile.js
 package-lock.json
 

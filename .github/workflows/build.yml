@@ -48,7 +48,7 @@ jobs:
 
       - name: Set version number of package.json and build artifact
         id: version_step
-        if: runner.os == 'Linux'
+        if: runner.os == 'macOS'
         env:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
@@ -83,12 +83,17 @@ jobs:
       - name: Install dependencies
         run: "npm ci"
 
-      - name: Build VSIX package
+      - name: Lint, compile and test
+        run: "node node_modules/gulp/bin/gulp.js lint test"
+        if: runner.os != 'macOS'
+
+      - name: Lint, compile, test and package
         run: "node node_modules/gulp/bin/gulp.js package"
+        if: runner.os == 'macOS'
 
       - name: Publish code coverage report
         uses: codecov/codecov-action@v1
-        if: runner.os == 'Linux'
+        if: runner.os == 'macOS'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: "**/coverage/*.json"
@@ -97,7 +102,7 @@ jobs:
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
-        if: runner.os == 'Linux'
+        if: runner.os == 'macOS'
         with:
           name: vrealize-developer-tools-${{steps.version_step.outputs.version_build}}.vsix
           path: "*.vsix"

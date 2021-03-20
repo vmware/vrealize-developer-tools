@@ -613,7 +613,7 @@
     "yaml": "^1.10.2"
   },
   "optionalDependencies": {
-    "fsevents": "2.3.2"
+    "fsevents": "~2.3.1"
   },
   "scripts": {
     "preinstall": "node build/preinstall.js"
