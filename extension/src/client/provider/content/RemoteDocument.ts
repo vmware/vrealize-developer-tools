@@ -1,11 +1,11 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import * as path from "path"
 
-import { Logger, VroRestClient } from "vrealize-common"
+import { Logger, VroRestClient } from "vrdt-common"
 import * as vscode from "vscode"
 import * as AdmZip from "adm-zip"
 import * as fs from "fs-extra"

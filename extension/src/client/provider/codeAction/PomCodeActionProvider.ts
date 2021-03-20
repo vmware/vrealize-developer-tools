@@ -1,9 +1,9 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger } from "vrealize-common"
+import { AutoWire, Logger } from "vrdt-common"
 import * as vscode from "vscode"
 
 import { FixCommands } from "../../constants"

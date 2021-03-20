@@ -1,9 +1,9 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, Token, TokenPair, VraIdentityIO } from "vrealize-common"
+import { AutoWire, Logger, Token, TokenPair, VraIdentityIO } from "vrdt-common"
 import * as vscode from "vscode"
 
 import { Registrable } from "../Registrable"

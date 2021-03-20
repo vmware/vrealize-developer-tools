@@ -536,8 +536,8 @@
     ]
   },
   "_moduleAliases": {
-    "vrealize-common": "common/out",
-    "vro-language-server": "language-server/out/public"
+    "vrdt-common": "packages/node/vrdt-common/out",
+    "vro-language-server": "packages/node/vro-language-server/out/public"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.33",

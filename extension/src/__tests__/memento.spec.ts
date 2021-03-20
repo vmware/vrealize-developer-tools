@@ -1,10 +1,10 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import { ExtensionContext, Memento } from "vscode"
-import { sleep } from "vrealize-common"
+import { sleep } from "vrdt-common"
 
 import { ScopedMemento } from "../client/storage/ScopedMemento"
 

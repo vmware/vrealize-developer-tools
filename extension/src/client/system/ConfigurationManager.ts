@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -15,7 +15,7 @@ import {
     MavenProfilesMap,
     MavenProfileWrapper,
     VrealizeSettings
-} from "vrealize-common"
+} from "vrdt-common"
 import * as vscode from "vscode"
 
 import { BuiltInCommands } from "../constants"

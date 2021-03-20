@@ -1,10 +1,10 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import { InputBox, QuickInputButton, QuickPick, QuickPickItem } from "vscode"
-import { Logger } from "vrealize-common"
+import { Logger } from "vrdt-common"
 
 export class BreakMultiStep extends Error {
     constructor() {

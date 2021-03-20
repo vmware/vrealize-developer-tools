@@ -114,7 +114,7 @@ module.exports = {
         "import/named": "off",
         "import/no-unresolved": [
             "warn",
-            { ignore: ["vscode", "vrealize-common", "vro-language-server", "../../proto"] }
+            { ignore: ["vscode", "vrdt-common", "vro-language-server", "../../proto"] }
         ],
         "import/namespace": "off",
         "import/newline-after-import": "warn",
@@ -134,7 +134,7 @@ module.exports = {
                 "!",
                 {
                     pattern: " * Copyright \\d{4}-\\d{4} VMware, Inc\\.",
-                    template: " * Copyright 2018-2020 VMware, Inc."
+                    template: " * Copyright 2018-2021 VMware, Inc."
                 },
                 " * SPDX-License-Identifier: MIT",
                 " "

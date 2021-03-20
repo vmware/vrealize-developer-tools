@@ -1,9 +1,9 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { Logger } from "vrealize-common"
+import { Logger } from "vrdt-common"
 import * as vscode from "vscode"
 
 import { Registrable } from "../Registrable"

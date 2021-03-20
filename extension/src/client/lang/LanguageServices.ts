@@ -1,11 +1,11 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import * as path from "path"
 
-import { AutoWire, Logger, MavenProfilesMap } from "vrealize-common"
+import { AutoWire, Logger, MavenProfilesMap } from "vrdt-common"
 import { remote } from "vro-language-server"
 import * as vscode from "vscode"
 import * as client from "vscode-languageclient/node"

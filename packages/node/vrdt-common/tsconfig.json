@@ -1,0 +1,12 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "target": "es5",
+    "rootDir": "src",
+    "outDir": "out",
+    "noImplicitAny": false,
+    "downlevelIteration": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

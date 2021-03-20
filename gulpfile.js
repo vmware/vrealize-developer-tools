@@ -1,4 +1,4 @@
-/* Copyright 2018-2019 VMware, Inc.
+/* Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT */
 
 const gulp = require("gulp")
@@ -36,7 +36,7 @@ const cmdLineOptions = minimist(process.argv.slice(2), {
 })
 
 gulp.task("generate-proto", done => {
-    const root = path.join(rootPath, "language-server")
+    const root = path.join(rootPath, "packages", "node", "vro-language-server")
     const protoPath = path.resolve(root, "src", "proto")
 
     fs.emptyDirSync(path.resolve(protoPath))
@@ -48,7 +48,7 @@ gulp.task("generate-proto", done => {
         "commonjs",
         "-o",
         path.resolve(protoPath, "index.js"),
-        path.join(root, "..", "protocol", "src", "**", "*.proto")
+        path.join(root, "protocol", "src", "**", "*.proto")
     ]
 
     const pbtsArgs = ["-o", path.resolve(protoPath, "index.d.ts"), path.resolve(protoPath, "index.js")]
@@ -59,7 +59,7 @@ gulp.task("generate-proto", done => {
 })
 
 gulp.task("copy-proto", () => {
-    const root = path.join(rootPath, "language-server")
+    const root = path.join(rootPath, "packages", "node", "vro-language-server")
     const protoSrcPath = path.resolve(root, "src", "proto")
     const protoOutPath = path.resolve(root, "out", "proto")
 
@@ -81,14 +81,14 @@ gulp.task("copy-changelog", () => {
         .pipe(gulp.dest(changelogOutPath))
 })
 
-const projects = ["common", "language-server", "extension"]
+const projects = ["packages/node/vrdt-common", "packages/node/vro-language-server", "extension"]
 
 gulp.task("clean", done => {
     projects.forEach(name => {
-        var outPath = path.join(rootPath, name, "out")
+        var outPath = path.join(rootPath, ...name.split("/"), "out")
         fs.removeSync(outPath)
 
-        var tsBuildInfo = path.join(rootPath, name, "tsconfig.tsbuildinfo")
+        var tsBuildInfo = path.join(rootPath, ...name.split("/"), "tsconfig.tsbuildinfo")
         fs.removeSync(tsBuildInfo)
     })
 
@@ -122,7 +122,7 @@ gulp.task("lint", () => {
 gulp.task(
     "test",
     gulp.series("compile", done => {
-        const projectRoots = projects.map(name => path.join(rootPath, name))
+        const projectRoots = projects.map(name => path.join(rootPath, ...name.split("/")))
         const args = ["--verbose", "--projects", ...projectRoots]
 
         if (cmdLineOptions.tests) {
@@ -135,7 +135,7 @@ gulp.task(
 )
 
 gulp.task("test:watch", done => {
-    const projectRoots = projects.map(name => path.join(rootPath, name))
+    const projectRoots = projects.map(name => path.join(rootPath, ...name.split("/")))
     const args = ["--verbose", "--watch", "--projects", ...projectRoots]
 
     exec(jest, args, rootPath)

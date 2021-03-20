@@ -1,11 +1,11 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 require("module-alias/register")
 
-import { LogChannel, Logger, LogLevel } from "vrealize-common"
+import { LogChannel, Logger, LogLevel } from "vrdt-common"
 import * as vscode from "vscode"
 
 import { ModuleRegistry } from "./client"

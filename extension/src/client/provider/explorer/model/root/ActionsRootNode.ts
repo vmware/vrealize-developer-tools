@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { VroRestClient } from "vrealize-common"
+import { VroRestClient } from "vrdt-common"
 import * as vscode from "vscode"
 
 import { ConfigurationManager } from "../../../../system"

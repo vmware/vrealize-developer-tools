@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -9,7 +9,7 @@ import * as fs from "fs-extra"
 import * as jsonParser from "jsonc-parser"
 import * as _ from "lodash"
 import * as micromatch from "micromatch"
-import { AutoWire, Logger, PomFile, TasksInfo } from "vrealize-common"
+import { AutoWire, Logger, PomFile, TasksInfo } from "vrdt-common"
 import * as vscode from "vscode"
 
 import { extensionShortName } from "../../constants"

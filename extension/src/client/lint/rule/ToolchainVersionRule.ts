@@ -1,11 +1,11 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import * as xmlParser from "fast-xml-parser"
 import * as semver from "semver"
-import { Logger, PomFile } from "vrealize-common"
+import { Logger, PomFile } from "vrdt-common"
 import * as vscode from "vscode"
 
 import { Patterns } from "../../constants"

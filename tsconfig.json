@@ -2,8 +2,8 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "vro-language-server": ["language-server/src/public/"],
-      "vrealize-common": ["common/src/"]
+      "vro-language-server": ["./packages/node/vro-language-server/src/public/"],
+      "vrdt-common": ["./packages/node/vrdt-common/src/"]
     },
     "target": "es2017",
     "lib": ["es2017"],

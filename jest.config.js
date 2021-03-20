@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -9,7 +9,7 @@ const { compilerOptions } = require("./tsconfig");
 module.exports = {
     preset: "ts-jest",
     testMatch: ["**/__tests__/**/*.spec.ts"],
-    moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/../" }),
+    moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/../../../" }),
     collectCoverage: true,
     setupFilesAfterEnv: ["jest-extended"],
     coveragePathIgnorePatterns: [".*/__tests__/.*", ".*/src/proto/.*", ".*/common/src/rest/.*"],
