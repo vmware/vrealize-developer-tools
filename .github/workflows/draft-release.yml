@@ -74,7 +74,7 @@ jobs:
 
       - name: Generate release notes
         id: generate_changelog
-        uses: nblagoev/pull-release-notes-action@v1
+        uses: nblagoev/pull-release-notes-action@v1.0.2
         with:
           base-ref: ${{ env.baseRef }}
           head-ref: ${{ github.ref }}
