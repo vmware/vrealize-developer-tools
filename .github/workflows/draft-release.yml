@@ -52,11 +52,11 @@ jobs:
 
       - name: Checksum and sign
         run: |
-          sha256sum --tag vrealize-developer-tools-${version}.vsix > vrealize-developer-tools-${version}.vsix.sha256
-          gpg --default-key ${keyid} --armor --detach-sig vrealize-developer-tools-${version}.vsix.sha256
-        with:
-          version: ${{steps.version_step.outputs.version}}
-          keyid: ${{steps.import_gpg.outputs.keyid}}
+          sha256sum --tag vrealize-developer-tools-$PKG_VERSION.vsix > vrealize-developer-tools-$PKG_VERSION.vsix.sha256
+          gpg --default-key $KEYID --armor --detach-sig vrealize-developer-tools-$PKG_VERSION.vsix.sha256
+        env:
+          PKG_VERSION: ${{steps.version_step.outputs.version}}
+          KEYID: ${{steps.import_gpg.outputs.keyid}}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
