@@ -25,6 +25,9 @@ jobs:
       - name: Use NPM 7
         run: npm install -g npm@7
 
+      - name: Install sha256sum
+        run: brew install coreutils
+
       - name: Get version number
         id: version_step
         run: |
