@@ -7,22 +7,28 @@ jobs:
     name: Publish to Visual Studio Marketplace
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+
+      - name: Install vsce
+        run: npm install -g vsce
 
       - name: Download release asset
         id: release_asset
         env:
-          TAG_NAME: ${{ github.event.tag_name }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
           VERSION=$(echo -n $TAG_NAME | sed 's/^v//')
           FILE_NAME="vrealize-developer-tools-${VERSION}.vsix"
-          DOWNLOAD_URL=$(jq --raw-output '.release.assets[] | select(.name == "$FILE_NAME") | .browser_download_url' "$GITHUB_EVENT_PATH")
+          DOWNLOAD_URL=$(jq --raw-output ".release.assets[] | select(.name == \"$FILE_NAME\") | .browser_download_url" "$GITHUB_EVENT_PATH")
 
           wget $DOWNLOAD_URL
           echo "::set-output name=file_name::$FILE_NAME"
 
-      - name: Publish
+      - name: Publish to VS Marketplace
         env:
           MARKETPLACE_SECRET: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           FILE_NAME: ${{ steps.release_asset.outputs.file_name }}
-        run: "node node_modules/.bin/vsce publish -p $MARKETPLACE_SECRET --packagePath $FILE_NAME"
+        run: "vsce publish -p $MARKETPLACE_SECRET --packagePath $FILE_NAME"
