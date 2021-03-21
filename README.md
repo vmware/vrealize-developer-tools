@@ -108,6 +108,26 @@ The `vrdev.tasks.exclude` setting can be used to _exclude_ certain projects from
 ]
 ```
 
+## Install
+
+vRDT can be installed either through the [VS Marketplace](https://marketplace.visualstudio.com/items?itemName=vmware-pscoe.vrealize-developer-tools) or a .vsix file downloaded from the [Releases](https://github.com/vmware/vrealize-developer-tools/releases/latest) page.
+
+To verify the checksum of a .vsix file, do the following:
+
+1. Download all 3 files from the [Releases](https://github.com/vmware/vrealize-developer-tools/releases/latest) page (`.vsix`, `.vsix.sha256` and `.vsix.sha256.asc`)
+2. Import the vRDT release GPG key
+    ```
+    gpg --keyid-format long --keyserver hkps://keys.openpgp.org --recv-keys 0x7882C7818C15E4F3
+    ```
+3. Verify the signature of the checksum file
+    ```
+    gpg --keyid-format long --verify vrealize-developer-tools-X.X.X.vsix.sha256.asc vrealize-developer-tools-X.X.X.vsix.sha256
+    ```
+4. Verify the checksum of the vsix file
+    ```
+    sha256sum -c vrealize-developer-tools-X.X.X.vsix.sha256
+    ```
+
 ## Upgrade steps
 
 If you have installed any versions prior 2.0.0, do the following to upgrade.
