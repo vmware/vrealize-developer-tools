@@ -9,10 +9,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Print GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "::debug::$GITHUB_CONTEXT"
+          echo "::debug::$GITHUB_EVENT_PATH"
+
       - name: Download release asset
         id: release_asset
         env:
-          TAG_NAME: ${{ github.event.tag_name }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
           VERSION=$(echo -n $TAG_NAME | sed 's/^v//')
           FILE_NAME="vrealize-developer-tools-${VERSION}.vsix"
