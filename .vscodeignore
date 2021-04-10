@@ -10,7 +10,7 @@ packages/**
 wiki/**
 tools/**
 **/src/**
-**/out/__tests__/**
+**/out/**
 **/coverage
 
 **/*.ts
@@ -35,4 +35,4 @@ CONTRIBUTING.md
 gulpfile.js
 package-lock.json
 
-!node_modules/**
+node_modules/**

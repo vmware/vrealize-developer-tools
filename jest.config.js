@@ -11,10 +11,10 @@ module.exports = {
     coveragePathIgnorePatterns: [".*/__tests__/.*", ".*/src/proto/.*", ".*/vrdt-common/src/rest/.*"],
     globals: {
         "ts-jest": {
-            "tsconfig": "<rootDir>/tsconfig.json",
-            "diagnostics": {
-                "warnOnly": true
+            tsconfig: "<rootDir>/tsconfig.json",
+            diagnostics: {
+                warnOnly: true
             }
         }
     }
-};
+}

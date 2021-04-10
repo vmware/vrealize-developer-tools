@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-require("module-alias/register")
-
 import { di, LogChannel, Logger } from "@vmware/vrdt-common"
 import { Connection } from "vscode-languageserver"
 

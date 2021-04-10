@@ -19,7 +19,7 @@ export abstract class BaseEnvironment {
 
     get version(): string {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const packageJson = require("../../../package.json")
+        const packageJson = require("../../package.json")
         return packageJson.version.trim()
     }
 

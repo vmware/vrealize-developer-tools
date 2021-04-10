@@ -46,7 +46,7 @@
     "onCommand:vrdev.blueprint.upload",
     "onCommand:vrdev.blueprint.deploy"
   ],
-  "main": "./out/extension",
+  "main": "./dist/extension",
   "icon": "assets/logo.png",
   "contributes": {
     "viewsContainers": {
@@ -565,12 +565,18 @@
     "jsdoc": "^3.6.6",
     "merge-stream": "^2.0.0",
     "minimist": "^1.2.5",
+    "node-loader": "^1.0.2",
     "prettier": "^2.2.1",
+    "shebang-loader": "^0.0.1",
     "tmp": "^0.2.0",
     "ts-jest": "^26.5.4",
+    "ts-loader": "^8.0.18",
+    "tsconfig-paths-webpack-plugin": "^3.5.1",
     "typescript": "~4.2.3",
     "uglify-js": "^3.13.1",
-    "vsce": "^1.87.0"
+    "vsce": "^1.87.0",
+    "webpack": "^5.27.0",
+    "webpack-cli": "^4.5.0"
   },
   "dependencies": {
     "@vmware/vrdt-common": "2.2.1",
@@ -582,7 +588,6 @@
     "jsonc-parser": "^3.0.0",
     "lodash": "^4.17.21",
     "micromatch": "^4.0.2",
-    "module-alias": "^2.2.2",
     "moment": "^2.29.1",
     "semver": "^7.3.4",
     "tmp": "^0.2.1",
@@ -599,10 +604,10 @@
     "utf-8-validate": "^5.0.2"
   },
   "workspaces": [
-    "packages/node/*",
-    "extension"
+    "packages/node/*"
   ],
   "scripts": {
-    "preinstall": "node build/preinstall.js"
+    "preinstall": "node build/preinstall.js",
+    "vscode:prepublish": "webpack --mode production"
   }
 }
