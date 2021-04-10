@@ -5,8 +5,8 @@
 
 import * as path from "path"
 
-import { AutoWire, Logger, MavenProfilesMap } from "vrdt-common"
-import { remote } from "vro-language-server"
+import { AutoWire, Logger, MavenProfilesMap } from "@vmware/vrdt-common"
+import { remote } from "@vmware/vro-language-server"
 import * as vscode from "vscode"
 import * as client from "vscode-languageclient/node"
 
@@ -74,7 +74,7 @@ export class LanguageServices implements Registrable, vscode.Disposable {
 
     private newLanguageClient(): client.LanguageClient {
         const config = vscode.workspace.getConfiguration("vrdev")
-        const module = this.extensionContext.asAbsolutePath(path.join("packages", "node", "vro-language-server"))
+        const module = this.extensionContext.asAbsolutePath(path.join("packages", "node", "@vmware/vro-language-server"))
         const executable = path.join(module, "out", "server", "langserver.js")
         this.logger.info(`Starting vRO language server on port 6014`)
 

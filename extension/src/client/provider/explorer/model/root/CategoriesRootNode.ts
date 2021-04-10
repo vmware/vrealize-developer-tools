@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { ApiCategoryType, VroRestClient } from "vrdt-common"
+import { ApiCategoryType, VroRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { AbstractNode } from "../AbstractNode"

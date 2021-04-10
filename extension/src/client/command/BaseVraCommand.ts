@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { VraNgRestClient } from "vrdt-common"
+import { VraNgRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { ConfigurationManager, EnvironmentManager } from "../system"

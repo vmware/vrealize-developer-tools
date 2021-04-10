@@ -5,7 +5,7 @@
 
 import * as path from "path"
 
-import { AutoWire, Logger } from "vrdt-common"
+import { AutoWire, Logger } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 import { parse as parseYaml, Document as YamlDocument } from "yaml"
 

@@ -5,7 +5,7 @@
 
 import * as path from "path"
 
-import { VroRestClient } from "vrdt-common"
+import { VroRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 import * as fs from "fs-extra"
 

@@ -7,7 +7,7 @@ import * as path from "path"
 
 import * as fs from "fs-extra"
 import * as _ from "lodash"
-import { AutoWire, Logger, PomFile, proc, WorkspaceFolder } from "vrdt-common"
+import { AutoWire, Logger, PomFile, proc, WorkspaceFolder } from "@vmware/vrdt-common"
 import { FileChangeType } from "vscode-languageserver"
 
 import { Environment, FileChangeEventParams, HintLookup, WorkspaceFilesWatcher } from "../../core"

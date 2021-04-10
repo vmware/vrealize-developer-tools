@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, VroElementPickInfo, VroRestClient } from "vrdt-common"
+import { AutoWire, Logger, VroElementPickInfo, VroRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Commands, ElementKinds } from "../constants"

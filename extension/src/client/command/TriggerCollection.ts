@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, sleep } from "vrdt-common"
-import { remote } from "vro-language-server"
+import { AutoWire, Logger, sleep } from "@vmware/vrdt-common"
+import { remote } from "@vmware/vro-language-server"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"

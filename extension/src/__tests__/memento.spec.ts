@@ -4,7 +4,7 @@
  */
 
 import { ExtensionContext, Memento } from "vscode"
-import { sleep } from "vrdt-common"
+import { sleep } from "@vmware/vrdt-common"
 
 import { ScopedMemento } from "../client/storage/ScopedMemento"
 

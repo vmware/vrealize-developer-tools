@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, BaseConfiguration, Logger, MavenProfilesMap } from "vrdt-common"
+import { AutoWire, BaseConfiguration, Logger, MavenProfilesMap } from "@vmware/vrdt-common"
 import * as server from "vscode-languageserver"
 
 import { MavenProfileWatcher } from "../maven"

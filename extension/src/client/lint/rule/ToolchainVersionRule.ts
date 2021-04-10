@@ -5,7 +5,7 @@
 
 import * as xmlParser from "fast-xml-parser"
 import * as semver from "semver"
-import { Logger, PomFile } from "vrdt-common"
+import { Logger, PomFile } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Patterns } from "../../constants"

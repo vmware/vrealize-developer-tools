@@ -5,7 +5,7 @@
 
 import * as path from "path"
 
-import { AutoWire, Logger, VroRestClient } from "vrdt-common"
+import { AutoWire, Logger, VroRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 import * as fs from "fs-extra"
 

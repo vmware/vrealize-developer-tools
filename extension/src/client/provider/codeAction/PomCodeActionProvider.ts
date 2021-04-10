@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger } from "vrdt-common"
+import { AutoWire, Logger } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { FixCommands } from "../../constants"

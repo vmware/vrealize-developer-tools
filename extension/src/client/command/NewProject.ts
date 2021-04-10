@@ -5,7 +5,7 @@
 
 import * as path from "path"
 
-import { AutoWire, Logger, MavenCliProxy, ProjectPickInfo, ProjectType } from "vrdt-common"
+import { AutoWire, Logger, MavenCliProxy, ProjectPickInfo, ProjectType } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Commands, Patterns } from "../constants"

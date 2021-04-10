@@ -9,7 +9,7 @@ import * as fs from "fs-extra"
 import * as jsonParser from "jsonc-parser"
 import * as _ from "lodash"
 import * as micromatch from "micromatch"
-import { AutoWire, Logger, PomFile, TasksInfo } from "vrdt-common"
+import { AutoWire, Logger, PomFile, TasksInfo } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { extensionShortName } from "../../constants"

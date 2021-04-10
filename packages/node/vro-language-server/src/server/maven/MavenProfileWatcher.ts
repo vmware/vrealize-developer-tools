@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AbstractWatcher, AutoWire, Logger, MavenProfilesMap } from "vrdt-common"
+import { AbstractWatcher, AutoWire, Logger, MavenProfilesMap } from "@vmware/vrdt-common"
 import { Disposable } from "vscode-languageserver"
 
 import { remote } from "../../public"

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AbstractWatcher, AutoWire, Logger } from "vrdt-common"
+import { AbstractWatcher, AutoWire, Logger } from "@vmware/vrdt-common"
 import { DidChangeConfigurationParams, Disposable } from "vscode-languageserver"
 
 import { ConnectionLocator } from "./ConnectionLocator"

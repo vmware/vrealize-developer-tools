@@ -5,7 +5,7 @@
 
 require("module-alias/register")
 
-import { LogChannel, Logger, LogLevel } from "vrdt-common"
+import { LogChannel, Logger, LogLevel } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { ModuleRegistry } from "./client"

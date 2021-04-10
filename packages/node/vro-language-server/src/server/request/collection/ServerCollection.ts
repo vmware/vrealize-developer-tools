@@ -5,7 +5,7 @@
 
 import * as AdmZip from "adm-zip"
 import * as fs from "fs-extra"
-import { AutoWire, Logger, promise, VroRestClient } from "vrdt-common"
+import { AutoWire, Logger, promise, VroRestClient } from "@vmware/vrdt-common"
 import { CancellationToken } from "vscode"
 
 import { remote } from "../../../public"

@@ -5,7 +5,7 @@
 
 import * as path from "path"
 
-import { AutoWire, Logger, validate, VraNgRestClient } from "vrdt-common"
+import { AutoWire, Logger, validate, VraNgRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml"
 

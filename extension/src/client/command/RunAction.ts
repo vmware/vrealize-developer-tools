@@ -9,7 +9,7 @@ import * as fs from "fs-extra"
 import * as moment from "moment"
 import * as semver from "semver"
 import * as tmp from "tmp"
-import { AutoWire, Logger, LogMessage, MavenCliProxy, PomFile, proc, sleep, VroRestClient } from "vrdt-common"
+import { AutoWire, Logger, LogMessage, MavenCliProxy, PomFile, proc, sleep, VroRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"

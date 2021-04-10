@@ -6,7 +6,7 @@
 import * as fs from "fs"
 
 import * as _ from "lodash"
-import { AutoWire, Logger, WorkspaceFolder } from "vrdt-common"
+import { AutoWire, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import { Disposable, WorkspaceFoldersChangeEvent } from "vscode-languageserver"
 
 import { vmw } from "../../proto"

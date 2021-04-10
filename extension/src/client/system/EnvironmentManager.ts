@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, BaseEnvironment, Logger, WorkspaceFolder } from "vrdt-common"
+import { AutoWire, BaseEnvironment, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { extensionShortName, ProjectArchetypes } from "../constants"

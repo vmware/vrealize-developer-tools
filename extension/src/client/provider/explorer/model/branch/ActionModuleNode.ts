@@ -4,7 +4,7 @@
  */
 
 import * as vscode from "vscode"
-import { VroRestClient } from "vrdt-common"
+import { VroRestClient } from "@vmware/vrdt-common"
 
 import { ActionNode } from "../leaf/ActionNode"
 import { ElementKinds } from "../../../../constants"

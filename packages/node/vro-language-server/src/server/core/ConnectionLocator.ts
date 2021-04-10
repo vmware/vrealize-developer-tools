@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire } from "vrdt-common"
+import { AutoWire } from "@vmware/vrdt-common"
 import * as server from "vscode-languageserver/node"
 
 @AutoWire

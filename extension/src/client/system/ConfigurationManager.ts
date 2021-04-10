@@ -15,7 +15,7 @@ import {
     MavenProfilesMap,
     MavenProfileWrapper,
     VrealizeSettings
-} from "vrdt-common"
+} from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { BuiltInCommands } from "../constants"

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { di, Logger } from "vrdt-common"
+import { di, Logger } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Registrable } from "./Registrable"

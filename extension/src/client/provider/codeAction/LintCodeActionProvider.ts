@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { Logger } from "vrdt-common"
+import { Logger } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Linter } from "../../lint"

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AbstractWatcher, AutoWire, Logger, WorkspaceFolder } from "vrdt-common"
+import { AbstractWatcher, AutoWire, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import { DidChangeWatchedFilesParams, Disposable, FileEvent } from "vscode-languageserver"
 import { URI } from "vscode-uri"
 

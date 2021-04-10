@@ -6,7 +6,7 @@
 
 require("module-alias/register")
 
-import { di, LogChannel, Logger } from "vrdt-common"
+import { di, LogChannel, Logger } from "@vmware/vrdt-common"
 import { Connection } from "vscode-languageserver"
 
 import { ConnectionLocator } from "./core"

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger } from "vrdt-common"
+import { AutoWire, Logger } from "@vmware/vrdt-common"
 import { Disposable, InitializedParams, InitializeParams, ServerCapabilities } from "vscode-languageserver"
 
 import capabilities from "./Capabilities"

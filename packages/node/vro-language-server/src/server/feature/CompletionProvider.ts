@@ -4,7 +4,7 @@
  */
 
 import * as _ from "lodash"
-import { AutoWire, Logger, WorkspaceFolder } from "vrdt-common"
+import { AutoWire, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import {
     CancellationToken,
     CompletionItem,

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AuthGrant, AutoWire, Logger, validate, VraAuthType, VraNgRestClient } from "vrdt-common"
+import { AuthGrant, AutoWire, Logger, validate, VraAuthType, VraNgRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"

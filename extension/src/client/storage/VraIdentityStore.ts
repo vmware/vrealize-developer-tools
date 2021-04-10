@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, Token, TokenPair, VraIdentityIO } from "vrdt-common"
+import { AutoWire, Logger, Token, TokenPair, VraIdentityIO } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Registrable } from "../Registrable"

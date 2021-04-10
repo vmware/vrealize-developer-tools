@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { MavenProfilesMap } from "vrdt-common"
+import { MavenProfilesMap } from "@vmware/vrdt-common"
 import { NotificationType, RequestType } from "vscode-jsonrpc"
 import { Location, TextDocumentIdentifier, TextDocumentPositionParams } from "vscode-languageclient"
 

@@ -4,7 +4,7 @@
  */
 
 import { InputBox, QuickInputButton, QuickPick, QuickPickItem } from "vscode"
-import { Logger } from "vrdt-common"
+import { Logger } from "@vmware/vrdt-common"
 
 export class BreakMultiStep extends Error {
     constructor() {
