@@ -41,10 +41,6 @@ const config = {
                 loader: "node-loader"
             },
             {
-                test: /langserver\.ts$/,
-                use: [{ loader: "shebang-loader" }]
-            },
-            {
                 test: /\.ts$/,
                 exclude: /node_modules/,
                 use: [
