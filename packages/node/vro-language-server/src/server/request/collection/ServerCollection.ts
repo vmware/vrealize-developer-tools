@@ -5,8 +5,8 @@
 
 import * as AdmZip from "adm-zip"
 import * as fs from "fs-extra"
+import { CancellationToken } from "vscode-jsonrpc"
 import { AutoWire, Logger, promise, VroRestClient } from "@vmware/vrdt-common"
-import { CancellationToken } from "vscode"
 
 import { remote } from "../../../public"
 import { ConnectionLocator, Environment, HintLookup, Settings } from "../../core"

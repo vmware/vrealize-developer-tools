@@ -552,8 +552,8 @@
     "typescript": "~4.2.3"
   },
   "dependencies": {
-    "@vmware/vrdt-common": "2.0.1",
-    "@vmware/vro-language-server": "^0.5.4",
+    "@vmware/vrdt-common": "2.2.1",
+    "@vmware/vro-language-server": "2.2.1",
     "adm-zip": "^0.5.4",
     "chokidar": "~3.5.1",
     "fast-xml-parser": "3.19.0",

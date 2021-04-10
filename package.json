@@ -12,8 +12,8 @@
     "url": "https://github.com/vmware/vrealize-developer-tools.git"
   },
   "workspaces": [
-    "./extension",
-    "./packages/node/*"
+    "packages/node/*",
+    "extension"
   ],
   "devDependencies": {
     "@types/jest": "^26.0.21",
