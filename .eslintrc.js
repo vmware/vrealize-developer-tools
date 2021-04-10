@@ -114,7 +114,7 @@ module.exports = {
         "import/named": "off",
         "import/no-unresolved": [
             "warn",
-            { ignore: ["vscode", "vrdt-common", "vro-language-server", "../../proto"] }
+            { ignore: ["vscode", "../../proto"] }
         ],
         "import/namespace": "off",
         "import/newline-after-import": "warn",
