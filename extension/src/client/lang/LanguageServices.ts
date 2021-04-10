@@ -74,7 +74,9 @@ export class LanguageServices implements Registrable, vscode.Disposable {
 
     private newLanguageClient(): client.LanguageClient {
         const config = vscode.workspace.getConfiguration("vrdev")
-        const module = this.extensionContext.asAbsolutePath(path.join("packages", "node", "@vmware/vro-language-server"))
+        const module = this.extensionContext.asAbsolutePath(
+            path.join("packages", "node", "@vmware/vro-language-server")
+        )
         const executable = path.join(module, "out", "server", "langserver.js")
         this.logger.info(`Starting vRO language server on port 6014`)
 

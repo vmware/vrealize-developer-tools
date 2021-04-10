@@ -6,7 +6,7 @@
 assets/images/**
 build/**
 typings/**
-protocol/**
+packages/**
 wiki/**
 tools/**
 **/src/**

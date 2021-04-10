@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    // "paths": {
-    //   "vro-language-server": ["./packages/node/vro-language-server/src/public/"],
-    //   "vrdt-common": ["./packages/node/vrdt-common/src/"]
-    // },
     "target": "es2017",
     "lib": ["es2017"],
     "module": "commonjs",
