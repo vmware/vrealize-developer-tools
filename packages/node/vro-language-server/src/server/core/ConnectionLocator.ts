@@ -4,7 +4,7 @@
  */
 
 import { AutoWire } from "@vmware/vrdt-common"
-import * as server from "vscode-languageserver/node"
+import * as server from "vscode-languageserver"
 
 @AutoWire
 export class ConnectionLocator {
@@ -18,5 +18,5 @@ export class ConnectionLocator {
      *
      * @see https://github.com/Microsoft/vscode-languageserver-node/issues/299
      */
-    readonly connection: server.Connection = server.createConnection()
+    readonly connection: server.IConnection = server.createConnection()
 }

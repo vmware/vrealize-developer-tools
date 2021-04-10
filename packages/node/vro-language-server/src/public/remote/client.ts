@@ -4,21 +4,25 @@
  */
 
 import { MavenProfilesMap } from "@vmware/vrdt-common"
-import { NotificationType, RequestType } from "vscode-jsonrpc"
+import { NotificationType, RequestType } from "vscode-languageserver"
 import { Location, TextDocumentIdentifier, TextDocumentPositionParams } from "vscode-languageclient"
 
 import * as types from "../types"
 
-export const givePrefix = new RequestType<TextDocumentPositionParams, null | string, void>("vrdev.client.givePrefix")
+export const givePrefix = new RequestType<TextDocumentPositionParams, null | string, void, void>(
+    "vrdev.client.givePrefix"
+)
 
-export const giveText = new RequestType<Location, string, void>("vrdev.client.giveText")
+export const giveText = new RequestType<Location, string, void, void>("vrdev.client.giveText")
 
-export const giveTextDocument = new RequestType<TextDocumentIdentifier, types.TextDocumentData, void>(
+export const giveTextDocument = new RequestType<TextDocumentIdentifier, types.TextDocumentData, void, void>(
     "vrdev.client.giveTextDocument"
 )
 
-export const giveWordAtPosition = new RequestType<types.LocatedPosition, string, void>(
+export const giveWordAtPosition = new RequestType<types.LocatedPosition, string, void, void>(
     "vrdev.client.giveWordAtPosition"
 )
 
-export const didChangeMavenProfiles = new NotificationType<MavenProfilesMap>("vrdev.client.didChangeMavenProfiles")
+export const didChangeMavenProfiles = new NotificationType<MavenProfilesMap, void>(
+    "vrdev.client.didChangeMavenProfiles"
+)

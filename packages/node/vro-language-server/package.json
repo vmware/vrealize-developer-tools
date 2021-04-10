@@ -31,12 +31,8 @@
     "fs-extra": "~9.1.0",
     "lodash": "^4.17.21",
     "protobufjs": "^6.10.2",
-    "vscode-jsonrpc": "^6.0.0",
-    "vscode-languageclient": "^7.0.0",
-    "vscode-languageserver": "^7.0.0",
-    "vscode-languageserver-protocol": "^3.16.0",
+    "vscode-languageserver": "^6.1.1",
     "vscode-languageserver-textdocument": "^1.0.1",
-    "vscode-languageserver-types": "^3.16.0",
     "vscode-uri": "^3.0.2"
   }
 }

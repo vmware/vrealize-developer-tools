@@ -5,7 +5,7 @@
  */
 
 import { di, LogChannel, Logger } from "@vmware/vrdt-common"
-import { Connection } from "vscode-languageserver"
+import { IConnection } from "vscode-languageserver"
 
 import { ConnectionLocator } from "./core"
 import * as document from "./document"
@@ -31,7 +31,7 @@ function registerModule(mod: any) {
     }
 }
 
-function getLoggingChannel(connection: Connection): LogChannel {
+function getLoggingChannel(connection: IConnection): LogChannel {
     return {
         debug(message: string) {
             connection.console.log(message)
