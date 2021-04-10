@@ -3,6 +3,7 @@
 logs
 *.log*
 *.tsbuildinfo
+*.bkp
 
 out/
 dist/

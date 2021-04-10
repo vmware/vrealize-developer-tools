@@ -34,5 +34,6 @@ CONTRIBUTING.md
 *.vsix
 gulpfile.js
 package-lock.json
+dist/package.json
 
 node_modules/**

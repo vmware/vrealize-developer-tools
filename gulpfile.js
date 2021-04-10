@@ -9,13 +9,14 @@ const fs = require("fs-extra")
 const minimist = require("minimist")
 const log = require("fancy-log")
 const eslint = require("gulp-eslint")
+const jeditor = require("gulp-json-editor")
 
 const rootPath = __dirname
 const nodeModulesPathPrefix = path.resolve("./node_modules")
 const isWin = /^win/.test(process.platform)
 const jest = path.join(nodeModulesPathPrefix, ".bin", "jest") + (isWin ? ".cmd" : "")
-const pbjs = path.join(nodeModulesPathPrefix,  ".bin", "pbjs")
-const pbts = path.join(nodeModulesPathPrefix,  ".bin", "pbts")
+const pbjs = path.join(nodeModulesPathPrefix, ".bin", "pbjs")
+const pbts = path.join(nodeModulesPathPrefix, ".bin", "pbts")
 const vsce = path.join(nodeModulesPathPrefix, ".bin", "vsce")
 const tsc = path.join(nodeModulesPathPrefix, ".bin", "tsc")
 
@@ -144,20 +145,34 @@ gulp.task("test:watch", done => {
 
 gulp.task(
     "package",
-    gulp.series("lint", "test", done => {
-        exec(
-            vsce,
-            [
-                "package",
-                "--baseContentUrl",
-                "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/",
-                "--baseImagesUrl",
-                "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/"
-            ],
-            rootPath
-        )
-        done()
-    })
+    gulp.series(
+        "lint",
+        "test",
+        () => gulp.src("package.json", { base: rootPath }).pipe(gulp.dest("./dist", { overwrite: true })),
+        () =>
+            gulp
+                .src("package.json")
+                .pipe(
+                    jeditor({
+                        main: "./dist/extension"
+                    })
+                )
+                .pipe(gulp.dest("./")),
+        () => {
+            exec(
+                vsce,
+                [
+                    "package",
+                    "--baseContentUrl",
+                    "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/",
+                    "--baseImagesUrl",
+                    "https://raw.githubusercontent.com/vmware/vrealize-developer-tools/master/"
+                ],
+                rootPath
+            )
+            return gulp.src("./dist/package.json").pipe(gulp.dest("./", { overwrite: true }))
+        }
+    )
 )
 
 gulp.task("default", gulp.series("watch"))
@@ -165,7 +180,7 @@ gulp.task("default", gulp.series("watch"))
 function exec(cmd, args, cwd, stdio = "inherit") {
     var cmdString = `${cmd} ${args.join(" ")}`
     log(cmdString)
-    var result = cp.spawnSync(cmd, args, {shell:true, stdio, cwd })
+    var result = cp.spawnSync(cmd, args, { shell: true, stdio, cwd })
     if (result.status != 0) {
         throw new Error(`Command "${cmdString}" exited with code ` + result.status)
     }
