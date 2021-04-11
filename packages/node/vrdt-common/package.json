@@ -1,15 +1,13 @@
 {
   "name": "@vmware/vrdt-common",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "",
   "license": "MIT",
   "homepage": "https://github.com/vmware/vrealize-developer-tools",
-  "bugs": {
-    "url": "https://github.com/vmware/vrealize-developer-tools/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vmware/vrealize-developer-tools.git"
+  "bugs": "https://github.com/vmware/vrealize-developer-tools/issues",
+  "repository": "git://github.com/vmware/vrealize-developer-tools.git",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "main": "./out/index",
   "devDependencies": {

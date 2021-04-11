@@ -3,7 +3,7 @@
   "name": "vrealize-developer-tools",
   "displayName": "vRealize Developer Tools",
   "description": "Provides code intelligence features and enables a more developer-friendly experience when creating VMware vRealize Orchestrator and VMware vRealize Automation content.",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "publisher": "vmware-pscoe",
   "license": "MIT",
   "homepage": "https://github.com/vmware/vrealize-developer-tools",
@@ -580,8 +580,8 @@
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
-    "@vmware/vrdt-common": "2.2.1",
-    "@vmware/vro-language-server": "2.2.1",
+    "@vmware/vrdt-common": "2.3.0",
+    "@vmware/vro-language-server": "2.3.0",
     "adm-zip": "^0.5.4",
     "chokidar": "~3.5.1",
     "fast-xml-parser": "3.19.0",
