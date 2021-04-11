@@ -18,7 +18,7 @@ The toolchain consists of components in both Node.js and Maven worlds.
 
 ### Visual Studio Code extension
 
--   **`extension`** - The VS Code extension' source; depends on `common` and `language-server` through TypeScript project references
+-   **`extension`** - The VS Code extension' source
 
 ### Node.js tooling and libraries
 
