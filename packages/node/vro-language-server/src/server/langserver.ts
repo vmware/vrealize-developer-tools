@@ -6,7 +6,7 @@
 import { di, LogChannel, Logger } from "@vmware/vrdt-common"
 import { IConnection } from "vscode-languageserver"
 
-import { ConnectionLocator } from "./core"
+import * as core from "./core"
 import * as document from "./document"
 import * as feature from "./feature"
 import * as maven from "./maven"
@@ -51,13 +51,14 @@ function getLoggingChannel(connection: IConnection): LogChannel {
 }
 
 const container = new di.Container()
-const locator: ConnectionLocator = container.get(ConnectionLocator)
+const locator: core.ConnectionLocator = container.get(core.ConnectionLocator)
 
 Logger.setup(getLoggingChannel(locator.connection))
 
 const logger = Logger.get("langserver")
 logger.info("\n\n=== Booting the vRO language server ===\n")
 
+registerModule(core)
 registerModule(maven)
 registerModule(feature)
 registerModule(request)

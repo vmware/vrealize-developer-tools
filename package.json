@@ -564,6 +564,7 @@
     "jest-create-mock-instance": "^1.1.0",
     "jest-extended": "0.11.5",
     "jsdoc": "^3.6.6",
+    "merge-options": "^3.0.4",
     "merge-stream": "^2.0.0",
     "minimist": "^1.2.5",
     "node-loader": "^1.0.2",
@@ -608,6 +609,6 @@
   ],
   "scripts": {
     "preinstall": "node build/preinstall.js",
-    "vscode:prepublish": "webpack --mode production"
+    "vscode:prepublish": "webpack --mode production --config ./extension/webpack.config.js && webpack --mode production --config ./packages/node/vro-language-server/webpack.config.js"
   }
 }

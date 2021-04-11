@@ -34,6 +34,8 @@ CONTRIBUTING.md
 *.vsix
 gulpfile.js
 package-lock.json
-dist/package.json
+extension/dist/package.json
 
 node_modules/**
+
+!packages/node/vro-language-server/dist/langserver.js

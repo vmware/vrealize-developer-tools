@@ -7,3 +7,4 @@ packages/node/vro-language-server/src/proto/**
 
 gulpfile.js
 jest.config.js
+webpack.config.js

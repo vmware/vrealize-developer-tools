@@ -89,6 +89,9 @@ gulp.task("clean", done => {
         var outPath = path.join(rootPath, ...name.split("/"), "out")
         fs.removeSync(outPath)
 
+        var distPath = path.join(rootPath, ...name.split("/"), "dist")
+        fs.removeSync(distPath)
+
         var tsBuildInfo = path.join(rootPath, ...name.split("/"), "tsconfig.tsbuildinfo")
         fs.removeSync(tsBuildInfo)
     })
@@ -148,13 +151,13 @@ gulp.task(
     gulp.series(
         "lint",
         "test",
-        () => gulp.src("package.json", { base: rootPath }).pipe(gulp.dest("./dist", { overwrite: true })),
+        () => gulp.src("package.json", { base: rootPath }).pipe(gulp.dest("./extension/dist", { overwrite: true })),
         () =>
             gulp
                 .src("package.json")
                 .pipe(
                     jeditor({
-                        main: "./dist/extension"
+                        main: "./extension/dist/extension"
                     })
                 )
                 .pipe(gulp.dest("./")),
@@ -170,7 +173,7 @@ gulp.task(
                 ],
                 rootPath
             )
-            return gulp.src("./dist/package.json").pipe(gulp.dest("./", { overwrite: true }))
+            return gulp.src("./extension/dist/package.json").pipe(gulp.dest("./", { overwrite: true }))
         }
     )
 )
