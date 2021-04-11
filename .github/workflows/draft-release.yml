@@ -6,7 +6,7 @@ on:
 jobs:
   build_release:
     name: Build and Release
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -21,6 +21,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 12.x
+
+      - name: Use NPM 7
+        run: npm install -g npm@7
+
+      - name: Install sha256sum
+        run: brew install coreutils
 
       - name: Get version number
         id: version_step
@@ -52,11 +58,11 @@ jobs:
 
       - name: Checksum and sign
         run: |
-          sha256sum --tag vrealize-developer-tools-${version}.vsix > vrealize-developer-tools-${version}.vsix.sha256
-          gpg --default-key ${keyid} --armor --detach-sig vrealize-developer-tools-${version}.vsix.sha256
-        with:
-          version: ${{steps.version_step.outputs.version}}
-          keyid: ${{steps.import_gpg.outputs.keyid}}
+          sha256sum --tag vrealize-developer-tools-$PKG_VERSION.vsix > vrealize-developer-tools-$PKG_VERSION.vsix.sha256
+          gpg --default-key $KEYID --armor --detach-sig vrealize-developer-tools-$PKG_VERSION.vsix.sha256
+        env:
+          PKG_VERSION: ${{steps.version_step.outputs.version}}
+          KEYID: ${{steps.import_gpg.outputs.keyid}}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
@@ -74,7 +80,7 @@ jobs:
 
       - name: Generate release notes
         id: generate_changelog
-        uses: nblagoev/pull-release-notes-action@v1
+        uses: nblagoev/pull-release-notes-action@v1.0.2
         with:
           base-ref: ${{ env.baseRef }}
           head-ref: ${{ github.ref }}
