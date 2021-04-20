@@ -499,17 +499,10 @@
           "description": "",
           "scope": "window"
         },
-        "vrdev.experimental.typescript": {
-          "type": "boolean",
-          "required": false,
-          "default": false,
-          "description": "Enables experimental vRO TypeScript support.",
-          "scope": "application"
-        },
         "vrdev.buildTools.defaultVersion": {
           "type": "string",
           "required": false,
-          "default": "1.7.1",
+          "default": "2.12.5",
           "description": "The version of vRealize Build Tools to be used outside the context of a project (e.g. when onboarding project and running untitled actions).",
           "scope": "application"
         },

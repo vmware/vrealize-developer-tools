@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -21,6 +21,12 @@ interface State extends ProjectPickInfo {
 }
 
 const projectTypes: ProjectType[] = [
+    {
+        id: "vro-ts",
+        label: "vRO TypeScript-based",
+        containsWorkflows: false,
+        description: "A vRO project that contains actions, workflows and configs as TypeScript files."
+    },
     {
         id: "vro-js",
         label: "vRO JavaScript-based",
@@ -75,19 +81,6 @@ export class NewProject extends Command<void> {
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {
-        const noTypeScriptProject = projectTypes.every(e => e.id !== "vro-ts")
-        if (this.config.vrdev.experimental.typescript && noTypeScriptProject) {
-            projectTypes.unshift({
-                id: "vro-ts",
-                label: "vRO TypeScript-based",
-                containsWorkflows: false,
-                description: "A vRO project that contains actions, workflows and configs as TypeScript files."
-            })
-        } else if (!this.config.vrdev.experimental.typescript && !noTypeScriptProject) {
-            // remove the TS project from the list
-            projectTypes.shift()
-        }
-
         this.logger.info("Executing command New Project")
         const multiStep = new MultiStepInput(TITLE, context, this.config)
         await multiStep.run(this.buildStepTree(), this.state)

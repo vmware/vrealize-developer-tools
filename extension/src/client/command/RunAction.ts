@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
@@ -151,14 +151,6 @@ export class RunAction extends Command<void> {
     private validateFileType(document: vscode.TextDocument): boolean {
         if (document.languageId !== "javascript" && document.languageId !== "typescript") {
             vscode.window.showErrorMessage("The currently opened file is not a TypeScript or JavaScript file")
-            return false
-        }
-
-        if (!this.config.vrdev.experimental.typescript && document.languageId === "typescript") {
-            vscode.window.showErrorMessage(
-                "Running a TypeScript action is experimental feature and " +
-                    "must be enabled via the `vrdev.experimental.typescript` setting"
-            )
             return false
         }
 
