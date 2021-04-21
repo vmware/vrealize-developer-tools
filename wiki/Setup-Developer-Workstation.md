@@ -193,7 +193,7 @@ The bundle is produced as a separate artifact during `mvn package`. To produce i
 $ mvn clean deploy -Pbundle-with-installer
 ```
 
-To learn more about the bundle installer, check [vRealize Build Tools - Bundle Installer](./use-bundle-installer.md) for more information.
+To learn more about the bundle installer, check [vRealize Build Tools - Bundle Installer](./Using-the-Bundle-Installer.md) for more information.
 
 ### Security
 
