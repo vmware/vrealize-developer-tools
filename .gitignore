@@ -4,13 +4,14 @@ logs
 *.log*
 *.tsbuildinfo
 *.bkp
+*.tgz
+*.vsix
 
 out/
 dist/
 coverage/
 node_modules/
 
-*.vsix
 .vscode-test/
 .vscode/*
 

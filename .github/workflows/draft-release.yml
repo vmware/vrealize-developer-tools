@@ -40,6 +40,9 @@ jobs:
       - name: Build VSIX package
         run: "node node_modules/gulp/bin/gulp.js package"
 
+      - name: Build NPM tarballs
+        run: "npm pack --workspaces"
+
       - name: Publish code coverage report
         uses: codecov/codecov-action@v1
         with:
@@ -56,19 +59,25 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.RELEASE_GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.RELEASE_GPG_PASSPHRASE }}
 
-      - name: Checksum and sign
+      - name: Checksum and sign all artifacts
         run: |
           sha256sum --tag vrealize-developer-tools-$PKG_VERSION.vsix > vrealize-developer-tools-$PKG_VERSION.vsix.sha256
           gpg --default-key $KEYID --armor --detach-sig vrealize-developer-tools-$PKG_VERSION.vsix.sha256
+
+          find *.tgz -type f -exec sha256sum --tag {} \; | sort > packages.sha256
+          gpg --default-key $KEYID --armor --detach-sig packages.sha256
         env:
           PKG_VERSION: ${{steps.version_step.outputs.version}}
           KEYID: ${{steps.import_gpg.outputs.keyid}}
 
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: vrealize-developer-tools-${{steps.version_step.outputs.version}}
           path: |
+            *.tgz
+            packages.sha256
+            packages.sha256.asc
             vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
             vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256
             vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.asc
@@ -85,36 +94,10 @@ jobs:
           base-ref: ${{ env.baseRef }}
           head-ref: ${{ github.ref }}
 
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body: ${{steps.generate_changelog.outputs.result}}
-          draft: true
-          prerelease: false
-
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
-          asset_name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
-          asset_content_type: application/octet-stream
-
-      - name: Upload release checksum
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256
-          asset_name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256
-          asset_content_type: application/octet-stream
-
-      - name: Upload release signature
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.asc
-          asset_name: vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.asc
-          asset_content_type: application/octet-stream
+      - name: Create a release
+        run: |
+          tagname="${GITHUB_REF#refs/tags/}"
+          gh release create "$tagname" --draft --notes $RELEASE_NOTES *.tgz *.vsix *.sha256 *.asc
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          RELEASE_NOTES: ${{steps.generate_changelog.outputs.result}}

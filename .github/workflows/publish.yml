@@ -4,7 +4,7 @@ on:
     types: [released]
 jobs:
   publish:
-    name: Publish to Visual Studio Marketplace
+    name: Publish to Visual Studio Marketplace and GitHub Packages
     runs-on: ubuntu-latest
     steps:
       - name: Use Node.js 12.x
@@ -15,20 +15,39 @@ jobs:
       - name: Install vsce
         run: npm install -g vsce
 
-      - name: Download release asset
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v2
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.RELEASE_GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.RELEASE_GPG_PASSPHRASE }}
+
+      - name: Download release assets
         id: release_asset
         env:
           TAG_NAME: ${{ github.event.release.tag_name }}
-        run: |
-          VERSION=$(echo -n $TAG_NAME | sed 's/^v//')
-          FILE_NAME="vrealize-developer-tools-${VERSION}.vsix"
-          DOWNLOAD_URL=$(jq --raw-output ".release.assets[] | select(.name == \"$FILE_NAME\") | .browser_download_url" "$GITHUB_EVENT_PATH")
+        run: gh release download $TAG_NAME
 
-          wget $DOWNLOAD_URL
-          echo "::set-output name=file_name::$FILE_NAME"
-
-      - name: Publish to VS Marketplace
+      - name: Verify all release assets
         env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          KEYID: ${{steps.import_gpg.outputs.keyid}}
+        run: |
+          gpg --keyid-format long --verify vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256.asc vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256
+          gpg --keyid-format long --verify packages.sha256.asc packages.sha256
+
+          sha256sum -c vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256
+          sha256sum -c packages.sha256
+
+      - name: Publish extension to VS Marketplace
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
           MARKETPLACE_SECRET: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          FILE_NAME: ${{ steps.release_asset.outputs.file_name }}
-        run: "vsce publish -p $MARKETPLACE_SECRET --packagePath $FILE_NAME"
+        run: "vsce publish -p $MARKETPLACE_SECRET --packagePath vrealize-developer-tools-${TAG_NAME#v}.vsix"
+
+      - name: Publish npm packages to GitHub Packages Registry
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: | # uses the package.json's publishConfig/registry URL
+          find *.tgz -type f -exec npm publish {} \;
