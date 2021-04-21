@@ -28,9 +28,6 @@ tools/**
 .eslintrc*
 .prettierrc*
 
-CODE_OF_CONDUCT.md
-CONTRIBUTING.md
-
 *.vsix
 gulpfile.js
 package-lock.json

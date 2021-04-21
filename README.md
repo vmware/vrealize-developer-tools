@@ -48,7 +48,7 @@ If you have installed any versions prior 2.0.0, do the following to upgrade.
 
 ## Contributing
 
-If you're interested in contributing, see our [contributing guide](CONTRIBUTING.md).
+If you're interested in contributing, see our [contributing guide](./.github/CONTRIBUTING.md).
 
 ## Open Source Licenses
 
