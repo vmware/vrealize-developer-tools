@@ -1,11 +1,11 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import * as path from "path"
 
-import { AutoWire, Logger } from "vrealize-common"
+import { AutoWire, Logger } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 import { parse as parseYaml, Document as YamlDocument } from "yaml"
 

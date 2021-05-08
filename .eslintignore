@@ -3,7 +3,8 @@ build/
 coverage/
 node_modules/
 
-language-server/src/proto/**
+packages/node/vro-language-server/src/proto/**
 
 gulpfile.js
 jest.config.js
+webpack.config.js

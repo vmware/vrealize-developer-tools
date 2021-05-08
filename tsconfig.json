@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "paths": {
-      "vro-language-server": ["language-server/src/public/"],
-      "vrealize-common": ["common/src/"]
-    },
     "target": "es2017",
     "lib": ["es2017"],
     "module": "commonjs",

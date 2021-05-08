@@ -1,14 +1,14 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
 import * as path from "path"
 
-import { AutoWire, Logger, MavenProfilesMap } from "vrealize-common"
-import { remote } from "vro-language-server"
+import { AutoWire, Logger, MavenProfilesMap } from "@vmware/vrdt-common"
+import { remote } from "@vmware/vro-language-server"
 import * as vscode from "vscode"
-import * as client from "vscode-languageclient/node"
+import * as client from "vscode-languageclient"
 
 import { OutputChannels, ProjectArchetypes } from "../constants"
 import { Registrable } from "../Registrable"
@@ -74,8 +74,14 @@ export class LanguageServices implements Registrable, vscode.Disposable {
 
     private newLanguageClient(): client.LanguageClient {
         const config = vscode.workspace.getConfiguration("vrdev")
-        const module = this.extensionContext.asAbsolutePath(path.join("language-server"))
-        const executable = path.join(module, "out", "server", "langserver.js")
+        const module: string = this.extensionContext.asAbsolutePath(
+            path.join("packages", "node", "vro-language-server")
+        )
+        const executable =
+            process.env.NODE_ENV === "production"
+                ? path.join(module, "dist", "langserver.js")
+                : path.join(module, "out", "server", "langserver.js")
+
         this.logger.info(`Starting vRO language server on port 6014`)
 
         const serverOptions = {

@@ -1,9 +1,9 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { VroRestClient } from "vrealize-common"
+import { VroRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { PropertyNode } from "./leaf/PropertyNode"

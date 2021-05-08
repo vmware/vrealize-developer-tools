@@ -1,0 +1,66 @@
+/*
+ * Copyright 2018-2021 VMware, Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
+syntax = "proto3";
+
+package vmw.pscoe.hints;
+
+option java_package = "com.vmware.pscoe.o11n.hints.proto";
+option java_outer_classname = "ScriptingConstructsProto";
+option java_multiple_files = false;
+
+import "vmw/pscoe/hints/scripting-api.proto";
+import "vmw/pscoe/hints/members.proto";
+
+message Class {
+    string name = 1;
+    string description = 2;
+    ScriptingApi.Stage stage = 3;
+    repeated Property properties = 4;
+    repeated Constructor constructors = 5;
+    repeated Method methods = 6;
+    repeated Event events = 7;
+    repeated string code_snippets = 8;
+}
+
+message Type {
+    string name = 1;
+    string description = 2;
+    string script_name = 3;
+    repeated string property_names = 4;
+}
+
+message FunctionSet {
+    string name = 1;
+    string description = 2;
+    ScriptingApi.Stage stage = 3;
+    repeated string code_snippets = 4;
+    repeated Method methods = 5;
+
+}
+
+message Enumeration {
+    string name = 1;
+    string description = 2;
+    ScriptingApi.Stage stage = 3;
+    repeated PossibleValue possible_values = 4;
+
+    message PossibleValue {
+        string name = 1;
+        string description = 2;
+    }
+}
+
+message Primitive {
+    string name = 1;
+    string description = 2;
+}
+
+message Event {
+    string name = 1;
+    string description = 2;
+    ScriptingApi.Stage stage = 3;
+    repeated Example examples = 4;
+}
