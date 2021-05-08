@@ -52,23 +52,28 @@ jobs:
           flags: unittest
           name: codecov
 
-      - name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v2
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.RELEASE_GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.RELEASE_GPG_PASSPHRASE }}
-
-      - name: Checksum and sign all artifacts
+      - name: Checksum all artifacts
         run: |
           sha256sum --tag vrealize-developer-tools-$PKG_VERSION.vsix > vrealize-developer-tools-$PKG_VERSION.vsix.sha256
-          gpg --default-key $KEYID --armor --detach-sig vrealize-developer-tools-$PKG_VERSION.vsix.sha256
-
           find *.tgz -type f -exec sha256sum --tag {} \; | sort > packages.sha256
-          gpg --default-key $KEYID --armor --detach-sig packages.sha256
         env:
           PKG_VERSION: ${{steps.version_step.outputs.version}}
-          KEYID: ${{steps.import_gpg.outputs.keyid}}
+
+      - name: Sign VSIX checksum
+        uses: thomaso-mirodin/minisign-action@v1.1
+        with:
+          args: -Sm vrealize-developer-tools-$PKG_VERSION.vsix.sha256
+          minisign_key: ${{ secrets.RELEASE_MINISIGN_KEY }}
+          password: ${{ secrets.RELEASE_MINISIGN_PASS }}
+        env:
+          PKG_VERSION: ${{steps.version_step.outputs.version}}
+
+      - name: Sign packages checksum
+        uses: thomaso-mirodin/minisign-action@v1.1
+        with:
+          args: -Sm packages.sha256
+          minisign_key: ${{ secrets.RELEASE_MINISIGN_KEY }}
+          password: ${{ secrets.RELEASE_MINISIGN_PASS }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -77,10 +82,10 @@ jobs:
           path: |
             *.tgz
             packages.sha256
-            packages.sha256.asc
+            packages.sha256.minisig
             vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix
             vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256
-            vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.asc
+            vrealize-developer-tools-${{steps.version_step.outputs.version}}.vsix.sha256.minisig
 
       - name: Get previous tag
         run: |
@@ -97,7 +102,7 @@ jobs:
       - name: Create a release
         run: |
           tagname="${GITHUB_REF#refs/tags/}"
-          gh release create "$tagname" --draft --notes $RELEASE_NOTES *.tgz *.vsix *.sha256 *.asc
+          gh release create "$tagname" --draft --notes $RELEASE_NOTES *.tgz *.vsix *.sha256 *.minisig
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           RELEASE_NOTES: ${{steps.generate_changelog.outputs.result}}

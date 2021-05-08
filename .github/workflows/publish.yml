@@ -15,27 +15,30 @@ jobs:
       - name: Install vsce
         run: npm install -g vsce
 
-      - name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v2
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.RELEASE_GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.RELEASE_GPG_PASSPHRASE }}
-
       - name: Download release assets
         id: release_asset
         env:
           TAG_NAME: ${{ github.event.release.tag_name }}
         run: gh release download $TAG_NAME
 
-      - name: Verify all release assets
+      - name: Verify VSIX signature
+        uses: thomaso-mirodin/minisign-action@v1.1
+        with:
+          args: -Vm vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
+          minisign_key: ${{ secrets.RELEASE_MINISIGN_KEY }}
+          password: ${{ secrets.RELEASE_MINISIGN_PASS }}
+
+      - name: Verify packages signature
+        uses: thomaso-mirodin/minisign-action@v1.1
+        with:
+          args: -Vm packages.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
+          minisign_key: ${{ secrets.RELEASE_MINISIGN_KEY }}
+          password: ${{ secrets.RELEASE_MINISIGN_PASS }}
+
+      - name: Verify checksums of all release assets
         env:
           TAG_NAME: ${{ github.event.release.tag_name }}
-          KEYID: ${{steps.import_gpg.outputs.keyid}}
         run: |
-          gpg --keyid-format long --verify vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256.asc vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256
-          gpg --keyid-format long --verify packages.sha256.asc packages.sha256
-
           sha256sum -c vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256
           sha256sum -c packages.sha256
 

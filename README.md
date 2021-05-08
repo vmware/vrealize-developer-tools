@@ -24,16 +24,13 @@ vRDT can be installed either through the [VS Marketplace](https://marketplace.vi
 
 To verify the checksum of a .vsix file, do the following:
 
-1. Download all 3 files from the [Releases](https://github.com/vmware/vrealize-developer-tools/releases/latest) page (`.vsix`, `.vsix.sha256` and `.vsix.sha256.asc`)
-2. Import the vRDT release GPG key
+1. Download all 3 files from the [Releases](https://github.com/vmware/vrealize-developer-tools/releases/latest) page (`.vsix`, `.vsix.sha256` and `.vsix.sha256.minisig`)
+2. Verify the signature of the checksum file using [minisign](https://jedisct1.github.io/minisign)
     ```
-    gpg --keyid-format long --keyserver hkps://keys.openpgp.org --recv-keys 0x7882C7818C15E4F3
+    minisign -Vm vrealize-developer-tools-X.X.X.vsix.sha256 \
+        -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
     ```
-3. Verify the signature of the checksum file
-    ```
-    gpg --keyid-format long --verify vrealize-developer-tools-X.X.X.vsix.sha256.asc vrealize-developer-tools-X.X.X.vsix.sha256
-    ```
-4. Verify the checksum of the vsix file
+3. Verify the checksum of the vsix file
     ```
     sha256sum -c vrealize-developer-tools-X.X.X.vsix.sha256
     ```
