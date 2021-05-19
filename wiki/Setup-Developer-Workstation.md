@@ -165,6 +165,50 @@ to the maven invocation.
 
 `Note:` {vro_username} is usually taking the form of `username`@`domain`. For vRO8 embedded in vRA8 with BASIC for {vro_auth} it will be required that only `username` part is specified for successful authentication.
 
+#### Multi-tenancy profile
+
+The following is an example profile settings for multi-tenancy environment with internal/embedded vRO.
+````xml
+		<profile>
+			<id>multi-tenancy</id>
+			<properties>
+                <!--vRO Connection-->
+                <vro.host>vra-l-01a.corp.local</vro.host>
+				<vro.authHost>vra-l-01a.corp.local</vro.authHost>
+				<vro.port>443</vro.port>
+				<vro.auth>BASIC</vro.auth>
+				<vro.username>youradministrator</vro.username>
+				<vro.password>YoUrSecr3tP4$sw0rD</vro.password>
+
+                <!--vRA Connection-->
+                <vrang.host>vra-l-01a.corp.local</vrang.host>
+				<vrang.auth.host>vra-l-01a.corp.local</vrang.auth.host>
+				<vrang.port>443</vrang.port>
+				<vrang.username>youradministrator</vrang.username>
+				<vrang.password>YoUrSecr3tP4$sw0rD</vrang.password>
+				<vrang.authSource>local</vrang.authSource>
+
+                <vrang.project.name>Multi-tenancy</vrang.project.name>
+				<!-- default tenant: https://vra-l-01a.corp.local -->
+				<vrang.project.id>d4d4caef-a8e2-467b-bc4b-6a336d5cf3e2</vrang.project.id>
+				<vrang.org.id>1219113e-d320-4975-8e04-453f58905692</vrang.org.id>
+				<!-- tenant 1: https://tenant-1.vra-l-01a.corp.local -->
+				<vrang.project.id>9e1df919-505a-4c5d-8a79-efedd8767c9a</vrang.project.id>
+				<vrang.org.id>0c3c837b-b0df-4c79-9902-ffd9430628b5</vrang.org.id>
+				<!-- tenant 2: https://tenant-2.vra-l-01a.corp.local -->
+				<vrang.project.id>f4b42f53-a646-4217-926c-99df870a916b</vrang.project.id>
+				<vrang.org.id>71c77114-0942-463d-84f8-e5b6838d0eea</vrang.org.id>
+
+                <vrang.bp.release>true</vrang.bp.release>
+
+                <vrealize.ssl.ignore.hostname>true</vrealize.ssl.ignore.hostname>
+				<vrealize.ssl.ignore.certificate>true</vrealize.ssl.ignore.certificate>
+			</properties>
+		</profile>
+````
+
+`Note:` In case additional vRO is required in the environment, those additional vRO should be in a cluster, and the vRO load balancer hostname should be used as reference.
+
 ### Signing
 
 vRO packages are signed. In order to be able to use the toolchain, you have to have a keystore and
