@@ -3,13 +3,15 @@
 logs
 *.log*
 *.tsbuildinfo
+*.bkp
+*.tgz
+*.vsix
 
 out/
 dist/
 coverage/
 node_modules/
 
-*.vsix
 .vscode-test/
 .vscode/*
 
@@ -18,5 +20,5 @@ node_modules/
 !/.vscode/launch.json
 !/.vscode/extensions.json
 
-language-server/src/proto/**
+packages/node/vro-language-server/src/proto
 workflow-schema/*

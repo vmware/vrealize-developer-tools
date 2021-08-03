@@ -78,4 +78,4 @@ jfrog rt u --recursive true --flat false ./ vro-local
 
 # Next step
 
--   Configure developer **[Workstation](./Setup-Workstation.md)**
+-   Configure developer **[Workstation](./Setup-Developer-Workstation.md)**

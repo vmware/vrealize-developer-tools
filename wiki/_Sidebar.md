@@ -2,6 +2,7 @@
 
 -   [[Setup Artifact Repository]]
 -   [[Setup Developer Workstation]]
+-   [[Using the VS Code Extension]]
 -   [[Using the Bundle Installer]]
 -   Project Types
     -   [[vRA 7.x project]]

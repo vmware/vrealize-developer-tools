@@ -6,11 +6,11 @@
 assets/images/**
 build/**
 typings/**
-protocol/**
+packages/**
 wiki/**
 tools/**
 **/src/**
-**/out/__tests__/**
+**/out/**
 **/coverage
 
 **/*.ts
@@ -28,11 +28,11 @@ tools/**
 .eslintrc*
 .prettierrc*
 
-CODE_OF_CONDUCT.md
-CONTRIBUTING.md
-
 *.vsix
 gulpfile.js
 package-lock.json
+extension/dist/package.json
 
-!node_modules/**
+node_modules/**
+
+!packages/node/vro-language-server/dist/langserver.js

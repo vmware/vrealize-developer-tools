@@ -1,9 +1,9 @@
 /*!
- * Copyright 2018-2020 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { VraNgRestClient } from "vrealize-common"
+import { VraNgRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { ConfigurationManager, EnvironmentManager } from "../system"

@@ -4,16 +4,14 @@
     "rootDir": "src",
     "outDir": "out"
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    ".vscode-test"
-  ],
-  "references": [{
-    "path": "../common"
-  }, {
-    "path": "../language-server"
-  }]
+  "include": ["src", "../node_modules/vscode/vscode.d.ts", "../node_modules/vscode/lib/*"],
+  "exclude": ["node_modules", ".vscode-test"],
+  "references": [
+    {
+      "path": "../packages/node/vrdt-common"
+    },
+    {
+      "path": "../packages/node/vro-language-server"
+    }
+  ]
 }

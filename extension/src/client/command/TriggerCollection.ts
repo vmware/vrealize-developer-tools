@@ -1,10 +1,10 @@
 /*!
- * Copyright 2018-2019 VMware, Inc.
+ * Copyright 2018-2021 VMware, Inc.
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire, Logger, sleep } from "vrealize-common"
-import { remote } from "vro-language-server"
+import { AutoWire, Logger, sleep } from "@vmware/vrdt-common"
+import { remote } from "@vmware/vro-language-server"
 import * as vscode from "vscode"
 
 import { Commands } from "../constants"
