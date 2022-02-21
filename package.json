@@ -15,7 +15,7 @@
     "url": "https://github.com/vmware/vrealize-developer-tools.git"
   },
   "engines": {
-    "node": ">=12.0.0",
+    "node": ">=14.0.0",
     "npm": ">=7.0.0",
     "vscode": "^1.54.0"
   },
