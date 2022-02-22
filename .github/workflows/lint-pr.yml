@@ -17,7 +17,7 @@ jobs:
           node-version: 16.x
 
       - name: Use NPM 8
-        run: npm install -g npm@8
+        run: npm install -g npm@8.3.1 # lock to 8.3.1 until actions/setup-node#411 and npm/cli#4341 are fixed
 
       - name: reviewdog
         uses: reviewdog/action-eslint@v1
