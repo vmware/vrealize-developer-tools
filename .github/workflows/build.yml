@@ -36,8 +36,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Use NPM 7
-        run: npm install -g npm@7
+      - name: Use NPM 8
+        run: npm install -g npm@8
 
       - name: Set version number of package.json and build artifact
         id: version_step
