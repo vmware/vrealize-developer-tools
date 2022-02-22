@@ -17,13 +17,13 @@ jobs:
       - name: echo github.ref
         run: echo ${{ github.ref }}
 
-      - name: Use Node.js 14.x
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 16.x
 
-      - name: Use NPM 7
-        run: npm install -g npm@7
+      - name: Use NPM 8
+        run: npm install -g npm@8.3.1 # lock to 8.3.1 until actions/setup-node#411 and npm/cli#4341 are fixed
 
       - name: Install sha256sum
         run: brew install coreutils

@@ -5,8 +5,8 @@
 
 const major = parseInt(/^(\d+)\./.exec(process.versions.node)[1]);
 
-if (major < 12) {
-    console.error('\033[1;31m*** Please use node >=12.0.0.\033[0;0m');
+if (major < 14) {
+    console.error('\033[1;31m*** Please use node >=14.0.0.\033[0;0m');
     process.exit(1);
 }
 
@@ -18,8 +18,8 @@ const npmVersion = cp.execSync('npm -v', {
 const parsedNpmVersion = /^(\d+)\.(\d+)\./.exec(npmVersion);
 const majorNpmVersion = parseInt(parsedNpmVersion[1]);
 
-if (majorNpmVersion < 7) {
-    console.error('\033[1;31m*** Please use npm >=7.0.0.\033[0;0m');
+if (majorNpmVersion < 8) {
+    console.error('\033[1;31m*** Please use npm >=8.0.0.\033[0;0m');
     process.exit(1);
 }
 

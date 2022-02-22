@@ -34,8 +34,8 @@ git clone https://github.com/vmware/vrealize-developer-tools.git
 ### Prerequisites
 
 -   [Git](https://git-scm.com/)
--   [Node.js](https://nodejs.org/), `>= 12.0.0`
--   [npm](https://npmjs.com/), `>= 7.0.0`
+-   [Node.js](https://nodejs.org/), `>= 14.0.0`
+-   [npm](https://npmjs.com/), `>= 8.0.0`
 -   [gulp CLI](https://gulpjs.com/), `>= 2.0.1`
 -   [Visual Studio Code](https://code.visualstudio.com/), `>= 1.54.0`
 -   For building any of the maven cli tools
