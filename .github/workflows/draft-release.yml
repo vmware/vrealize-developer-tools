@@ -6,7 +6,7 @@ on:
 jobs:
   build_release:
     name: Build and Release
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
