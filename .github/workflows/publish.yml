@@ -25,7 +25,7 @@ jobs:
         env:
           TAG_NAME: ${{ github.event.release.tag_name }}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        run: gh release download $TAG_NAME
+        run: gh release download $TAG_NAME -R vmware/vrealize-developer-tools
 
       - name: Verify checksum signatures
         run: |
