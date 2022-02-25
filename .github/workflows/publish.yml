@@ -5,7 +5,7 @@ on:
 jobs:
   publish:
     name: Publish to Visual Studio Marketplace and GitHub Packages
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Use Node.js 16.x
         uses: actions/setup-node@v2
@@ -15,25 +15,23 @@ jobs:
       - name: Install vsce
         run: npm install -g vsce
 
+      - name: Install sha256sum and minisign
+        run: |
+          brew update
+          brew install coreutils minisign
+
       - name: Download release assets
         id: release_asset
         env:
           TAG_NAME: ${{ github.event.release.tag_name }}
         run: gh release download $TAG_NAME
 
-      - name: Verify VSIX signature
-        uses: thomaso-mirodin/minisign-action@v1.1
-        with:
-          args: -Vm vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
-          minisign_key: ${{ secrets.RELEASE_MINISIGN_KEY }}
-          password: ${{ secrets.RELEASE_MINISIGN_PASS }}
-
-      - name: Verify packages signature
-        uses: thomaso-mirodin/minisign-action@v1.1
-        with:
-          args: -Vm packages.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
-          minisign_key: ${{ secrets.RELEASE_MINISIGN_KEY }}
-          password: ${{ secrets.RELEASE_MINISIGN_PASS }}
+      - name: Verify checksum signatures
+        run: |
+          minisign -Vm vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
+          minisign -Vm packages.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
 
       - name: Verify checksums of all release assets
         env:
