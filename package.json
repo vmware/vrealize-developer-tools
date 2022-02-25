@@ -580,8 +580,6 @@
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
-    "@vmware/vrdt-common": "2.3.0",
-    "@vmware/vro-language-server": "2.3.0",
     "adm-zip": "^0.5.4",
     "chokidar": "~3.5.1",
     "fast-xml-parser": "3.19.0",
