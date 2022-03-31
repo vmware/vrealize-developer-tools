@@ -566,7 +566,7 @@
     "jsdoc": "^3.6.10",
     "merge-options": "^3.0.4",
     "merge-stream": "^2.0.0",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "node-loader": "^1.0.2",
     "prettier": "^2.2.1",
     "tmp": "^0.2.0",
