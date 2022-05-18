@@ -587,7 +587,7 @@
     "jsonc-parser": "^3.0.0",
     "lodash": "^4.17.21",
     "micromatch": "^4.0.2",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "semver": "^7.3.4",
     "tmp": "^0.2.1",
     "vscode-languageclient": "^6.1.3",
