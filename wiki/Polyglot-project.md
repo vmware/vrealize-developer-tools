@@ -20,7 +20,7 @@ mvn archetype:generate \
     -DgroupId=local.corp.it.cloud \
     -DartifactId=polyglot \
     -Druntime=nodejs \
-    -Dtype=polyglot
+    -Dtype=<polyglot_type>
 
 # Python
 mvn archetype:generate \
@@ -31,7 +31,7 @@ mvn archetype:generate \
     -DgroupId=local.corp.it.cloud \
     -DartifactId=polyglot \
     -Druntime=python \
-    -Dtype=polyglot
+    -Dtype=<polyglot_type>
 
 # PowerShell
 mvn archetype:generate \
@@ -42,10 +42,12 @@ mvn archetype:generate \
     -DgroupId=local.corp.it.cloud \
     -DartifactId=polyglot \
     -Druntime=powershell \
-    -Dtype=polyglot
+    -Dtype=<polyglot_type>
 ```
 
 **Note**: _The specified <iac_for_vrealize_version> should be minimum 2.7.1_
+
+_<polyglot_type>_ must be either **abx**, or **vro**, depending on your use case. Otherwise, a project will be created with missing parameters (e.g. groupId, artifactId, plugins, etc), which will have to be entered manually in order to successfully build the project.
 
 The generated project from the archetype is specific to the runtime, i.e. the src directory will contain .py files
 for Python projects, .ts files for NodeJS projects and .ps1 files for PowerShell projects.
