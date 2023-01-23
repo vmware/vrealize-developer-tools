@@ -19,35 +19,56 @@ This page describes how to consigure a vRealize engineer development machine to 
 
 There are several things that need to be in place before you can use the toolchain to work with vRO content.
 
-### Java Keystore
+### Keystore
 
-Java keystore used for signing packages build time.
+Java keystore is used for signing packages build time.
 
+#### Create private key and certificate
+
+The process creates an archive called **archetype.keystore-1.0.0** (artifact name + version) containing the generated files (**archetype.keystore**, **cert.pem**, **private_key.pem** ). The archive needs to be deployed on the artifact manager.
+
+```sh
+mkdir -p ~/cert/archetype.keystore-1.0.0
+cd ~/cert/archetype.keystore-1.0.0
+
+## Create the certificates and fill in the required country,state,location,organization details ...
+openssl req -newkey rsa:2048 -new -x509 -days 3650 -keyout private_key.pem -out cert.pem
+keytool -genkey -v -keystore archetype.keystore -alias _dunesrsa_alias_ -keyalg RSA -keysize 2048 -validity 10000
+
+cd ~/cert
+zip archetype.keystore-1.0.0.zip -r archetype.keystore-1.0.0
 ```
-# Create new Keystore
-keytool -keystore package.jks -genkey -alias _dunesrsa_alias_ -storepass 'VMware1!' -keyalg RSA
-
-# Delete default alias
-keytool -delete -alias _dunesrsa_alias_ -keystore package.jks -storepass 'VMware1!'
-
-# Generate new Key
-keytool -genkey -keyalg RSA -keysize 2048 -alias _dunesrsa_alias_ -keystore package.jks -storepass 'VMware1!' -validity 3650 -dname 'CN=Project,OU=Department,O=Company,L=City,ST=State,C=XX,emailAddress=administrator@vsphere.local'
-
-##  Optional  ##
-
-# Generate Certificate Signing Request
-keytool -certreq -alias _dunesrsa_alias_ -keypass 'VMware1!' -keystore package.jre -storepass 'VMware1!' -file packageCertRequest.csr
-
-# Import the signed certificate
-keytool -importcert -alias _dunesrsa_alias_ -keypass 'VMware1!' -file packageCertRequest.crt -keystore package.jks -storepass 'VMware1!'
-
-# Export/Backup Certificate
-keytool -exportcert -alias _dunesrsa_alias_ -keystore package.jks -storepass 'VMware1!' -file packageCertExport
-```
-
-`Note:` Mind the single quotes in the examples above on Windows - those might be part of the passowrd depending on which interpreter (shell) you are using. Correct the string literal and escaping appropriately for your case.
+`Note:` Its very important to note that "Email" field should be EMPTY, otherwise the vRO import will break with 400 OK error
 
 `Note:` JKS is a propriatary format specific to the particular JVM provider. When running above commands, ensure the keytool used is the one under the JVM that Maven would use (check with `mvn -v`).
+
+#### Deploy the keystore artifact
+
+The artifact should be deployed to any path as long as the **settings.xml** file points to it.
+
+Example:
+- artifact group ID: com.clientname.build
+- artifact ID: archetype.keystore
+- artifact version: 1.0.0
+- **keystorePassword** and **vroKeyPass** passwords need to be replaced with the values used during the key generation process above
+- settings section:
+```xml
+<properties>
+    <keystoreGroupId>com.clientname.build</keystoreGroupId>
+    <keystoreArtifactId>archetype.keystore</keystoreArtifactId>
+    <keystoreLocation>target/${keystoreArtifactId}-${keystoreVersion}/archetype.keystore</keystoreLocation>
+    <keystoreVersion>1.0.0</keystoreVersion>
+    <keystorePassword>{{keystorePassword}}</keystorePassword>
+    <vroPrivateKeyPem>target/${keystoreArtifactId}-${keystoreVersion}/private_key.pem</vroPrivateKeyPem>
+    <vroCertificatePem>target/${keystoreArtifactId}-${keystoreVersion}/cert.pem</vroCertificatePem>
+    <vroKeyPass>{{vroKeyPass}}</vroKeyPass>
+</properties>
+```
+
+The artifact can be pushed from the root directory via the following command:
+```
+jfrog rt u --recursive true --flat false ./ {name-of-repository}
+```
 
 ### Global Configuration (_settings.xml_)
 
