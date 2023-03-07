@@ -60,6 +60,10 @@ export abstract class BaseEnvironment {
         return this.createAndResolveDir(this.homeDir, ".o11n", "hints")
     }
 
+    getGlobalProtoDir(): string {
+        return this.createAndResolveDir(this.homeDir, ".o11n", "proto")
+    }
+
     getGlobalTokenFile(): string {
         const tokensFolder = this.createAndResolveDir(this.homeDir, ".o11n", "tokens")
         return path.join(tokensFolder, this.getHostname())
@@ -67,6 +71,10 @@ export abstract class BaseEnvironment {
 
     private getLocalHintsDir(workspaceFolder: WorkspaceFolder): string {
         return this.createAndResolveDir(workspaceFolder.uri.fsPath, ".o11n", "hints")
+    }
+
+    private getLocalProtoDir(workspaceFolder: WorkspaceFolder): string {
+        return this.createAndResolveDir(workspaceFolder.uri.fsPath, ".o11n", "proto")
     }
 
     getGlobalO11nDir(): string {
@@ -91,6 +99,14 @@ export abstract class BaseEnvironment {
         }
 
         return path.join(this.getGlobalHintsDir(), this.getHostname())
+    }
+
+    resolveProtoDir(workspaceFolder?: WorkspaceFolder): string {
+        if (workspaceFolder) {
+            return this.getLocalProtoDir(workspaceFolder)
+        }
+
+        return path.join(this.getGlobalProtoDir(), this.getHostname())
     }
 
     resolvePluginHintFiles(): string[] {

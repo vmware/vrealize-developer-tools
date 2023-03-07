@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { AutoWire } from "@vmware/vrdt-common"
 import { Position, TextDocument } from "vscode-languageserver-textdocument"
 
+@AutoWire
 export class TextDocumentWrapper {
     constructor(public readonly textDocument: TextDocument) {}
 

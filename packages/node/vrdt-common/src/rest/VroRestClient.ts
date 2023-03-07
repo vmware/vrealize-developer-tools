@@ -23,6 +23,7 @@ import {
     WorkflowState
 } from "./vro-model"
 import { Logger, MavenCliProxy, promise, sleep } from ".."
+import { HintAction, HintModule } from "../types/hint"
 
 export class VroRestClient {
     private readonly logger = Logger.get("VroRestClient")
@@ -71,7 +72,8 @@ export class VroRestClient {
         const url = route.indexOf("://") > 0 ? route : `https://${this.hostname}:${this.port}/vco/api/${route}`
         return request({
             headers: {
-                Accept: "application/json"
+                Accept: "application/json",
+                Connection: "keep-alive"
             },
             json: true,
             simple: true, // reject non-2xx
@@ -412,6 +414,38 @@ export class VroRestClient {
         return children.sort((x, y) => x.name.localeCompare(y.name))
     }
 
+    async getChildrenOfCategoryWithDetails(categoryId: string): Promise<HintAction[]> {
+        let responseJson: HintModule = {
+            id: "",
+            name: "",
+            actions: []
+        }
+
+        try {
+            responseJson = await this.send("GET", `server-configuration/api/category/${categoryId}`)
+        } catch (error) {
+            this.logger.error(`Error occurred: ${error}`)
+        }
+
+        if (!responseJson) {
+            return []
+        }
+
+        const children: HintAction[] = responseJson.actions.map(child => {
+            return {
+                name: child.name || undefined,
+                id: child.id || undefined,
+                returnType: child.returnType || undefined,
+                description: child.description || undefined,
+                version: child.version || undefined,
+                categoryId: child.categoryId || undefined,
+                parameters: child.parameters || []
+            } as HintAction
+        })
+
+        return children.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
     async getResource(id: string): Promise<http.IncomingMessage> {
         const options = {
             simple: true, // reject non-2xx
@@ -585,5 +619,13 @@ export class VroRestClient {
             },
             json: false
         })
+    }
+
+    async getVroServerData(): Promise<string> {
+        return this.send("GET", "server-configuration/api")
+    }
+
+    async getPluginDetails(link: string) {
+        return this.send("GET", `server-configuration/api/plugins/${link}`)
     }
 }

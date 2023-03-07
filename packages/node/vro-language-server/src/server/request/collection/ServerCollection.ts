@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as AdmZip from "adm-zip"
-import * as fs from "fs-extra"
 import { CancellationToken } from "vscode-languageserver"
-import { AutoWire, Logger, promise, VroRestClient } from "@vmware/vrdt-common"
+import { AutoWire, HintAction, HintModule, HintPlugin, Logger, VroRestClient } from "@vmware/vrdt-common"
 
 import { remote } from "../../../public"
 import { ConnectionLocator, Environment, HintLookup, Settings } from "../../core"
+import { WorkspaceCollection } from "./WorkspaceCollection"
+import { vmw } from "../../../proto"
 
+@AutoWire
 export class CollectionStatus {
     message: string = "idle"
     error: string | undefined = undefined
@@ -19,6 +20,7 @@ export class CollectionStatus {
     data: CollectionData = new CollectionData()
 }
 
+@AutoWire
 export class CollectionData {
     hintsPluginBuild: number = -1
     vpkResourceId: string | undefined = undefined
@@ -34,8 +36,10 @@ export class ServerCollection {
         private environment: Environment,
         private hints: HintLookup,
         settings: Settings,
-        connectionLocator: ConnectionLocator
+        connectionLocator: ConnectionLocator,
+        private workspaceCollection: WorkspaceCollection
     ) {
+        this.logger.info(`Server collection constructor`)
         connectionLocator.connection.onRequest(
             remote.server.giveVroCollectionStatus,
             this.giveCollectionStatus.bind(this)
@@ -51,139 +55,120 @@ export class ServerCollection {
         return this.currentStatus
     }
 
-    triggerCollection(offline: boolean, event: CancellationToken) {
-        if (offline) {
-            // Load any locally available hint files
-            this.hints.initialize()
-            return
-        }
+    async triggerCollection(offline: boolean, event: CancellationToken) {
+        this.logger.info("Triggering vRO server data collection...")
+        this.environment.workspaceFolders.forEach(workspaceFolder => {
+            this.workspaceCollection.triggerCollectionAndRefresh(workspaceFolder)
+        })
 
-        this.currentStatus = new CollectionStatus()
-        let promise = Promise.resolve()
-        const operations = [
-            this.verifyVroConnection,
-            // this.downloadLatestPlugin,
-            // this.installHintingPlugin,
-            // this.waitVroServices,
-            this.startCollecting,
-            this.downloadHintsPack,
-            this.done
-        ]
+        this.restClient
+            .getVersion()
+            .then(res => {
+                this.logger.info(`Connected to vRO. Version: ${res.version}`)
 
-        for (const op of operations) {
-            promise = promise
-                .then(() => {
-                    if (event.isCancellationRequested) {
-                        this.currentStatus.message = "Operation cancelled"
-                        this.currentStatus.finished = true
-                    } else if (!this.currentStatus.finished) {
-                        return op.apply(this)
-                    }
+                this.currentStatus = new CollectionStatus()
+                let promise = Promise.resolve()
+                const operations = [this.collectModulesAndActions, this.collectObjects, this.done]
 
-                    return undefined
-                })
-                .catch(errorMessage => {
-                    this.setError(errorMessage)
-                })
-        }
-    }
+                for (const op of operations) {
+                    promise = promise
+                        .then(() => {
+                            if (event.isCancellationRequested) {
+                                this.currentStatus.message = "Operation cancelled"
+                                this.currentStatus.finished = true
+                            } else if (!this.currentStatus.finished) {
+                                return op.apply(this)
+                            }
 
-    async verifyVroConnection() {
-        this.currentStatus.message = "Authenticating..."
-        this.logger.info(this.currentStatus.message)
-
-        try {
-            const responseBody = await this.restClient.getPlugins()
-            for (const plugin of responseBody.plugin) {
-                if (plugin.moduleName === "HintPlugin" && plugin.enabled) {
-                    this.logger.debug("Hint plugin is installed in target vRO: ", plugin)
-                    this.currentStatus.data.hintsPluginBuild = plugin.buildNumber
-                    return
+                            return undefined
+                        })
+                        .catch(errorMessage => {
+                            this.setError(errorMessage)
+                        })
                 }
+            })
+            .catch(error => {
+                this.logger.info("Could not connect to vRO. Collecting offline hints collection...")
+                this.logger.error(error)
+                this.currentStatus.finished = true
+                this.hints.initialize()
+            })
+    }
+
+    async getModulesAndActions() {
+        this.logger.info("Collecting Modules and Actions...")
+        const modules: HintModule[] = (await this.restClient.getRootCategories("ScriptModuleCategory")).map(module => {
+            return {
+                id: module.id,
+                name: module.name,
+                actions: []
             }
-
-            this.setError("The vRO Hint plug-in is not installed")
-            this.currentStatus.data.hintsPluginBuild = 0
-        } catch (error) {
-            this.setError(error.message)
-            this.currentStatus.data.hintsPluginBuild = -1
-        }
+        })
+        await Promise.all(
+            modules.map(
+                async module =>
+                    (module.actions = await this.restClient.getChildrenOfCategoryWithDetails(module.id).then(actions =>
+                        actions.map(action => {
+                            return {
+                                id: action.id,
+                                name: action.name,
+                                version: action.version,
+                                description: action.description,
+                                returnType: action.returnType,
+                                parameters: action.parameters
+                            } as HintAction
+                        })
+                    ))
+            )
+        )
+        this.logger.info("Modules and Actions collected from vRO")
+        return modules
     }
 
-    async downloadLatestPlugin() {
-        this.currentStatus.message = "Downloading latest plugin..."
-        this.logger.info(this.currentStatus.message)
+    collectModulesAndActions() {
+        this.getModulesAndActions().then(modules => {
+            this.hints.collectModulesAndActions(modules)
+        })
     }
 
-    async installHintingPlugin() {
-        this.currentStatus.message = "Installing the plugin..."
-        this.logger.info(this.currentStatus.message)
+    collectObjects() {
+        this.getVroObjects().then(objects => {
+            this.hints.collectVroObjects(objects)
+        })
     }
 
-    async waitVroServices() {
-        this.currentStatus.message = "Waiting vRO services to start..."
-        this.logger.info(this.currentStatus.message)
-    }
+    async getVroObjects() {
+        this.logger.info("Collecting vRO objects...")
 
-    async startCollecting() {
-        this.currentStatus.message = "Collecting..."
-        this.logger.info(this.currentStatus.message)
-
+        let objects = {}
         try {
-            const outParams = await this.restClient.executeWorkflow("548056f3-7dad-49d8-93a4-ba4cff675b72")
-            const vpkResourceIdParam = !!outParams && outParams.length > 0 ? outParams[0] : undefined
-
-            if (
-                !vpkResourceIdParam ||
-                vpkResourceIdParam.name !== "vpkResourceId" ||
-                !vpkResourceIdParam.value ||
-                !vpkResourceIdParam.value.string ||
-                !vpkResourceIdParam.value.string.value
-            ) {
-                throw new Error("Missing vpkResourceId output parameter")
-            }
-
-            this.currentStatus.data.vpkResourceId = vpkResourceIdParam.value.string.value
+            objects = await this.restClient.getVroServerData()
         } catch (error) {
-            this.setError(error.message)
+            this.logger.error(error)
         }
-    }
+        const plugins: HintPlugin[] = objects["plugins"]
+        const allObjects: vmw.pscoe.hints.IClass[] = []
+        const regex = new RegExp(/\/plugins\/([a-zA-Z0-9\_\-\.\/]+)/)
 
-    async downloadHintsPack() {
-        this.currentStatus.message = "Downloading hints package..."
-        this.logger.info(this.currentStatus.message)
-
-        try {
-            const vpkFilePath = this.environment.resolveVpkFile()
-            const hintsDirPath = this.environment.resolveHintsDir()
-
-            if (!hintsDirPath) {
-                // should never happen
-                throw new Error("Undefined global hints dir path")
+        for (const plugin of plugins) {
+            const link = plugin.detailsLink.match(regex)
+            if (!link) {
+                throw new Error(`No plugin details found`)
             }
 
-            if (fs.existsSync(vpkFilePath)) {
-                fs.unlinkSync(vpkFilePath)
+            const parsedLink = link[0].substring(9).toString()
+            const pluginDetails = await this.restClient.getPluginDetails(parsedLink)
+
+            for (const pluginObject of pluginDetails["objects"]) {
+                const object: vmw.pscoe.hints.IClass = {
+                    name: pluginObject["name"]
+                }
+                allObjects.push(object)
             }
-
-            if (fs.existsSync(hintsDirPath)) {
-                fs.removeSync(hintsDirPath)
-            }
-
-            if (!this.currentStatus.data.vpkResourceId) {
-                throw new Error("Missing VPK resource ID")
-            }
-
-            const response = await this.restClient.getResource(this.currentStatus.data.vpkResourceId)
-            const stream = response.pipe(fs.createWriteStream(vpkFilePath), { end: true })
-            await promise.streamPromise(stream)
-
-            this.currentStatus.message = "Unpacking hints..."
-            this.logger.info(this.currentStatus.message)
-            new AdmZip(vpkFilePath).extractAllTo(hintsDirPath, true)
-        } catch (error) {
-            this.setError(error.message)
         }
+
+        this.logger.info(`Objects collected from vRO`)
+        return allObjects
     }
 
     async done() {

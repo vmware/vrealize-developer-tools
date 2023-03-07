@@ -112,6 +112,7 @@ export class CompletionProvider {
 
         const workspaceFolder = this.environment.getWorkspaceFolderOf(URI.parse(event.textDocument.uri).fsPath)
 
+        this.logger.info(`Prefix: ${JSON.stringify(prefix)}`)
         switch (prefix.kind) {
             case CompletionPrefixKind.MODULE_IMPORT:
                 return workspaceFolder ? this.getModuleSuggestions(prefix, workspaceFolder) : []
@@ -292,17 +293,17 @@ export class CompletionProvider {
     private getPrefix(document: TextDocumentWrapper, position: Position): CompletionPrefix | null {
         const lineContent = document.getLineContentUntil(position)
 
-        this.logger.debug(`Trying to provide auto completion for line '${lineContent}'`)
+        this.logger.info(`Trying to provide auto completion for line '${lineContent}'`)
 
         for (const pattern of prefixPatterns) {
             const prefix = pattern.match(lineContent)
             if (prefix) {
-                this.logger.debug(`Matched '${prefix.kind}' pattern`)
+                this.logger.info(`Matched: '${prefix.kind}' pattern`)
                 return prefix
             }
         }
 
-        this.logger.debug("None of the patterns matched.")
+        this.logger.info("None of the patterns matched.")
         return null
     }
 }

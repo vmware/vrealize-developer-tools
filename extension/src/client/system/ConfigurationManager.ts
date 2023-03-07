@@ -101,7 +101,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
 
         if (settingsXmlContent.length < 1) {
             this.logger.warn(`Got no content from ${this.settingsXmlPath}`)
-            this.allProfiles = undefined
+            this.allProfiles = {}
             return
         }
 
@@ -109,9 +109,9 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         const allProfiles = settingsJson?.settings?.profiles?.profile
         const vroProfiles: MavenProfilesMap = {}
 
-        if (!allProfiles) {
+        if (Object.keys(allProfiles).length < 1) {
             this.logger.warn(`No profiles found in ${this.settingsXmlPath}`)
-            this.allProfiles = undefined
+            this.allProfiles = {}
             return
         }
 

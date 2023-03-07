@@ -153,7 +153,7 @@ export class VraNgRestClient {
                 break
             }
             case "password": {
-                if (isOnPrem) {
+                if (await isOnPrem) {
                     uri = `${baseUrl}/csp/gateway/am/api/login?access_token`
                     options.body = {
                         username: grant.username,

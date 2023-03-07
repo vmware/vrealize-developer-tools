@@ -6,7 +6,7 @@
 import { AutoWire, Logger } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
-import { Commands, ProjectArchetypes } from "../constants"
+import { Commands } from "../constants"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 import { Registrable } from "../Registrable"
 
@@ -33,7 +33,7 @@ export class StatusBarController implements Registrable, vscode.Disposable {
     register(context: vscode.ExtensionContext): void {
         context.subscriptions.push(this)
 
-        if (this.env.hasRelevantProject(prj => prj.is(ProjectArchetypes.Actions))) {
+        if (this.env.hasRelevantProject()) {
             context.subscriptions.push(
                 vscode.commands.registerCommand(Commands.EventCollectionStart, this.onCollectionStart.bind(this)),
                 vscode.commands.registerCommand(Commands.EventCollectionSuccess, this.onCollectionSuccess.bind(this)),
@@ -56,11 +56,7 @@ export class StatusBarController implements Registrable, vscode.Disposable {
     private onConfigurationOrProfilesChanged() {
         const currentProfileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
 
-        if (
-            this.verifyConfiguration() &&
-            currentProfileName !== this.profileName &&
-            this.env.hasRelevantProject(prj => prj.is(ProjectArchetypes.Actions))
-        ) {
+        if (this.verifyConfiguration() && currentProfileName !== this.profileName && this.env.hasRelevantProject()) {
             vscode.commands.executeCommand(Commands.TriggerServerCollection)
         }
     }
@@ -71,7 +67,7 @@ export class StatusBarController implements Registrable, vscode.Disposable {
 
         const serverConfIsValid = !!this.profileName
         if (serverConfIsValid) {
-            if (this.env.hasRelevantProject(prj => prj.is(ProjectArchetypes.Actions))) {
+            if (this.env.hasRelevantProject()) {
                 this.collectionButton.show()
 
                 this.collectionButton.text = "$(cloud-download)"
@@ -102,8 +98,8 @@ export class StatusBarController implements Registrable, vscode.Disposable {
 
     private onCollectionStart() {
         this.collectionButton.text = "$(watch) "
-        this.collectionButton.command = undefined
-        this.collectionButton.tooltip = undefined
+        this.collectionButton.command = Commands.TriggerServerCollection
+        this.collectionButton.tooltip = "Trigger vRO hint collection"
         this.collectionButton.color = undefined
     }
 
