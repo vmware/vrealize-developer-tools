@@ -4,6 +4,7 @@
  */
 
 import * as path from "path"
+import * as os from "os"
 
 import { parse } from "comment-parser"
 import * as protobuf from "protobufjs"
@@ -137,12 +138,21 @@ export class WorkspaceCollection {
             const parsedActions = parse(action)
             const parameters: ActionParameters[] = []
             let returnType = ""
+            let moduleName = ""
 
-            const moduleName = actionPath
-                .substring(actionPath.indexOf("src/main/resources/"))
-                .replace("src/main/resources/", "")
-                .replace(/\/$/, "")
-                .replace(/\//g, ".")
+            if (os.platform() == "win32") {
+                moduleName = actionPath
+                    .substring(actionPath.indexOf("src\\main\\resources\\"))
+                    .replace("src\\main\\resources\\", "")
+                    .replace(/\\$/, "")
+                    .replace(/\\/g, ".")
+            } else {
+                moduleName = actionPath
+                    .substring(actionPath.indexOf("src/main/resources/"))
+                    .replace("src/main/resources/", "")
+                    .replace(/\/$/, "")
+                    .replace(/\//g, ".")
+            }
 
             parsedActions[0].tags.forEach(tag => {
                 if (tag.tag === "param") {
@@ -159,6 +169,7 @@ export class WorkspaceCollection {
             })
 
             const actionObj: HintAction = {
+                id: actionName,
                 name: actionName,
                 moduleName: moduleName,
                 returnType: returnType,
@@ -170,7 +181,7 @@ export class WorkspaceCollection {
             const isModuleInArray = modules.some(module => module.name === moduleName)
             if (!isModuleInArray) {
                 const newModule: HintModule = {
-                    id: "",
+                    id: moduleName,
                     name: moduleName,
                     actions: []
                 }

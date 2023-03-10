@@ -7,7 +7,7 @@ import * as fs from "fs"
 
 import * as _ from "lodash"
 import { v4 as uuidv4 } from "uuid"
-import { AutoWire, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
+import { AutoWire, HintModule, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import { Disposable, WorkspaceFoldersChangeEvent } from "vscode-languageserver"
 
 import { vmw } from "../../proto"
@@ -39,9 +39,9 @@ export class HintLookup implements Disposable {
     private readonly logger = Logger.get("HintLookup")
 
     private scriptingApi: HintStore<vmw.pscoe.hints.ScriptingApiPack> = new HintStore()
-    private actions: HintStore<vmw.pscoe.hints.ActionsPack> = new HintStore()
+    private actions: any = new HintStore()
     private configs: HintStore<vmw.pscoe.hints.ConfigurationsPack> = new HintStore()
-    private vroModulesAndActions: vmw.pscoe.hints.IModule[]
+    private vroModulesAndActions: HintModule[]
     private vroObjects: vmw.pscoe.hints.IClass[]
 
     private subscriptions: Disposable[] = []
@@ -64,8 +64,8 @@ export class HintLookup implements Disposable {
         this.subscriptions.forEach(s => s && s.dispose())
     }
 
-    getGlobalActionsPack(): vmw.pscoe.hints.ActionsPack {
-        const actionPack: vmw.pscoe.hints.ActionsPack = {
+    getGlobalActionsPack() {
+        const actionPack = {
             modules: this.vroModulesAndActions,
             uuid: uuidv4(),
             version: 1,
@@ -76,7 +76,7 @@ export class HintLookup implements Disposable {
         return actionPack
     }
 
-    collectModulesAndActions(vroModulesAndActions: vmw.pscoe.hints.IModule[]): void {
+    collectModulesAndActions(vroModulesAndActions: HintModule[]): void {
         this.vroModulesAndActions = vroModulesAndActions
     }
 
@@ -84,7 +84,7 @@ export class HintLookup implements Disposable {
         this.vroObjects = vroObjects
     }
 
-    getActionModules(workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IModule[] {
+    getActionModules(workspaceFolder?: WorkspaceFolder): HintModule[] {
         if (this.vroModulesAndActions) {
             this.actions.global.push(this.getGlobalActionsPack())
         }

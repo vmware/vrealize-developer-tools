@@ -72,8 +72,9 @@ export class VroRestClient {
         const url = route.indexOf("://") > 0 ? route : `https://${this.hostname}:${this.port}/vco/api/${route}`
         return request({
             headers: {
-                Accept: "application/json",
-                Connection: "keep-alive"
+                "Accept": "application/json",
+                "Connection": "keep-alive",
+                "Cache-Control": "no-cache"
             },
             json: true,
             simple: true, // reject non-2xx
