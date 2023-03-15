@@ -39,7 +39,7 @@ export class HintLookup implements Disposable {
     private readonly logger = Logger.get("HintLookup")
 
     private scriptingApi: HintStore<vmw.pscoe.hints.ScriptingApiPack> = new HintStore()
-    private actions: any = new HintStore()
+    actions: any = new HintStore()
     private configs: HintStore<vmw.pscoe.hints.ConfigurationsPack> = new HintStore()
     private vroModulesAndActions: HintModule[]
     private vroObjects: vmw.pscoe.hints.IClass[]

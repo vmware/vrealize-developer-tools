@@ -138,21 +138,12 @@ export class WorkspaceCollection {
             const parsedActions = parse(action)
             const parameters: ActionParameters[] = []
             let returnType = ""
-            let moduleName = ""
-
-            if (os.platform() == "win32") {
-                moduleName = actionPath
-                    .substring(actionPath.indexOf("src\\main\\resources\\"))
-                    .replace("src\\main\\resources\\", "")
-                    .replace(/\\$/, "")
-                    .replace(/\\/g, ".")
-            } else {
-                moduleName = actionPath
-                    .substring(actionPath.indexOf("src/main/resources/"))
-                    .replace("src/main/resources/", "")
-                    .replace(/\/$/, "")
-                    .replace(/\//g, ".")
-            }
+            const separator = os.platform() == "win32" ? "\\" : "/"
+            const moduleName = actionPath
+                .split(`src${separator}main${separator}resources${separator}`)[1]
+                .replace(/^[\/\\]/, "") // remove leading slash or backslash
+                .replace(/[\/\\]$/, "") // remove trailing slash or backslash
+                .replace(/[\/\\]/g, ".") // replace remaining slashes or backslashes with dots
 
             parsedActions[0].tags.forEach(tag => {
                 if (tag.tag === "param") {
