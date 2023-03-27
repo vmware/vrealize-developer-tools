@@ -27,9 +27,10 @@ import { HintAction, HintModule } from "../types/hint"
 
 export class VroRestClient {
     private readonly logger = Logger.get("VroRestClient")
+    private auth
 
     constructor(private settings: BaseConfiguration, private environment: BaseEnvironment) {
-        // empty
+        this.auth = this.getInitialAuth()
     }
 
     private get hostname(): string {
@@ -45,13 +46,26 @@ export class VroRestClient {
     }
 
     private async getAuth(): Promise<Record<string, unknown>> {
+        return await this.auth
+    }
+
+    private async getInitialAuth(): Promise<Record<string, unknown>> {
+        this.logger.info("Initial authentication...")
         let auth: Auth
+
+        await sleep(1000) // to properly initialize the compoments
+
         switch (this.authMethod.toLowerCase()) {
             case "vra":
-                const maven = new MavenCliProxy(this.environment, this.settings.vrdev.maven, this.logger)
-                auth = new VraSsoAuth(await maven.getToken())
+                this.logger.info(`vRA token authentication chosen...`)
+                const refreshToken = this.settings.activeProfile.get("vrang.refresh.token")
+                this.logger.debug(`Refresh token: ${refreshToken}`)
+
+                new MavenCliProxy(this.environment, this.settings.vrdev.maven, this.logger)
+                auth = new VraSsoAuth(await this.getToken(refreshToken))
                 break
             case "basic":
+                this.logger.info(`Basic authentication chosen...`)
                 auth = new BasicAuth(
                     this.settings.activeProfile.get("vro.username"),
                     this.settings.activeProfile.get("vro.password")
@@ -60,8 +74,34 @@ export class VroRestClient {
             default:
                 throw new Error(`Unsupported authentication mechanism: ${this.authMethod}`)
         }
-
         return auth.toRequestJson()
+    }
+
+    async getToken(refreshToken: string): Promise<string> {
+        if (!refreshToken) {
+            throw new Error("Refresh token not provided")
+        }
+
+        this.logger.info("Obtaining Bearer token...")
+        const uri = `https://${this.hostname}:${this.port}/iaas/api/login`
+
+        const options = {
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
+            headers: {
+                Accept: "application/json"
+            },
+            body: {
+                refreshToken: refreshToken
+            },
+            json: true,
+            method: "POST",
+            uri
+        }
+        const bearerToken = await request(options)
+        this.logger.debug(`Bearer token: ${bearerToken}`)
+        return bearerToken.token
     }
 
     private async send<T = any>(
