@@ -293,7 +293,7 @@ export class CompletionProvider {
     private getPrefix(document: TextDocumentWrapper, position: Position): CompletionPrefix | null {
         const lineContent = document.getLineContentUntil(position)
 
-        this.logger.info(`Trying to provide auto completion for line '${lineContent}'`)
+        this.logger.debug(`Trying to provide auto completion for line '${lineContent}'`)
 
         for (const pattern of prefixPatterns) {
             const prefix = pattern.match(lineContent)
