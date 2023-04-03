@@ -20,6 +20,7 @@ type VroProfileKeys =
     | "vro.auth"
     | "vro.tenant"
     | "vro.refresh.token"
+    | "vro.authHost"
 type VraProfileKeys =
     | "vrang.host"
     | "vrang.port"

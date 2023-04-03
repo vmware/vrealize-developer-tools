@@ -38,3 +38,7 @@ message Action {
         string description = 3;
     }
 }`
+
+export const Timeout = {
+    ONE_SECOND: 1000
+}

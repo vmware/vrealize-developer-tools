@@ -24,12 +24,12 @@ import { FileChangeType } from "vscode-languageserver"
 
 import { Environment, FileChangeEventParams, HintLookup, WorkspaceFilesWatcher } from "../../core"
 import { FileSavedEventParams, WorkspaceDocumentWatcher } from "../../core/WorkspaceDocumentWatcher"
-import { ActionsPackProto } from "../../../constants"
+import { ActionsPackProto, Timeout } from "../../../constants"
 
 @AutoWire
 export class WorkspaceCollection {
     private readonly logger = Logger.get("WorkspaceCollection")
-    private readonly debounceTriggerCollection = _.debounce(this.triggerCollectionAndRefresh, 1000)
+    private readonly debounceTriggerCollection = _.debounce(this.triggerCollectionAndRefresh, Timeout.ONE_SECOND)
 
     constructor(
         private environment: Environment,
@@ -78,7 +78,7 @@ export class WorkspaceCollection {
 
         this.getModulesForCollection(workspaceFolder, undefined, modules)
         if (modules.length === 0) {
-            this.logger.info("Skipping workspace collection as there are no JS action modules in the project")
+            this.logger.debug("Skipping workspace collection as there are no JS action modules in the project")
             return
         }
 

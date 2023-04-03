@@ -16,7 +16,9 @@ Connect to different vRO environments by configuring maven profiles in `~/.m2/se
         <vro.username>administrator@vsphere.local</vro.username>
         <vro.password>myPlainTextPass</vro.password>
         <vro.auth>basic</vro.auth> <!-- or 'vra' for sso auth -->
-        <vro.tenant>vsphere.local</vro.tenant> <!-- required for 'vra' auth -->
+        <vro.tenant>vsphere.local</vro.tenant>
+        <vro.authHost>10.27.120.27</vro.authHost> <!-- required for 'vra' auth -->
+        <vro.refresh.token>CrxGISrDKxqwfvitdnmlodXxneHARsFi</vro.refresh.token>
 
         <!-- vRA Connection -->
         <vra.host>10.27.120.27</vra.host>

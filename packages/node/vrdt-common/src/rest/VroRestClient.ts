@@ -37,6 +37,26 @@ export class VroRestClient {
         return this.settings.activeProfile.get("vro.host")
     }
 
+    private get vroAuthHost(): string {
+        return this.settings.activeProfile.get("vro.authHost")
+    }
+
+    private get vrangHost(): string {
+        return this.settings.activeProfile.get("vrang.host")
+    }
+
+    private get vroUsername(): string {
+        return this.settings.activeProfile.getOptional("vro.username", "")
+    }
+
+    private get vroPassword(): string {
+        return this.settings.activeProfile.getOptional("vro.password", "")
+    }
+
+    private get refreshToken(): string {
+        return this.settings.activeProfile.getOptional("vro.refresh.token", "")
+    }
+
     private get port(): number {
         return parseInt(this.settings.activeProfile.getOptional("vro.port", "8281"), 10)
     }
@@ -53,23 +73,23 @@ export class VroRestClient {
         this.logger.info("Initial authentication...")
         let auth: Auth
 
-        await sleep(1000) // to properly initialize the compoments
+        await sleep(1000) // to properly initialize the components
+
+        let refreshToken = this.refreshToken
 
         switch (this.authMethod.toLowerCase()) {
             case "vra":
-                this.logger.info(`vRA token authentication chosen...`)
-                const refreshToken = this.settings.activeProfile.get("vrang.refresh.token")
-                this.logger.debug(`Refresh token: ${refreshToken}`)
-
+                this.logger.info(`Token authentication chosen...`)
                 new MavenCliProxy(this.environment, this.settings.vrdev.maven, this.logger)
-                auth = new VraSsoAuth(await this.getToken(refreshToken))
+                if (this.vroUsername && this.vroPassword) {
+                    refreshToken = await this.getRefreshToken(this.vroUsername, this.vroPassword)
+                }
+                this.logger.debug(`Refresh token: ${refreshToken}`)
+                auth = new VraSsoAuth(await this.getBearerToken(refreshToken))
                 break
             case "basic":
                 this.logger.info(`Basic authentication chosen...`)
-                auth = new BasicAuth(
-                    this.settings.activeProfile.get("vro.username"),
-                    this.settings.activeProfile.get("vro.password")
-                )
+                auth = new BasicAuth(this.vroUsername, this.vroPassword)
                 break
             default:
                 throw new Error(`Unsupported authentication mechanism: ${this.authMethod}`)
@@ -77,13 +97,16 @@ export class VroRestClient {
         return auth.toRequestJson()
     }
 
-    async getToken(refreshToken: string): Promise<string> {
+    async getBearerToken(refreshToken: string): Promise<string> {
         if (!refreshToken) {
             throw new Error("Refresh token not provided")
         }
 
-        this.logger.info("Obtaining Bearer token...")
-        const uri = `https://${this.hostname}:${this.port}/iaas/api/login`
+        this.logger.info("Generating Bearer token...")
+        const uri =
+            this.authMethod.toLowerCase() === "vra"
+                ? `https://${this.vrangHost}:${this.port}/iaas/api/login`
+                : `https://${this.hostname}:${this.port}/iaas/api/login`
 
         const options = {
             simple: true, // reject non-2xx
@@ -100,8 +123,43 @@ export class VroRestClient {
             uri
         }
         const bearerToken = await request(options)
-        this.logger.debug(`Bearer token: ${bearerToken}`)
+        this.logger.debug(`Bearer token: ${bearerToken.token}`)
         return bearerToken.token
+    }
+
+    async getRefreshToken(username: string, password: string) {
+        if (!username || !password) {
+            throw new Error("Username or password not provided")
+        }
+
+        this.logger.info("Username and password provided in the profile. Generating Refresh token...")
+        if (this.vroAuthHost.toLowerCase() === "console.cloud.vmware.com") {
+            throw new Error(
+                "For Cloud vRO, the token must be generated via the cloud management console (https://console.cloud.vmware.com). Please remove the fields 'vro.username' and 'vro.password' from the profile and add 'vro.refresh.token'"
+            )
+        }
+        const uri = `https://${this.vroAuthHost}:${this.port}/csp/gateway/am/api/login?access_token`
+        const domain = username.split("@")[1]
+        username = username.split("@")[0]
+
+        const options = {
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
+            headers: {
+                Accept: "application/json"
+            },
+            body: {
+                username: username,
+                password: password,
+                domain: domain || undefined
+            },
+            json: true,
+            method: "POST",
+            uri
+        }
+        const refreshToken = await request(options)
+        return refreshToken.refresh_token
     }
 
     private async send<T = any>(

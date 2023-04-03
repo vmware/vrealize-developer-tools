@@ -88,7 +88,7 @@ export class ServerCollection {
                 }
             })
             .catch(error => {
-                this.logger.info("Could not connect to vRO. Collecting offline hints collection...")
+                this.logger.info("Could not connect to vRO. Collecting data from local JS files in the project...")
                 this.logger.error(error)
                 this.currentStatus.finished = true
                 this.hints.initialize()
@@ -126,15 +126,23 @@ export class ServerCollection {
     }
 
     collectModulesAndActions() {
-        this.getModulesAndActions().then(modules => {
-            this.hints.collectModulesAndActions(modules)
-        })
+        this.getModulesAndActions()
+            .then(modules => {
+                this.hints.collectModulesAndActions(modules)
+            })
+            .catch(error => {
+                this.logger.info(`Error occurred: ${error}`)
+            })
     }
 
     collectObjects() {
-        this.getVroObjects().then(objects => {
-            this.hints.collectVroObjects(objects)
-        })
+        this.getVroObjects()
+            .then(objects => {
+                this.hints.collectVroObjects(objects)
+            })
+            .catch(error => {
+                this.logger.info(`Error occurred: ${error}`)
+            })
     }
 
     async getVroObjects() {
@@ -150,24 +158,27 @@ export class ServerCollection {
         const allObjects: vmw.pscoe.hints.IClass[] = []
         const regex = new RegExp(/\/plugins\/([a-zA-Z0-9\_\-\.\/]+)/)
 
-        for (const plugin of plugins) {
-            const link = plugin.detailsLink.match(regex)
-            if (!link) {
-                throw new Error(`No plugin details found`)
-            }
-
-            const parsedLink = link[0].substring(9).toString()
-            const pluginDetails = await this.restClient.getPluginDetails(parsedLink)
-
-            for (const pluginObject of pluginDetails["objects"]) {
-                const object: vmw.pscoe.hints.IClass = {
-                    name: pluginObject["name"]
+        if (!plugins || plugins.length < 1) {
+            this.logger.error("No vRO objects found")
+        } else {
+            for (const plugin of plugins) {
+                const link = plugin.detailsLink.match(regex)
+                if (!link) {
+                    throw new Error(`No plugin details found`)
                 }
-                allObjects.push(object)
-            }
-        }
 
-        this.logger.info(`Objects collected from vRO`)
+                const parsedLink = link[0].substring(9).toString() // always retrieve and parse the first occurrence
+                const pluginDetails = await this.restClient.getPluginDetails(parsedLink)
+
+                for (const pluginObject of pluginDetails["objects"]) {
+                    const object: vmw.pscoe.hints.IClass = {
+                        name: pluginObject["name"]
+                    }
+                    allObjects.push(object)
+                }
+            }
+            this.logger.info(`Objects collected from vRO`)
+        }
         return allObjects
     }
 

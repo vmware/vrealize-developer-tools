@@ -298,12 +298,12 @@ export class CompletionProvider {
         for (const pattern of prefixPatterns) {
             const prefix = pattern.match(lineContent)
             if (prefix) {
-                this.logger.info(`Matched: '${prefix.kind}' pattern`)
+                this.logger.debug(`Matched: '${prefix.kind}' pattern`)
                 return prefix
             }
         }
 
-        this.logger.info("None of the patterns matched.")
+        this.logger.debug("None of the patterns matched.")
         return null
     }
 }
