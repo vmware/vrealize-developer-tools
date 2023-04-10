@@ -6,7 +6,8 @@
 import * as fs from "fs"
 
 import * as _ from "lodash"
-import { AutoWire, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
+import { v4 as uuidv4 } from "uuid"
+import { AutoWire, HintModule, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import { Disposable, WorkspaceFoldersChangeEvent } from "vscode-languageserver"
 
 import { vmw } from "../../proto"
@@ -15,6 +16,7 @@ import { Environment } from "./Environment"
 import { Initializer } from "./Initializer"
 import { WorkspaceFoldersWatcher } from "./WorkspaceFoldersWatcher"
 
+@AutoWire
 export class ClassFilter {
     isInstantiable: boolean | undefined = undefined
 }
@@ -25,8 +27,7 @@ interface HintFileDecoder<T> {
 
 class HintStore<T> {
     local: Map<string, T[]> = new Map()
-
-    constructor(public global: T[] = []) {}
+    global: T[] = []
 
     isEmpty(): boolean {
         return this.local.size === 0 && this.global.length === 0
@@ -38,8 +39,10 @@ export class HintLookup implements Disposable {
     private readonly logger = Logger.get("HintLookup")
 
     private scriptingApi: HintStore<vmw.pscoe.hints.ScriptingApiPack> = new HintStore()
-    private actions: HintStore<vmw.pscoe.hints.ActionsPack> = new HintStore()
+    actions: any = new HintStore()
     private configs: HintStore<vmw.pscoe.hints.ConfigurationsPack> = new HintStore()
+    private vroModulesAndActions: HintModule[]
+    private vroObjects: vmw.pscoe.hints.IClass[]
 
     private subscriptions: Disposable[] = []
 
@@ -61,13 +64,33 @@ export class HintLookup implements Disposable {
         this.subscriptions.forEach(s => s && s.dispose())
     }
 
-    getActionModules(workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IModule[] {
-        if (this.actions.isEmpty()) {
-            return []
+    getGlobalActionsPack() {
+        const actionPack = {
+            modules: this.vroModulesAndActions,
+            uuid: uuidv4(),
+            version: 1,
+            toJSON: function (): { [k: string]: any } {
+                return {}
+            }
+        }
+        return actionPack
+    }
+
+    collectModulesAndActions(vroModulesAndActions: HintModule[]): void {
+        this.vroModulesAndActions = vroModulesAndActions
+    }
+
+    collectVroObjects(vroObjects: vmw.pscoe.hints.IClass[]): void {
+        this.vroObjects = vroObjects
+    }
+
+    getActionModules(workspaceFolder?: WorkspaceFolder): HintModule[] {
+        if (this.vroModulesAndActions) {
+            this.actions.global.push(this.getGlobalActionsPack())
         }
 
         const localModules = workspaceFolder
-            ? _.flatMap(this.actions.local.get(workspaceFolder.uri.fsPath), pack => pack.modules)
+            ? _.flatMap(this.actions.local[workspaceFolder.uri.fsPath], pack => pack.modules)
             : []
         const globalModules = _.flatMap(this.actions.global, pack => pack.modules)
         return _.unionWith(localModules, globalModules, (x, y) => x.name === y.name)
@@ -75,6 +98,7 @@ export class HintLookup implements Disposable {
 
     getActionsIn(moduleName: string, workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IAction[] {
         const module = this.getActionModules(workspaceFolder).find(module => module.name === moduleName)
+        this.logger.debug(`Module hint: ${JSON.stringify(module, null, 4)}`)
 
         if (module && module.actions) {
             return module.actions.filter(action => !!action)
@@ -89,7 +113,7 @@ export class HintLookup implements Disposable {
         }
 
         const localCategories = workspaceFolder
-            ? _.flatMap(this.configs.local.get(workspaceFolder.uri.fsPath), pack => pack.categories)
+            ? _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories)
             : []
         const globalCategories = _.flatMap(this.configs.global, pack => pack.categories)
         return _.unionWith(localCategories, globalCategories, (x, y) => x.path === y.path)
@@ -107,6 +131,10 @@ export class HintLookup implements Disposable {
 
     getClasses(filter: ClassFilter): vmw.pscoe.hints.IClass[] {
         const result: vmw.pscoe.hints.IClass[] = []
+
+        if (this.vroObjects) {
+            result.push(...this.vroObjects)
+        }
 
         for (const api of this.scriptingApi.global) {
             for (const cls of api.classes) {
@@ -138,8 +166,7 @@ export class HintLookup implements Disposable {
     // Event Handlers
     //
 
-    initialize(): void {
-        this.logger.debug("HintLookup.initialize()")
+    initialize() {
         this.environment.workspaceFolders.forEach(this.load, this)
         this.load()
     }
@@ -153,10 +180,6 @@ export class HintLookup implements Disposable {
         this.logger.debug("HintLookup.onDidChangeWorkspaceFolders()")
         for (const folder of event.added) {
             this.load(WorkspaceFolder.fromProtocol(folder))
-        }
-
-        for (const folder of event.removed) {
-            this.unload(WorkspaceFolder.fromProtocol(folder))
         }
     }
 
@@ -227,12 +250,6 @@ export class HintLookup implements Disposable {
         } else {
             target.local[scope.uri.fsPath] = result
         }
-    }
-
-    private unload(workspaceFolder: WorkspaceFolder): void {
-        this.scriptingApi.local.delete(workspaceFolder.uri.fsPath)
-        this.actions.local.delete(workspaceFolder.uri.fsPath)
-        this.configs.local.delete(workspaceFolder.uri.fsPath)
     }
 
     private decodeProtoFile<T>(filePath: string, decoder: HintFileDecoder<T>): T | null {

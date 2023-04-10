@@ -14,7 +14,8 @@ export class PomFile {
         "typescript-project": "com.vmware.pscoe.o11n",
         "typescript-project-all": "com.vmware.pscoe.o11n",
         "vra-package": "com.vmware.pscoe.vra",
-        "vra-ng-package": "com.vmware.pscoe.vra-ng"
+        "vra-ng-package": "com.vmware.pscoe.vra-ng",
+        "polyglot-project": "com.vmware.pscoe.polyglot"
     }
 
     readonly jsonContent: any

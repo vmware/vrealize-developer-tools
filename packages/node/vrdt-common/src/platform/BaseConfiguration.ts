@@ -8,7 +8,7 @@ import { VrealizeSettings } from "../types"
 
 export abstract class BaseConfiguration {
     vrdev: VrealizeSettings
-    allProfiles: MavenProfilesMap | undefined
+    allProfiles: MavenProfilesMap
 
     hasActiveProfile(): boolean {
         try {

@@ -46,7 +46,7 @@ export class RemoteDocument {
                                 const fileBuffer = new AdmZip(filePath).readFile("action-content")
 
                                 if (!fileBuffer) {
-                                    throw new Error(`Could not extact action content from $filePath`)
+                                    throw new Error(`Could not extract action content from $filePath`)
                                 }
 
                                 this.source = fileBuffer // content is in UTF-16BE
@@ -61,7 +61,7 @@ export class RemoteDocument {
                                 const fileBuffer = new AdmZip(filePath).readFile("workflow-content")
 
                                 if (!fileBuffer) {
-                                    throw new Error(`Could not extact action content from $filePath`)
+                                    throw new Error(`Could not extract action content from $filePath`)
                                 }
 
                                 this.source = fileBuffer // content is in UTF-16BE

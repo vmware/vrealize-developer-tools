@@ -23,16 +23,38 @@ import {
     WorkflowState
 } from "./vro-model"
 import { Logger, MavenCliProxy, promise, sleep } from ".."
+import { HintAction, HintModule } from "../types/hint"
 
 export class VroRestClient {
     private readonly logger = Logger.get("VroRestClient")
+    private auth
 
     constructor(private settings: BaseConfiguration, private environment: BaseEnvironment) {
-        // empty
+        this.auth = this.getInitialAuth()
     }
 
     private get hostname(): string {
         return this.settings.activeProfile.get("vro.host")
+    }
+
+    private get vroAuthHost(): string {
+        return this.settings.activeProfile.get("vro.authHost")
+    }
+
+    private get vrangHost(): string {
+        return this.settings.activeProfile.get("vrang.host")
+    }
+
+    private get vroUsername(): string {
+        return this.settings.activeProfile.getOptional("vro.username", "")
+    }
+
+    private get vroPassword(): string {
+        return this.settings.activeProfile.getOptional("vro.password", "")
+    }
+
+    private get refreshToken(): string {
+        return this.settings.activeProfile.getOptional("vro.refresh.token", "")
     }
 
     private get port(): number {
@@ -44,23 +66,100 @@ export class VroRestClient {
     }
 
     private async getAuth(): Promise<Record<string, unknown>> {
+        return await this.auth
+    }
+
+    private async getInitialAuth(): Promise<Record<string, unknown>> {
+        this.logger.info("Initial authentication...")
         let auth: Auth
+
+        await sleep(1000) // to properly initialize the components
+
+        let refreshToken = this.refreshToken
+
         switch (this.authMethod.toLowerCase()) {
             case "vra":
-                const maven = new MavenCliProxy(this.environment, this.settings.vrdev.maven, this.logger)
-                auth = new VraSsoAuth(await maven.getToken())
+                this.logger.info(`Token authentication chosen...`)
+                new MavenCliProxy(this.environment, this.settings.vrdev.maven, this.logger)
+                if (this.vroUsername && this.vroPassword) {
+                    refreshToken = await this.getRefreshToken(this.vroUsername, this.vroPassword)
+                }
+                this.logger.debug(`Refresh token: ${refreshToken}`)
+                auth = new VraSsoAuth(await this.getBearerToken(refreshToken))
                 break
             case "basic":
-                auth = new BasicAuth(
-                    this.settings.activeProfile.get("vro.username"),
-                    this.settings.activeProfile.get("vro.password")
-                )
+                this.logger.info(`Basic authentication chosen...`)
+                auth = new BasicAuth(this.vroUsername, this.vroPassword)
                 break
             default:
                 throw new Error(`Unsupported authentication mechanism: ${this.authMethod}`)
         }
-
         return auth.toRequestJson()
+    }
+
+    async getBearerToken(refreshToken: string): Promise<string> {
+        if (!refreshToken) {
+            throw new Error("Refresh token not provided")
+        }
+
+        this.logger.info("Generating Bearer token...")
+        const uri =
+            this.authMethod.toLowerCase() === "vra"
+                ? `https://${this.vrangHost}:${this.port}/iaas/api/login`
+                : `https://${this.hostname}:${this.port}/iaas/api/login`
+
+        const options = {
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
+            headers: {
+                Accept: "application/json"
+            },
+            body: {
+                refreshToken: refreshToken
+            },
+            json: true,
+            method: "POST",
+            uri
+        }
+        const bearerToken = await request(options)
+        this.logger.debug(`Bearer token: ${bearerToken.token}`)
+        return bearerToken.token
+    }
+
+    async getRefreshToken(username: string, password: string) {
+        if (!username || !password) {
+            throw new Error("Username or password not provided")
+        }
+
+        this.logger.info("Username and password provided in the profile. Generating Refresh token...")
+        if (this.vroAuthHost.toLowerCase() === "console.cloud.vmware.com") {
+            throw new Error(
+                "For Cloud vRO, the token must be generated via the cloud management console (https://console.cloud.vmware.com). Please remove the fields 'vro.username' and 'vro.password' from the profile and add 'vro.refresh.token'"
+            )
+        }
+        const uri = `https://${this.vroAuthHost}:${this.port}/csp/gateway/am/api/login?access_token`
+        const domain = username.split("@")[1]
+        username = username.split("@")[0]
+
+        const options = {
+            simple: true, // reject non-2xx
+            resolveWithFullResponse: false,
+            rejectUnauthorized: false,
+            headers: {
+                Accept: "application/json"
+            },
+            body: {
+                username: username,
+                password: password,
+                domain: domain || undefined
+            },
+            json: true,
+            method: "POST",
+            uri
+        }
+        const refreshToken = await request(options)
+        return refreshToken.refresh_token
     }
 
     private async send<T = any>(
@@ -71,7 +170,9 @@ export class VroRestClient {
         const url = route.indexOf("://") > 0 ? route : `https://${this.hostname}:${this.port}/vco/api/${route}`
         return request({
             headers: {
-                Accept: "application/json"
+                "Accept": "application/json",
+                "Connection": "keep-alive",
+                "Cache-Control": "no-cache"
             },
             json: true,
             simple: true, // reject non-2xx
@@ -412,6 +513,38 @@ export class VroRestClient {
         return children.sort((x, y) => x.name.localeCompare(y.name))
     }
 
+    async getChildrenOfCategoryWithDetails(categoryId: string): Promise<HintAction[]> {
+        let responseJson: HintModule = {
+            id: "",
+            name: "",
+            actions: []
+        }
+
+        try {
+            responseJson = await this.send("GET", `server-configuration/api/category/${categoryId}`)
+        } catch (error) {
+            this.logger.error(`Error occurred: ${error}`)
+        }
+
+        if (!responseJson) {
+            return []
+        }
+
+        const children: HintAction[] = responseJson.actions.map(child => {
+            return {
+                name: child.name || undefined,
+                id: child.id || undefined,
+                returnType: child.returnType || undefined,
+                description: child.description || undefined,
+                version: child.version || undefined,
+                categoryId: child.categoryId || undefined,
+                parameters: child.parameters || []
+            } as HintAction
+        })
+
+        return children.sort((x, y) => x.name.localeCompare(y.name))
+    }
+
     async getResource(id: string): Promise<http.IncomingMessage> {
         const options = {
             simple: true, // reject non-2xx
@@ -585,5 +718,13 @@ export class VroRestClient {
             },
             json: false
         })
+    }
+
+    async getVroServerData(): Promise<string> {
+        return this.send("GET", "server-configuration/api")
+    }
+
+    async getPluginDetails(link: string) {
+        return this.send("GET", `server-configuration/api/plugins/${link}`)
     }
 }

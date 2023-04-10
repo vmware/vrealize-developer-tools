@@ -26,7 +26,7 @@ export class WorkspaceFilesWatcher extends AbstractWatcher<FileChangeEventParams
 
     constructor(connectionLocator: ConnectionLocator, private environment: Environment) {
         super()
-        // pattern for the files to watch is defined in the LanguageClientOptions. See {LangugeServices}
+        // pattern for the files to watch is defined in the LanguageClientOptions. See {LanguageServices}
         connectionLocator.connection.onDidChangeWatchedFiles(this.watchedFilesChanged.bind(this))
     }
 

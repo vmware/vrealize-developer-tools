@@ -47,13 +47,13 @@ export class TriggerCollection extends Command<void> {
                     let status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
 
                     while (status && !status.finished) {
-                        this.logger.debug("Collection status:", status)
+                        this.logger.info("Collection status:", status)
                         progress.report(status)
-                        await sleep(500)
+                        await sleep(1000)
                         status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
                     }
 
-                    this.logger.debug("Collection finished:", status)
+                    this.logger.info("Collection finished:", status)
 
                     if (status.error !== undefined) {
                         await vscode.commands.executeCommand(Commands.EventCollectionError, status.error)

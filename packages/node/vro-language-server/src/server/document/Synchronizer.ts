@@ -16,7 +16,7 @@ export class Synchronizer {
     private textDocuments = new TextDocuments(TextDocument)
 
     constructor(connectionLocator: ConnectionLocator) {
-        this.logger.info("Initilized the Document Synchronizer")
+        this.logger.info("Initialized the Document Synchronizer")
         this.textDocuments.listen(connectionLocator.connection)
     }
 

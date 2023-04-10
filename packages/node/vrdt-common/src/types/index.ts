@@ -6,3 +6,4 @@
 export * from "./project"
 export * from "./settings"
 export * from "./vro"
+export * from "./hint"

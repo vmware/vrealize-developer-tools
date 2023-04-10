@@ -133,5 +133,21 @@ export const TASKS_BY_TOOLCHAIN_PARENT: Record<ProjectArchetypes, VrealizeTaskCo
             label: "Pull",
             command: "mvn vra-ng:pull -P${config:vrdev.maven.profile}"
         }
+    ],
+
+    [ProjectArchetypes.Polyglot]: [
+        {
+            label: "Push",
+            windows: {
+                command:
+                    'mvn clean package vrealize:push -DincludeDependencies=true -DskipTests -P${config:vrdev.maven.profile} -D"vro.packageImportConfigurationAttributeValues=false"'
+            },
+            command:
+                "mvn clean package vrealize:push -DincludeDependencies=true -DskipTests -P${config:vrdev.maven.profile} -Dvro.packageImportConfigurationAttributeValues=false"
+        },
+        {
+            label: "Build",
+            command: "mvn clean package"
+        }
     ]
 }
