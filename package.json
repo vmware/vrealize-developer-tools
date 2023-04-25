@@ -598,7 +598,7 @@
     "vscode-languageserver": "^6.1.1",
     "vscode-languageserver-textdocument": "^1.0.1",
     "vscode-uri": "^3.0.2",
-    "yaml": "^1.10.2"
+    "yaml": "^2.2.2"
   },
   "optionalDependencies": {
     "fsevents": "~2.3.1"
