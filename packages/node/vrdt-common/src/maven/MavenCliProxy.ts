@@ -110,7 +110,7 @@ export class MavenCliProxy {
         const content = fs.readFileSync(filePath, { encoding: "utf8" })
         const token = JSON.parse(content)
 
-        if (!token || !token.value || !token.expirationDate) {
+        if (!token || !token.value) {
             throw new Error(`Missing or invalid token file: ${filePath}`)
         }
 
