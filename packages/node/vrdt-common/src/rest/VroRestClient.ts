@@ -9,7 +9,7 @@ import * as fs from "fs-extra"
 import * as request from "request-promise-native"
 
 import { ApiCategoryType } from "../types"
-import { BaseConfiguration, BaseEnvironment } from "../platform"
+import { BaseConfiguration } from "../platform"
 import { Auth, BasicAuth, VraSsoAuth } from "./auth"
 import {
     ApiElement,
@@ -22,14 +22,17 @@ import {
     WorkflowParam,
     WorkflowState
 } from "./vro-model"
-import { Logger, MavenCliProxy, promise, sleep } from ".."
+import { Logger, promise, sleep } from ".."
 import { HintAction, HintModule } from "../types/hint"
 
 export class VroRestClient {
     private readonly logger = Logger.get("VroRestClient")
-    private auth
+    private auth: Record<string, unknown> | PromiseLike<Record<string, unknown>>
+    private hintActions: HintAction[]
+    private hintElements: ApiElement[]
+    private actions: any[]
 
-    constructor(private settings: BaseConfiguration, private environment: BaseEnvironment) {
+    constructor(private settings: BaseConfiguration) {
         this.auth = this.getInitialAuth()
     }
 
@@ -80,7 +83,6 @@ export class VroRestClient {
         switch (this.authMethod.toLowerCase()) {
             case "vra":
                 this.logger.info(`Token authentication chosen...`)
-                new MavenCliProxy(this.environment, this.settings.vrdev.maven, this.logger)
                 if (this.vroUsername && this.vroPassword) {
                     refreshToken = await this.getRefreshToken(this.vroUsername, this.vroPassword)
                 }
@@ -367,6 +369,10 @@ export class VroRestClient {
     }
 
     async getActions(): Promise<{ fqn: string; id: string; version: string }[]> {
+        // return the cached actions (if any)
+        if (this.actions && Array.isArray(this.actions) && this.actions.length) {
+            return this.actions
+        }
         const responseJson: ContentLinksResponse = await this.send("GET", "actions")
         const actions: { fqn: string; id: string; version: string }[] = responseJson.link
             .map(action => {
@@ -388,7 +394,11 @@ export class VroRestClient {
                 return !!val && val.fqn !== undefined && val.id !== undefined
             }) as { fqn: string; id: string; version: string }[]
 
-        return actions.sort((x, y) => x.fqn.localeCompare(y.fqn))
+        actions.sort((x, y) => x.fqn.localeCompare(y.fqn))
+        // cache the actions in order not to overload vRO
+        this.actions = actions
+
+        return this.actions
     }
 
     async getWorkflows(): Promise<{ name: string; id: string; version: string }[]> {
@@ -488,6 +498,11 @@ export class VroRestClient {
     }
 
     async getChildrenOfCategory(categoryId: string): Promise<ApiElement[]> {
+        // return cached hint elements (if any) in order to not overload vRO
+        if (this.hintElements && Array.isArray(this.hintElements) && this.hintElements.length) {
+            return this.hintElements
+        }
+
         const responseJson: ContentChildrenResponse = await this.send("GET", `categories/${categoryId}`)
         const children = responseJson.relations.link
             .map(child => {
@@ -510,16 +525,24 @@ export class VroRestClient {
                 return !!val && val.name !== undefined && val.id !== undefined && val.type !== undefined
             }) as ApiElement[]
 
-        return children.sort((x, y) => x.name.localeCompare(y.name))
+        children.sort((x, y) => x.name.localeCompare(y.name))
+        // cache the hint elements in order not to overload vRO REST API
+        this.hintElements = children
+
+        return this.hintElements
     }
 
     async getChildrenOfCategoryWithDetails(categoryId: string): Promise<HintAction[]> {
+        // return cached hint actions (if any) in order to not overload vRO REST API
+        if (this.hintActions && Array.isArray(this.hintActions) && this.hintActions.length) {
+            return this.hintActions
+        }
+
         let responseJson: HintModule = {
             id: "",
             name: "",
             actions: []
         }
-
         try {
             responseJson = await this.send("GET", `server-configuration/api/category/${categoryId}`)
         } catch (error) {
@@ -541,8 +564,11 @@ export class VroRestClient {
                 parameters: child.parameters || []
             } as HintAction
         })
+        children.sort((x, y) => x.name.localeCompare(y.name))
+        // cache the hint actions in order not to overload vRO REST API
+        this.hintActions = children
 
-        return children.sort((x, y) => x.name.localeCompare(y.name))
+        return this.hintActions
     }
 
     async getResource(id: string): Promise<http.IncomingMessage> {

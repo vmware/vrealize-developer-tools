@@ -22,7 +22,7 @@ export class ShowActions extends Command<void> {
 
     constructor(environment: EnvironmentManager, private config: ConfigurationManager) {
         super()
-        this.restClient = new VroRestClient(config, environment)
+        this.restClient = new VroRestClient(config)
     }
 
     async execute(context: vscode.ExtensionContext): Promise<void> {

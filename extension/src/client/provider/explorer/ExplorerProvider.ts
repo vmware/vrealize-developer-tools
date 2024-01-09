@@ -33,7 +33,7 @@ export class ExplorerProvider implements vscode.TreeDataProvider<AbstractNode>, 
     readonly onDidChangeTreeData: vscode.Event<AbstractNode | undefined> = this.onDidChangeTreeDataEmitter.event
 
     constructor(environment: EnvironmentManager, private config: ConfigurationManager) {
-        this.restClient = new VroRestClient(config, environment)
+        this.restClient = new VroRestClient(config)
     }
 
     register(context: vscode.ExtensionContext): void {

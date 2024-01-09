@@ -47,7 +47,7 @@ export class ServerCollection {
 
         connectionLocator.connection.onRequest(remote.server.triggerVroCollection, this.triggerCollection.bind(this))
 
-        this.restClient = new VroRestClient(settings, environment)
+        this.restClient = new VroRestClient(settings)
     }
 
     giveCollectionStatus(): CollectionStatus {

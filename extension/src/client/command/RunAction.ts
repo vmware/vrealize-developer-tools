@@ -225,7 +225,7 @@ class ActionRunner {
     private executionToken: string
 
     constructor(config: ConfigurationManager, private environment: EnvironmentManager) {
-        this.restClient = new VroRestClient(config, environment)
+        this.restClient = new VroRestClient(config)
         this.mavenProxy = new MavenCliProxy(environment, config.vrdev.maven, this.logger)
     }
 
