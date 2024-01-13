@@ -58,12 +58,12 @@ jobs:
           fi
 
           npm version --no-git-tag-version $VERSION_STRING
-          echo "::set-output name=version_build::${VERSION_STRING}+${RUN_NUMBER}"
+          echo "version_build=${VERSION_STRING}+${RUN_NUMBER}" >> $GITHUB_OUTPUT
 
       - name: Get npm cache directory
         id: npm-cache-dir
         run: |
-          echo "::set-output name=dir::$(npm config get cache)"
+          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v2
         id: npm-cache
