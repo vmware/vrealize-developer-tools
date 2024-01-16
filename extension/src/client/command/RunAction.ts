@@ -147,53 +147,17 @@ export class RunAction extends Command<void> {
     }
 
     private async getScriptContent(document: vscode.TextDocument): Promise<string> {
-        if (document.languageId === "javascript") {
-            return document.getText()
-        }
-
-        if (document.languageId === "typescript") {
-            let inputFilePath = document.uri.fsPath
-            let inputFileName = path.basename(inputFilePath)
-            let tsNamespace: string | undefined
-            let rootPath: string
-            let srcPath: string
-
-            if (!document.isUntitled) {
-                const workspacePath = vscode.workspace.getWorkspaceFolder(document.uri)
-                if (!workspacePath) {
-                    throw new Error(`File ${inputFileName} is not part of the workspace`)
-                }
-
-                rootPath = workspacePath.uri.fsPath
-                srcPath = path.join(rootPath, "src")
-                const pomFilePath = path.join(workspacePath.uri.fsPath, "pom.xml")
-
-                if (!fs.existsSync(pomFilePath)) {
-                    throw new Error(`Missing pom.xml in workspace ${workspacePath.name}`)
-                }
-
-                const pomFile = new PomFile(pomFilePath)
-                tsNamespace = `${pomFile.groupId}.${pomFile.artifactId}`
-            } else {
-                rootPath = tmp.dirSync({ prefix: "o11n-ts-" }).name
-                srcPath = path.join(rootPath, "src")
-                inputFileName = inputFileName.endsWith(".ts") ? inputFileName : `${inputFileName}.ts`
-                inputFilePath = path.join(srcPath, inputFileName)
-                fs.mkdirpSync(path.dirname(inputFilePath))
-                fs.writeFileSync(inputFilePath, document.getText(), { encoding: "utf8" })
+        switch (document.languageId) {
+            case "javascript": {
+                return document.getText()
             }
-
-            this.outputChannel.appendLine(`# Compiling ${inputFileName}`)
-            const tsFileRelativePath = path.relative(srcPath, inputFilePath)
-            this.logger.debug(`Input TS file: ${inputFilePath}`)
-            const outputFilePath = await this.compileFile(tsFileRelativePath, rootPath, tsNamespace)
-            this.logger.debug(`Output JS file: ${outputFilePath}`)
-            const scriptContent = fs.readFileSync(outputFilePath, { encoding: "utf8" })
-
-            return scriptContent
+            case "typescript": {
+                return this.getTypescriptContent(document)
+            }
+            default: {
+                return Promise.reject(new Error(`Unsupported language ID: '${document.languageId}'`))
+            }
         }
-
-        return Promise.reject(`Unsupported language ID: ${document.languageId}`)
     }
 
     /**
@@ -213,7 +177,54 @@ export class RunAction extends Command<void> {
             command += ` -n ${namespace}`
         }
         await proc.exec(command, { cwd: projectDirPath }, this.logger)
+
         return path.join(outputDir, inputFile.replace(/\.ts$/, ".js"))
+    }
+
+    /**
+     * Return the typescript content of a vscode text document.
+     * @param document - reference to the vscode document.
+     *
+     * @returns the compiled javascript from the typescript document.
+     */
+    private async getTypescriptContent(document: vscode.TextDocument): Promise<string> {
+        let inputFilePath = document.uri.fsPath
+        let inputFileName = path.basename(inputFilePath)
+        let tsNamespace: string | undefined
+        let rootPath: string
+        let srcPath: string
+
+        if (!document.isUntitled) {
+            const workspacePath = vscode.workspace.getWorkspaceFolder(document.uri)
+            if (!workspacePath) {
+                throw new Error(`File ${inputFileName} is not part of the workspace`)
+            }
+            rootPath = workspacePath.uri.fsPath
+            srcPath = path.join(rootPath, "src")
+            const pomFilePath = path.join(workspacePath.uri.fsPath, "pom.xml")
+            if (!fs.existsSync(pomFilePath)) {
+                throw new Error(`Missing pom.xml in workspace ${workspacePath.name}`)
+            }
+
+            const pomFile = new PomFile(pomFilePath)
+            tsNamespace = `${pomFile.groupId}.${pomFile.artifactId}`
+        } else {
+            rootPath = tmp.dirSync({ prefix: "o11n-ts-" }).name
+            srcPath = path.join(rootPath, "src")
+            inputFileName = inputFileName.endsWith(".ts") ? inputFileName : `${inputFileName}.ts`
+            inputFilePath = path.join(srcPath, inputFileName)
+            fs.mkdirpSync(path.dirname(inputFilePath))
+            fs.writeFileSync(inputFilePath, document.getText(), { encoding: "utf8" })
+        }
+
+        this.outputChannel.appendLine(`# Compiling ${inputFileName}`)
+        const tsFileRelativePath = path.relative(srcPath, inputFilePath)
+        this.logger.debug(`Input TS file: ${inputFilePath}`)
+        const outputFilePath = await this.compileFile(tsFileRelativePath, rootPath, tsNamespace)
+        this.logger.debug(`Output JS file: ${outputFilePath}`)
+        const scriptContent = fs.readFileSync(outputFilePath, { encoding: "utf8" })
+
+        return scriptContent
     }
 }
 

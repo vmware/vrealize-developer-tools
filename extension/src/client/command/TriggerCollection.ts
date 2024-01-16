@@ -33,7 +33,6 @@ export class TriggerCollection extends Command<void> {
             this.logger.warn("The vRO language server is not running")
             return
         }
-
         await vscode.commands.executeCommand(Commands.EventCollectionStart)
 
         vscode.window.withProgress(

@@ -79,7 +79,6 @@ export class VroRestClient {
         await sleep(1000) // to properly initialize the components
 
         let refreshToken = this.refreshToken
-
         switch (this.authMethod.toLowerCase()) {
             case "vra":
                 this.logger.info(`Token authentication chosen...`)
@@ -96,6 +95,7 @@ export class VroRestClient {
             default:
                 throw new Error(`Unsupported authentication mechanism: ${this.authMethod}`)
         }
+
         return auth.toRequestJson()
     }
 
@@ -126,6 +126,7 @@ export class VroRestClient {
         }
         const bearerToken = await request(options)
         this.logger.debug(`Bearer token: ${bearerToken.token}`)
+
         return bearerToken.token
     }
 
@@ -161,6 +162,7 @@ export class VroRestClient {
             uri
         }
         const refreshToken = await request(options)
+
         return refreshToken.refresh_token
     }
 
@@ -206,7 +208,6 @@ export class VroRestClient {
     async executeWorkflow(id: string, ...inputParams: WorkflowParam[]): Promise<WorkflowParam[]> {
         const token: string = await this.startWorkflow(id, ...inputParams)
         let response = await this.getWorkflowExecution(id, token)
-
         while (response.state === "running") {
             await sleep(1000)
             response = await this.getWorkflowExecution(id, token)
@@ -223,6 +224,7 @@ export class VroRestClient {
         const response = await this.send("GET", `workflows/${id}/executions/${token}`, {
             resolveWithFullResponse: false
         })
+
         return response.state
     }
 
@@ -241,9 +243,7 @@ export class VroRestClient {
                 })
             }
         }
-
         const execResponse = await this.send("POST", `workflows/${id}/executions`, executeOptions)
-
         if (execResponse.statusCode !== 202) {
             throw new Error(`Expected status code 202, but got ${execResponse.statusCode}`)
         }
@@ -252,9 +252,9 @@ export class VroRestClient {
         if (!location) {
             throw new Error(`Missing location header in the response of POST /workflows/${id}/executions`)
         }
-
         location = location.replace(/\/$/, "") // remove trailing slash
         const execToken = location.substring(location.lastIndexOf("/") + 1)
+
         return execToken
     }
 
@@ -278,11 +278,9 @@ export class VroRestClient {
         )
 
         const messages: LogMessage[] = []
-
         for (const log of response.logs) {
             const e = log.entry
             const description = e["long-description"] ? e["long-description"] : e["short-description"]
-
             if (
                 e.origin === "server" || // skip server messages, as they are always included in the result
                 description.indexOf("*** End of execution stack.") > 0 ||
@@ -290,7 +288,6 @@ export class VroRestClient {
             ) {
                 continue
             }
-
             messages.push({
                 timestamp: e["time-stamp"],
                 severity: e.severity,
@@ -316,14 +313,12 @@ export class VroRestClient {
         )
 
         const messages: LogMessage[] = []
-
         for (const log of response.logs) {
             const e = log.entry
             const description = e["long-description"] ? e["long-description"] : e["short-description"]
             if (description.indexOf("*** End of execution stack.") > 0 || description.startsWith("__item_stack:/")) {
                 continue
             }
-
             messages.push({
                 timestamp: e["time-stamp"],
                 severity: e.severity,
@@ -365,7 +360,7 @@ export class VroRestClient {
             })
             .filter(val => val !== undefined) as string[]
 
-        return packages.sort()
+        return packages.sort((x, y) => x.localeCompare(y))
     }
 
     async getActions(): Promise<{ fqn: string; id: string; version: string }[]> {
@@ -373,13 +368,13 @@ export class VroRestClient {
         if (this.actions && Array.isArray(this.actions) && this.actions.length) {
             return this.actions
         }
+
         const responseJson: ContentLinksResponse = await this.send("GET", "actions")
         const actions: { fqn: string; id: string; version: string }[] = responseJson.link
             .map(action => {
                 if (!action.attributes) {
                     return undefined
                 }
-
                 const fqn = action.attributes.find(att => att.name === "fqn")
                 const id = action.attributes.find(att => att.name === "id")
                 const version = action.attributes.find(att => att.name === "version")
@@ -433,7 +428,6 @@ export class VroRestClient {
                 if (!conf.attributes) {
                     return undefined
                 }
-
                 const name = conf.attributes.find(att => att.name === "name")
                 const id = conf.attributes.find(att => att.name === "id")
                 const version = conf.attributes.find(att => att.name === "version")
@@ -458,7 +452,6 @@ export class VroRestClient {
                 if (!res.attributes) {
                     return undefined
                 }
-
                 const name = res.attributes.find(att => att.name === "name")
                 const id = res.attributes.find(att => att.name === "id")
 
@@ -509,7 +502,6 @@ export class VroRestClient {
                 if (!child.attributes) {
                     return undefined
                 }
-
                 const name = child.attributes.find(att => att.name === "name")
                 const id = child.attributes.find(att => att.name === "id")
                 const type = child.attributes.find(att => att.name === "type")
@@ -555,12 +547,12 @@ export class VroRestClient {
 
         const children: HintAction[] = responseJson.actions.map(child => {
             return {
-                name: child.name || undefined,
-                id: child.id || undefined,
-                returnType: child.returnType || undefined,
-                description: child.description || undefined,
-                version: child.version || undefined,
-                categoryId: child.categoryId || undefined,
+                name: child.name ?? undefined,
+                id: child.id ?? undefined,
+                returnType: child.returnType ?? undefined,
+                description: child.description ?? undefined,
+                version: child.version ?? undefined,
+                categoryId: child.categoryId ?? undefined,
                 parameters: child.parameters || []
             } as HintAction
         })
@@ -605,15 +597,15 @@ export class VroRestClient {
                 }
 
                 const id =
-                    child.attributes.find(att => att.name === "id") ||
+                    child.attributes.find(att => att.name === "id") ??
                     child.attributes.find(att => att.name === "dunesId")
 
                 const name =
-                    child.attributes.find(att => att.name === "displayName") ||
+                    child.attributes.find(att => att.name === "displayName") ??
                     child.attributes.find(att => att.name === "name")
 
                 const type =
-                    child.attributes.find(att => att.name === "type") ||
+                    child.attributes.find(att => att.name === "type") ??
                     child.attributes.find(att => att.name === "@type")
 
                 return {
@@ -665,8 +657,8 @@ export class VroRestClient {
             uri: `https://${this.hostname}:${this.port}/vco/api/workflows/${id}/schema`,
             auth: { ...(await this.getAuth()) }
         }
-
         const stream = request(options).pipe(fs.createWriteStream(targetPath))
+
         return new Promise((resolve, reject) => {
             stream.on("finish", () => resolve())
             stream.on("error", e => reject(e))
