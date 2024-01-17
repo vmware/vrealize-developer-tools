@@ -47,16 +47,33 @@ export interface WorkflowLogsResponse {
     }[]
 }
 
-export interface ApiElement {
-    name: string
+export interface Resource {
     id: string
+    name: string
+}
+
+// For better readability a separate interface is created
+export interface Configuration extends Resource {
+    version: string
+}
+
+// For better readability a separate interface is created
+export interface Workflow extends Resource {
+    version: string
+}
+
+export interface Action {
+    id: string
+    fqn: string
+    version: string
+}
+
+export interface ApiElement extends Resource {
     type: ApiCategoryType | ApiElementType
     rel: string
 }
 
-export interface InventoryElement {
-    name: string
-    id: string
+export interface InventoryElement extends Resource {
     type: string
     rel: string
     href: string
