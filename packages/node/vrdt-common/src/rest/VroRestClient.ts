@@ -39,9 +39,11 @@ export class VroRestClient {
     private workflows: Workflow[] = []
     private configurations: Configuration[] = []
     private resources: Resource[] = []
+    private isCachingEnabled: boolean
 
     constructor(private settings: BaseConfiguration) {
         this.auth = this.getInitialAuth()
+        this.isCachingEnabled = this.settings?.pluginSettings?.vro?.inventory?.cache ?? false
     }
 
     private get hostname(): string {
@@ -372,8 +374,8 @@ export class VroRestClient {
     }
 
     async getActions(): Promise<Action[]> {
-        // return the cached actions (if any)
-        if (this.actions && Array.isArray(this.actions) && this.actions.length) {
+        // return the cached actions (if any) if caching is enabled
+        if (this.isCachingEnabled && this.actions && Array.isArray(this.actions) && this.actions.length) {
             return this.actions
         }
 
@@ -398,15 +400,17 @@ export class VroRestClient {
             }) as { fqn: string; id: string; version: string }[]
 
         actions.sort((x, y) => x.fqn.localeCompare(y.fqn))
-        // cache the actions in order not to overload vRO
-        this.actions = actions
+        // cache the actions in order not to overload vRO if caching is enabled
+        if (this.isCachingEnabled) {
+            this.actions = actions
+        }
 
         return this.actions
     }
 
     async getWorkflows(): Promise<Workflow[]> {
-        // return the cached workflows (if any)
-        if (this.workflows && Array.isArray(this.workflows) && this.workflows.length) {
+        // return the cached workflows (if any) if caching is enabled
+        if (this.isCachingEnabled && this.workflows && Array.isArray(this.workflows) && this.workflows.length) {
             return this.workflows
         }
 
@@ -432,15 +436,22 @@ export class VroRestClient {
             }) as { name: string; id: string; version: string }[]
 
         workflows.sort((x, y) => x.name.localeCompare(y.name))
-        // cache the workflows
-        this.workflows = workflows
+        // cache the workflows if caching is enabled
+        if (this.isCachingEnabled) {
+            this.workflows = workflows
+        }
 
         return workflows
     }
 
     async getConfigurations(): Promise<Configuration[]> {
-        // return the cached configurations (if any)
-        if (this.configurations && Array.isArray(this.configurations) && this.configurations.length) {
+        // return the cached configurations (if any) if caching is enabled
+        if (
+            this.isCachingEnabled &&
+            this.configurations &&
+            Array.isArray(this.configurations) &&
+            this.configurations.length
+        ) {
             return this.configurations
         }
 
@@ -465,15 +476,17 @@ export class VroRestClient {
             }) as { name: string; id: string; version: string }[]
         configs.sort((x, y) => x.name.localeCompare(y.name))
 
-        // cache the configurations
-        this.configurations = configs
+        // cache the configurations if caching is enabled
+        if (this.isCachingEnabled) {
+            this.configurations = configs
+        }
 
         return configs
     }
 
     async getResources(): Promise<Resource[]> {
-        // return the cached resources (if any)
-        if (this.resources && Array.isArray(this.resources) && this.resources.length) {
+        // return the cached resources (if any) if caching is enabled
+        if (this.isCachingEnabled && this.resources && Array.isArray(this.resources) && this.resources.length) {
             return this.resources
         }
 
@@ -497,15 +510,21 @@ export class VroRestClient {
 
         resources.sort((x, y) => x.name.localeCompare(y.name))
 
-        // cache the resources
-        this.resources = resources
+        // cache the resources if caching is enabled
+        if (this.isCachingEnabled) {
+            this.resources = resources
+        }
 
         return resources
     }
 
     async getRootCategories(categoryType: ApiCategoryType): Promise<ApiElement[]> {
-        // return cached hint root elements (if any) in order to not overload vRO
-        if (this.rootElements?.has(categoryType) && Array.isArray(this.rootElements?.get(categoryType))) {
+        // return cached hint root elements (if any) in order to not overload vRO if caching is enabled
+        if (
+            this.isCachingEnabled &&
+            this.rootElements?.has(categoryType) &&
+            Array.isArray(this.rootElements?.get(categoryType))
+        ) {
             return this.childElements?.get(categoryType) as ApiElement[]
         }
 
@@ -530,15 +549,21 @@ export class VroRestClient {
 
         categories.sort((x, y) => x.name.localeCompare(y.name))
 
-        // cache the hint root elements in order not to overload vRO REST API
-        this.childElements.set(categoryType, categories)
+        // cache the hint root elements in order not to overload vRO REST API if caching is enabled
+        if (this.isCachingEnabled) {
+            this.childElements.set(categoryType, categories)
+        }
 
         return categories
     }
 
     async getChildrenOfCategory(categoryId: string): Promise<ApiElement[]> {
-        // return cached hint child elements (if any) in order to not overload vRO
-        if (this.childElements?.has(categoryId) && Array.isArray(this.childElements?.get(categoryId))) {
+        // return cached hint child elements (if any) in order to not overload vRO if caching is enabled
+        if (
+            this.isCachingEnabled &&
+            this.childElements?.has(categoryId) &&
+            Array.isArray(this.childElements?.get(categoryId))
+        ) {
             return this.childElements?.get(categoryId) as ApiElement[]
         }
 
@@ -565,15 +590,21 @@ export class VroRestClient {
 
         children.sort((x, y) => x.name.localeCompare(y.name))
 
-        // cache the hint child elements in order not to overload vRO REST API
-        this.childElements.set(categoryId, children)
+        // cache the hint child elements in order not to overload vRO REST API if caching is enabled
+        if (this.isCachingEnabled) {
+            this.childElements.set(categoryId, children)
+        }
 
         return children
     }
 
     async getChildrenOfCategoryWithDetails(categoryId: string): Promise<HintAction[]> {
-        // return cached hint actions (if any) in order to not overload vRO REST API
-        if (this.hintActions?.has(categoryId) && Array.isArray(this.hintActions?.get(categoryId))) {
+        // return cached hint actions (if any) in order to not overload vRO REST API if caching is enabled
+        if (
+            this.isCachingEnabled &&
+            this.hintActions?.has(categoryId) &&
+            Array.isArray(this.hintActions?.get(categoryId))
+        ) {
             return this.hintActions?.get(categoryId) as HintAction[]
         }
 
@@ -604,8 +635,10 @@ export class VroRestClient {
             } as HintAction
         })
         children.sort((x, y) => x.name.localeCompare(y.name))
-        // cache the hint actions in order not to overload vRO REST API
-        this.hintActions.set(categoryId, children)
+        // cache the hint actions in order not to overload vRO REST API if caching is enabled in config
+        if (this.isCachingEnabled) {
+            this.hintActions.set(categoryId, children)
+        }
 
         return children
     }
@@ -636,7 +669,7 @@ export class VroRestClient {
     }
 
     async getInventoryItems(href?: string): Promise<InventoryElement[]> {
-        const responseJson: ContentChildrenResponse = await this.send("GET", href || "inventory")
+        const responseJson: ContentChildrenResponse = await this.send("GET", href ?? "inventory")
         const children = responseJson.relations.link
             .map(child => {
                 if (!child.attributes) {

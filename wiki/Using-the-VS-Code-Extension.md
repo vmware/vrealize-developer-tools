@@ -75,6 +75,10 @@ A vRO explorer view is available in the activity bar that allows browsing the wh
 
 ![vRO Explorer](./images/explorer.png)
 
+#### Inventory Caching
+
+There is a support for vRO inventory items caching in order not to overload vRO on heavily loaded environments. If the vrdev:vro:inventory:cache setting is enabled in the plugin settings, the vRO inventory items will be fetched once from the vRO server during visual studion code session. When there are changes in vRO inventory made during visual studio code session they will not be fetched. In order to maintain fresh load of data either disable the cache setting or reload the visual studio code.
+
 ### Push and Pull content
 
 The VS Code build tasks palette (<kbd>Cmd+Shift+B</kbd> / <kbd>Ctrl+Shift+B</kbd>) contains commands for pushing content to a live vRO/vRA instance and for pulling workflows, configurations, resources and vRA content back to your local machine – in a form suitable for committing into source control.
