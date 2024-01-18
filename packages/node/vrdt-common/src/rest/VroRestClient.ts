@@ -43,7 +43,7 @@ export class VroRestClient {
 
     constructor(private settings: BaseConfiguration) {
         this.auth = this.getInitialAuth()
-        this.isCachingEnabled = this.settings?.pluginSettings?.vro?.inventory?.cache ?? false
+        this.isCachingEnabled = this.settings?.vrdev?.vro?.inventory?.cache ?? false
     }
 
     private get hostname(): string {

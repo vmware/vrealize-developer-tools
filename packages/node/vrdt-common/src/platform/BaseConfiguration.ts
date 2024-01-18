@@ -22,20 +22,19 @@ export abstract class BaseConfiguration {
         return this.getActiveProfileImpl()
     }
 
-    get pluginSettings(): VrealizeSettings {
-        return this.vrdev
-    }
-
     private getActiveProfileImpl(): MavenProfileWrapper {
         const profileName = this.vrdev.maven.profile
 
         if (!profileName) {
             throw new Error("There is no currently active maven profile. Set the 'vrdev.maven.profile' setting")
         }
+
         if (!this.allProfiles) {
             throw new Error("There are no vRO profiles in ~/.m2/settings.xml")
         }
+
         const profile = this.allProfiles[profileName]
+
         if (!profile) {
             throw new Error(`Could not find profile '${profileName}' in ~/.m2/settings.xml`)
         }
