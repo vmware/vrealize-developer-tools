@@ -34,7 +34,7 @@ jobs:
         id: version_step
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: "npm ci"
