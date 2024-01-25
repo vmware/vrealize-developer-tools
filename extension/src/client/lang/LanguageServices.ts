@@ -10,7 +10,7 @@ import { remote } from "@vmware/vro-language-server"
 import * as vscode from "vscode"
 import * as client from "vscode-languageclient"
 
-import { OutputChannels } from "../constants"
+import { LanguageServerConfig, OutputChannels } from "../constants"
 import { Registrable } from "../Registrable"
 import { ConfigurationManager, EnvironmentManager } from "../system"
 
@@ -82,20 +82,23 @@ export class LanguageServices implements Registrable, vscode.Disposable {
                 ? path.join(module, "dist", "langserver.js")
                 : path.join(module, "out", "server", "langserver.js")
 
-        this.logger.info(`Starting vRO language server on port 6014`)
+        this.logger.info(`Starting vRO language server on port '${LanguageServerConfig.Port}'`)
 
         const serverOptions = {
             run: {
                 module: executable,
                 transport: client.TransportKind.ipc,
-                args: ["--node-ipc"],
+                args: [`--${LanguageServerConfig.NodeType}`],
                 options: { cwd: module }
             },
             debug: {
                 module: executable,
                 transport: client.TransportKind.ipc,
-                args: ["--node-ipc"],
-                options: { cwd: module, execArgv: ["--nolazy", "--inspect=6014"] }
+                args: [`--${LanguageServerConfig.NodeType}`],
+                options: {
+                    cwd: module,
+                    execArgv: [`--${LanguageServerConfig.LoadType}`, `--inspect=${LanguageServerConfig.Port}`]
+                }
             }
         }
 
@@ -119,6 +122,6 @@ export class LanguageServices implements Registrable, vscode.Disposable {
                 ]
             }
         }
-        return new client.LanguageClient("vRO LS", serverOptions, clientOptions)
+        return new client.LanguageClient(LanguageServerConfig.DisplayName, serverOptions, clientOptions)
     }
 }

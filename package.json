@@ -525,7 +525,7 @@
         "vrdev.vro.inventory.cache": {
           "type": "boolean",
           "default": true,
-          "description": "Enable / Disable vRO Inventory Caching",
+          "description": "Enable vRO inventory caching (can be used in heavily loaded environments)",
           "scope": "window"
         }
       }

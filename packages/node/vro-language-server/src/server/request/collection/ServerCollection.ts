@@ -162,7 +162,7 @@ export class ServerCollection {
             this.logger.error("No vRO objects found")
         } else {
             for (const plugin of plugins) {
-                const link = plugin.detailsLink.match(regex)
+                const link = RegExp(regex).exec(plugin.detailsLink)
                 if (!link) {
                     throw new Error(`No plugin details found`)
                 }

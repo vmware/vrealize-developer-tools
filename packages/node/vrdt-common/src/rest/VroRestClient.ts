@@ -43,7 +43,7 @@ export class VroRestClient {
 
     constructor(private settings: BaseConfiguration) {
         this.auth = this.getInitialAuth()
-        this.isCachingEnabled = this.settings?.vrdev?.vro?.inventory?.cache ?? false
+        this.loadCacheConfiguration()
     }
 
     private get hostname(): string {
@@ -182,6 +182,8 @@ export class VroRestClient {
         options?: Partial<request.OptionsWithUrl>
     ): Promise<T> {
         const url = route.indexOf("://") > 0 ? route : `https://${this.hostname}:${this.port}/vco/api/${route}`
+        // reload the cache configuration in order cache to take effect when settings are changed
+        this.loadCacheConfiguration()
         return request({
             headers: {
                 "Accept": "application/json",
@@ -675,15 +677,12 @@ export class VroRestClient {
                 if (!child.attributes) {
                     return undefined
                 }
-
                 const id =
                     child.attributes.find(att => att.name === "id") ??
                     child.attributes.find(att => att.name === "dunesId")
-
                 const name =
                     child.attributes.find(att => att.name === "displayName") ??
                     child.attributes.find(att => att.name === "name")
-
                 const type =
                     child.attributes.find(att => att.name === "type") ??
                     child.attributes.find(att => att.name === "@type")
@@ -824,5 +823,9 @@ export class VroRestClient {
 
     async getPluginDetails(link: string) {
         return this.send("GET", `server-configuration/api/plugins/${link}`)
+    }
+
+    private loadCacheConfiguration(): void {
+        this.isCachingEnabled = this.settings?.vrdev?.vro?.inventory?.cache ?? false
     }
 }

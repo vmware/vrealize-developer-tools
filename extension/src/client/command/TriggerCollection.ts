@@ -7,7 +7,7 @@ import { AutoWire, Logger, sleep } from "@vmware/vrdt-common"
 import { remote } from "@vmware/vro-language-server"
 import * as vscode from "vscode"
 
-import { Commands } from "../constants"
+import { Commands, LanguageServerConfig } from "../constants"
 import { LanguageServices } from "../lang"
 import { Command } from "./Command"
 
@@ -30,7 +30,7 @@ export class TriggerCollection extends Command<void> {
         const languageClient = this.languageServices.client
 
         if (!languageClient) {
-            this.logger.warn("The vRO language server is not running")
+            this.logger.warn(`The ${LanguageServerConfig.DisplayName} is not running`)
             return
         }
         await vscode.commands.executeCommand(Commands.EventCollectionStart)
@@ -48,15 +48,13 @@ export class TriggerCollection extends Command<void> {
                     while (status && !status.finished) {
                         this.logger.info("Collection status:", status)
                         progress.report(status)
-                        await sleep(1000)
+                        await sleep(LanguageServerConfig.SleepTime)
                         status = await languageClient.sendRequest(remote.server.giveVroCollectionStatus)
                     }
 
                     this.logger.info("Collection finished:", status)
-
                     if (status.error !== undefined) {
                         await vscode.commands.executeCommand(Commands.EventCollectionError, status.error)
-
                         if (status.data.hintsPluginBuild === 0) {
                             vscode.window.showErrorMessage(
                                 "The vRO Hint plug-in is not installed on the configured vRO server"
