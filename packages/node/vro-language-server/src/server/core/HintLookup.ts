@@ -37,12 +37,14 @@ class HintStore<T> {
 @AutoWire
 export class HintLookup implements Disposable {
     private readonly logger = Logger.get("HintLookup")
+
     private scriptingApi: HintStore<vmw.pscoe.hints.ScriptingApiPack> = new HintStore()
+    actions: any = new HintStore()
     private configs: HintStore<vmw.pscoe.hints.ConfigurationsPack> = new HintStore()
     private vroModulesAndActions: HintModule[]
     private vroObjects: vmw.pscoe.hints.IClass[]
+
     private subscriptions: Disposable[] = []
-    actions: any = new HintStore()
 
     constructor(
         private environment: Environment,
@@ -91,7 +93,6 @@ export class HintLookup implements Disposable {
             ? _.flatMap(this.actions.local[workspaceFolder.uri.fsPath], pack => pack.modules)
             : []
         const globalModules = _.flatMap(this.actions.global, pack => pack.modules)
-
         return _.unionWith(localModules, globalModules, (x, y) => x.name === y.name)
     }
 
@@ -99,7 +100,7 @@ export class HintLookup implements Disposable {
         const module = this.getActionModules(workspaceFolder).find(module => module.name === moduleName)
         this.logger.debug(`Module hint: ${JSON.stringify(module, null, 4)}`)
 
-        if (module?.actions) {
+        if (module && module.actions) {
             return module.actions.filter(action => !!action)
         }
 
@@ -115,14 +116,13 @@ export class HintLookup implements Disposable {
             ? _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories)
             : []
         const globalCategories = _.flatMap(this.configs.global, pack => pack.categories)
-
         return _.unionWith(localCategories, globalCategories, (x, y) => x.path === y.path)
     }
 
     getConfigElementsIn(categoryPath: string, workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IConfig[] {
         const module = this.getConfigCategories(workspaceFolder).find(category => category.path === categoryPath)
 
-        if (module?.configurations) {
+        if (module && module.configurations) {
             return module.configurations.filter(config => !!config)
         }
 
@@ -135,10 +135,13 @@ export class HintLookup implements Disposable {
         if (this.vroObjects) {
             result.push(...this.vroObjects)
         }
+
         for (const api of this.scriptingApi.global) {
             for (const cls of api.classes) {
                 const hasConstructors = !!cls.constructors && cls.constructors.length > 0
-                if (filter.isInstantiable === undefined || hasConstructors === filter.isInstantiable) {
+                if (filter.isInstantiable === undefined) {
+                    result.push(cls)
+                } else if (hasConstructors === filter.isInstantiable) {
                     result.push(cls)
                 }
             }
@@ -162,6 +165,7 @@ export class HintLookup implements Disposable {
     //
     // Event Handlers
     //
+
     initialize() {
         this.environment.workspaceFolders.forEach(this.load, this)
         this.load()
@@ -186,6 +190,7 @@ export class HintLookup implements Disposable {
     //
     // Load proto files
     //
+
     private load(workspaceFolder?: WorkspaceFolder): void {
         const actionsFile = this.environment.resolveHintFile("actions.pb", workspaceFolder)
         if (actionsFile) {
@@ -254,8 +259,8 @@ export class HintLookup implements Disposable {
             this.logger.warn(`Hint file '${filePath}' does not exist`)
             return null
         }
-        const buffer = fs.readFileSync(filePath)
 
+        const buffer = fs.readFileSync(filePath)
         return decoder.decode(buffer)
     }
 }
