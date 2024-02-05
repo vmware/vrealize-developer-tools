@@ -211,7 +211,7 @@ export class HintLookup implements Disposable {
 
         if (!workspaceFolder) {
             // plugins aren't located in workspace folder
-            const coreApiFile = this.environment.resolveHintFile("core-api.pb")
+            const coreApiFile = this.environment.resolveHintFile("core-api.pb", undefined)
             const pluginFiles = this.environment.resolvePluginHintFiles()
 
             if (coreApiFile) {
