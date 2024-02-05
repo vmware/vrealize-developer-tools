@@ -59,7 +59,7 @@ export class HintLookup implements Disposable {
 
     dispose(): void {
         this.logger.debug("Disposing HintLookup")
-        this.subscriptions.forEach(s => s?.dispose())
+        this.subscriptions.forEach(s => s && s.dispose())
     }
 
     getGlobalActionsPack() {
@@ -167,10 +167,6 @@ export class HintLookup implements Disposable {
         this.load()
     }
 
-    refreshForWorkspace(workspaceFolder: WorkspaceFolder): void {
-        this.load(workspaceFolder)
-    }
-
     private onDidChangeConfiguration(): void {
         this.logger.debug("HintLookup.onDidChangeConfiguration()")
         this.load()
@@ -181,6 +177,10 @@ export class HintLookup implements Disposable {
         for (const folder of event.added) {
             this.load(WorkspaceFolder.fromProtocol(folder))
         }
+    }
+
+    refreshForWorkspace(workspaceFolder: WorkspaceFolder): void {
+        this.load(workspaceFolder)
     }
 
     //
@@ -203,6 +203,7 @@ export class HintLookup implements Disposable {
                 )
             }
         }
+
         const configsFile = this.environment.resolveHintFile("configs.pb", workspaceFolder)
         if (configsFile) {
             this.loadProtoInScope([configsFile], workspaceFolder, this.configs, vmw.pscoe.hints.ConfigurationsPack)
@@ -210,8 +211,9 @@ export class HintLookup implements Disposable {
 
         if (!workspaceFolder) {
             // plugins aren't located in workspace folder
-            const coreApiFile = this.environment.resolveHintFile("core-api.pb", undefined)
+            const coreApiFile = this.environment.resolveHintFile("core-api.pb")
             const pluginFiles = this.environment.resolvePluginHintFiles()
+
             if (coreApiFile) {
                 pluginFiles.push(coreApiFile)
             }
@@ -237,6 +239,7 @@ export class HintLookup implements Disposable {
                 result.push(hintPack)
             }
         })
+
         if (!scope) {
             target.global = result
         } else {
