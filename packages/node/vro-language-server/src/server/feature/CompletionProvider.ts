@@ -177,6 +177,38 @@ export class CompletionProvider {
         return suggestions
     }
 
+    private getConstructorSuggestions(prefix: CompletionPrefix): CompletionItem[] {
+        const suggestions: CompletionItem[] = []
+
+        this.hints
+            .getClasses({ isInstantiable: true })
+            .filter(cls => !!cls.name && cls.name.startsWith(prefix.filter || ""))
+            .forEach(cls => {
+                if (cls.constructors && cls.constructors.length > 0) {
+                    for (const constr of cls.constructors) {
+                        const name = cls.name ?? ""
+                        const completionItem = CompletionItem.create(name)
+                        completionItem.kind = CompletionItemKind.Constructor
+
+                        if (constr.description) {
+                            completionItem.documentation = Previewer.extendDescriptionWithParams(
+                                constr.description,
+                                constr.parameters
+                            )
+                        } else if (cls.description) {
+                            completionItem.documentation = cls.description
+                        }
+
+                        completionItem.detail = Previewer.computeDetailsForConstructor(cls, constr)
+                        completionItem.sortText = `000${name}`
+                        suggestions.push(completionItem)
+                    }
+                }
+            })
+
+        return suggestions
+    }
+
     private getStaticMemberSuggestions(prefix: CompletionPrefix): CompletionItem[] {
         // TODO: Set isInstantiable back to `false`, once there are other ways to find out
         // the members of non-static classes. At the moment, the only way to do that
@@ -185,15 +217,19 @@ export class CompletionProvider {
             .getClasses({ isInstantiable: undefined })
             .concat(this.hints.getFunctionSets())
             .find(c => c.name === prefix.value)
-
-        if (!cls) return []
+        if (!cls) {
+            return []
+        }
 
         const suggestions: CompletionItem[] = []
         const methods: CompletionItem[] = this.getMethodsSuggestions(cls, prefix)
         const properties: CompletionItem[] = this.getPropertiesSuggestions(cls, prefix)
-
-        methods.forEach(item => suggestions.push(item))
-        properties.forEach(item => suggestions.push(item))
+        if (methods?.length) {
+            methods.forEach(item => suggestions.push(item))
+        }
+        if (properties?.length) {
+            properties.forEach(item => suggestions.push(item))
+        }
 
         return suggestions
     }
@@ -249,38 +285,6 @@ export class CompletionProvider {
         return suggestions
     }
 
-    private getConstructorSuggestions(prefix: CompletionPrefix): CompletionItem[] {
-        const suggestions: CompletionItem[] = []
-
-        this.hints
-            .getClasses({ isInstantiable: true })
-            .filter(cls => !!cls.name && cls.name.startsWith(prefix.filter || ""))
-            .forEach(cls => {
-                if (cls.constructors && cls.constructors.length > 0) {
-                    for (const constr of cls.constructors) {
-                        const name = cls.name ?? ""
-                        const completionItem = CompletionItem.create(name)
-                        completionItem.kind = CompletionItemKind.Constructor
-
-                        if (constr.description) {
-                            completionItem.documentation = Previewer.extendDescriptionWithParams(
-                                constr.description,
-                                constr.parameters
-                            )
-                        } else if (cls.description) {
-                            completionItem.documentation = cls.description
-                        }
-
-                        completionItem.detail = Previewer.computeDetailsForConstructor(cls, constr)
-                        completionItem.sortText = `000${name}`
-                        suggestions.push(completionItem)
-                    }
-                }
-            })
-
-        return suggestions
-    }
-
     private getModuleClassSuggestions(prefix: CompletionPrefix, workspaceFolder: WorkspaceFolder): CompletionItem[] {
         const suggestions = this.hints
             .getActionsIn(prefix.value, workspaceFolder)
@@ -306,7 +310,6 @@ export class CompletionProvider {
         const lineContent = document.getLineContentUntil(position)
 
         this.logger.debug(`Trying to provide auto completion for line '${lineContent}'`)
-
         for (const pattern of prefixPatterns) {
             const prefix = pattern.match(lineContent)
             if (prefix) {
@@ -314,8 +317,8 @@ export class CompletionProvider {
                 return prefix
             }
         }
-
         this.logger.debug("None of the patterns matched.")
+
         return null
     }
 }

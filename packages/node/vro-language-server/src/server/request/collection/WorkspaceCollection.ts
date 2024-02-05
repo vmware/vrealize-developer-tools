@@ -68,6 +68,7 @@ export class WorkspaceCollection {
 
     async triggerCollectionAndRefresh(workspaceFolder: WorkspaceFolder): Promise<void> {
         await this.triggerCollection(workspaceFolder)
+        // workspace collection
         this.hints.refreshForWorkspace(workspaceFolder)
     }
 
@@ -84,7 +85,6 @@ export class WorkspaceCollection {
 
         const fullPath = path.join(workspaceFolder.uri.fsPath, modules.join(","))
         const modulesPath = path.join(fullPath, "src/main/resources")
-
         try {
             const payload = this.collectLocalData(modulesPath)
             this.generateActionsPbFiles(payload, outputDir, workspaceFolder)

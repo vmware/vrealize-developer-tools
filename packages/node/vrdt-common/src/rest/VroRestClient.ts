@@ -18,6 +18,7 @@ import {
     ContentChildrenResponse,
     ContentLinksResponse,
     InventoryElement,
+    LinkItem,
     LogMessage,
     Resource,
     Version,
@@ -86,7 +87,7 @@ export class VroRestClient {
         this.logger.info("Initial authentication...")
         let auth: Auth
 
-        await sleep(1000) // to properly initialize the components
+        await sleep(3000) // to properly initialize the components
 
         let refreshToken = this.refreshToken
         switch (this.authMethod.toLowerCase()) {
@@ -535,18 +536,19 @@ export class VroRestClient {
             `categories?isRoot=true&categoryType=${categoryType}`
         )
         const categories = responseJson.link
-            .map(child => {
-                const name = child.attributes.find(att => att.name === "name")
-                const id = child.attributes.find(att => att.name === "id")
+            .map((item: LinkItem) => {
+                const name = item.attributes.find(att => att.name === "name")
+                const id = item.attributes.find(att => att.name === "id")
                 return {
-                    name: name ? name.value : undefined,
-                    id: id ? id.value : undefined,
+                    name: name?.value ?? undefined,
+                    id: id?.value ?? undefined,
                     type: categoryType,
-                    rel: child.rel
+                    rel: item?.rel,
+                    description: item?.description?.value ?? undefined
                 }
             })
-            .filter(val => {
-                return val.name !== undefined && val.id !== undefined
+            .filter(item => {
+                return item.name !== undefined && item.id !== undefined
             }) as ApiElement[]
 
         categories.sort((x, y) => x.name.localeCompare(y.name))

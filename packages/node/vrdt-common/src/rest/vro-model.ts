@@ -79,12 +79,25 @@ export interface InventoryElement extends Resource {
     href: string
 }
 
+export interface BaseAttribute {
+    name: string
+    value?: string
+}
+
+export interface TypeAttribute extends BaseAttribute {
+    type: string
+}
+
+export interface LinkItem {
+    attributes: TypeAttribute[]
+    rel: string
+    href: string
+    description?: BaseAttribute
+}
+
 export interface ContentLinksResponse {
-    link: {
-        attributes: { name: string; value: string; type: string }[]
-        rel: string
-        href: string
-    }[]
+    link: LinkItem[]
+    total?: number
 }
 
 export interface ContentChildrenResponse {
