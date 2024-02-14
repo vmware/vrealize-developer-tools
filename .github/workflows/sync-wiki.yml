@@ -14,8 +14,8 @@ jobs:
 
       - id: get-commit-info
         run: |
-          echo "::set-output name=author::$(git log -1 --pretty=format:'%an <%ae>')"
-          echo "::set-output name=message::$(git show -s --format=%B)"
+          echo "author=$(git log -1 --pretty=format:'%an <%ae>')" >> "$GITHUB_OUTPUT"
+          echo "message=$(git show -s --format=%B)" >> "$GITHUB_OUTPUT"
 
       - run: git clone https://$GITHUB_TOKEN@github.com/vmware/vrealize-developer-tools.wiki.git /tmp/wiki-repo
         env:
