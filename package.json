@@ -521,6 +521,12 @@
           ],
           "markdownDescription": "Specifies how the _Explorer_ view will display vRO action packages",
           "scope": "window"
+        },
+        "vrdev.vro.inventory.cache": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable vRO inventory caching (can be used in heavily loaded environments)",
+          "scope": "window"
         }
       }
     },

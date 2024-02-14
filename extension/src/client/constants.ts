@@ -110,3 +110,11 @@ export enum ProjectArchetypes {
     VraNg = "com.vmware.pscoe.vra-ng:vra-ng-package",
     Polyglot = "com.vmware.pscoe.polyglot:polyglot-project"
 }
+
+export enum LanguageServerConfig {
+    Port = 6014,
+    LoadType = "nolazy",
+    NodeType = "node-ipc",
+    DisplayName = "vRO Language Server",
+    SleepTime = 1000
+}

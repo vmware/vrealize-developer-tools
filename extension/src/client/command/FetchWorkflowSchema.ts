@@ -25,7 +25,7 @@ export class FetchWorkflowSchema extends Command<void> {
 
     constructor(config: ConfigurationManager, environment: EnvironmentManager) {
         super()
-        this.restClient = new VroRestClient(config, environment)
+        this.restClient = new VroRestClient(config)
     }
 
     async execute(context: vscode.ExtensionContext, node: WorkflowNode): Promise<void> {

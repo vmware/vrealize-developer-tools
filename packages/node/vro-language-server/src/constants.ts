@@ -40,5 +40,16 @@ message Action {
 }`
 
 export const Timeout = {
-    ONE_SECOND: 1000
+    ONE_SECOND: 1000,
+    THREE_SECONDS: 3000,
+    FIVE_SECONDS: 5000
+}
+
+export enum CompletionPrefixKind {
+    UNKNOWN = "Unknown",
+    CLASS_IMPORT = "Class Import",
+    CLASS_REFERENCE = "Class Reference",
+    STATIC_MEMBER_REFERENCE = "Static Member Reference",
+    NEW_INSTANCE = "New Instance",
+    MODULE_IMPORT = "Module Import"
 }

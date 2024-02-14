@@ -53,14 +53,6 @@ export class StatusBarController implements Registrable, vscode.Disposable {
         this.collectionStatus.dispose()
     }
 
-    private onConfigurationOrProfilesChanged() {
-        const currentProfileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
-
-        if (this.verifyConfiguration() && currentProfileName !== this.profileName && this.env.hasRelevantProject()) {
-            vscode.commands.executeCommand(Commands.TriggerServerCollection)
-        }
-    }
-
     verifyConfiguration(): boolean {
         this.profileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
         this.logger.info(`Verifying configuration for active profile ${this.profileName}`)
@@ -94,6 +86,14 @@ export class StatusBarController implements Registrable, vscode.Disposable {
         this.collectionStatus.command = Commands.ChangeProfile
 
         return false
+    }
+
+    private onConfigurationOrProfilesChanged() {
+        const currentProfileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
+
+        if (this.verifyConfiguration() && currentProfileName !== this.profileName && this.env.hasRelevantProject()) {
+            vscode.commands.executeCommand(Commands.TriggerServerCollection)
+        }
     }
 
     private onCollectionStart() {
