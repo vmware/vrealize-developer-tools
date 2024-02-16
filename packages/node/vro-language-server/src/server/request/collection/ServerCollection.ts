@@ -58,9 +58,6 @@ export class ServerCollection {
 
     async triggerCollection(offline: boolean, event: CancellationToken) {
         this.logger.info("Triggering vRO server data collection...")
-        this.environment.workspaceFolders.forEach(workspaceFolder => {
-            this.workspaceCollection.triggerCollectionAndRefresh(workspaceFolder)
-        })
 
         this.restClient
             .getVersion()
@@ -94,6 +91,10 @@ export class ServerCollection {
                 this.currentStatus.finished = true
                 this.hints.initialize()
             })
+
+        this.environment.workspaceFolders.forEach(workspaceFolder => {
+            this.workspaceCollection.triggerCollectionAndRefresh(workspaceFolder)
+        })
     }
 
     async getModulesAndActions() {
