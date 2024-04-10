@@ -101,7 +101,7 @@ export class HintLookup implements Disposable {
         this.logger.debug(`Module hint: ${JSON.stringify(module, null, 4)}`)
 
         if (module?.actions) {
-            return module.actions.filter(action => !!action)
+            return module.actions.filter((action: any) => !!action)
         }
 
         return []
@@ -139,7 +139,7 @@ export class HintLookup implements Disposable {
         for (const api of this.scriptingApi.global) {
             for (const cls of api.classes) {
                 const hasConstructors = !!cls.constructors && cls.constructors.length > 0
-                if ((filter.isInstantiable === undefined) || (hasConstructors === filter.isInstantiable)) {
+                if (filter.isInstantiable === undefined || hasConstructors === filter.isInstantiable) {
                     result.push(cls)
                 }
             }
