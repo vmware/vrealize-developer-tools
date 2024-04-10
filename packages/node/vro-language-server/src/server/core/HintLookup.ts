@@ -5,9 +5,9 @@
 
 import * as fs from "fs"
 
+import { AutoWire, HintModule, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import * as _ from "lodash"
 import { v4 as uuidv4 } from "uuid"
-import { AutoWire, HintModule, Logger, WorkspaceFolder } from "@vmware/vrdt-common"
 import { Disposable, WorkspaceFoldersChangeEvent } from "vscode-languageserver"
 
 import { vmw } from "../../proto"
@@ -139,7 +139,7 @@ export class HintLookup implements Disposable {
         for (const api of this.scriptingApi.global) {
             for (const cls of api.classes) {
                 const hasConstructors = !!cls.constructors && cls.constructors.length > 0
-                if (filter.isInstantiable === undefined || hasConstructors === filter.isInstantiable) {
+                if ((filter.isInstantiable === undefined) || (hasConstructors === filter.isInstantiable)) {
                     result.push(cls)
                 }
             }

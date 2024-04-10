@@ -134,7 +134,6 @@ export class ServerCollection {
     collectObjects() {
         this.getVroObjects()
             .then(objects => {
-                // todo merge both in same actions.pb file
                 this.hints.collectVroObjects(objects)
             })
             .catch(error => {
