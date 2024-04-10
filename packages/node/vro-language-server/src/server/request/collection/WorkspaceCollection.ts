@@ -3,14 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as path from "path"
 import * as os from "os"
+import * as path from "path"
 
-import { parse } from "comment-parser"
-import * as protobuf from "protobufjs"
-import { v4 as uuidv4 } from "uuid"
-import * as fs from "fs-extra"
-import * as _ from "lodash"
 import {
     ActionParameters,
     AutoWire,
@@ -20,11 +15,16 @@ import {
     PomFile,
     WorkspaceFolder
 } from "@vmware/vrdt-common"
+import { parse } from "comment-parser"
+import * as fs from "fs-extra"
+import * as _ from "lodash"
+import * as protobuf from "protobufjs"
+import { v4 as uuidv4 } from "uuid"
 import { FileChangeType } from "vscode-languageserver"
 
+import { ActionsPackProto, Timeout } from "../../../constants"
 import { Environment, FileChangeEventParams, HintLookup, WorkspaceFilesWatcher } from "../../core"
 import { FileSavedEventParams, WorkspaceDocumentWatcher } from "../../core/WorkspaceDocumentWatcher"
-import { ActionsPackProto, Timeout } from "../../../constants"
 
 @AutoWire
 export class WorkspaceCollection {
@@ -145,12 +145,12 @@ export class WorkspaceCollection {
                 .replace(/[\/\\]$/, "") // remove trailing slash or backslash
                 .replace(/[\/\\]/g, ".") // replace remaining slashes or backslashes with dots
 
-            parsedActions[0].tags.forEach(tag => {
+            parsedActions[0]?.tags.forEach(tag => {
                 if (tag.tag === "param") {
                     const actionParams: ActionParameters = {
                         name: tag.name,
                         type: tag.type,
-                        description: tag.description
+                        description: tag?.description
                     }
                     parameters.push(actionParams)
                 }
@@ -164,7 +164,7 @@ export class WorkspaceCollection {
                 name: actionName,
                 moduleName: moduleName,
                 returnType: returnType,
-                description: parsedActions[0].description,
+                description: parsedActions[0]?.description,
                 parameters: parameters
             }
             actions.push(actionObj)
