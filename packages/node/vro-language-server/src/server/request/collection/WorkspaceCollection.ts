@@ -89,7 +89,7 @@ export class WorkspaceCollection {
             const payload = this.collectLocalData(modulesPath)
             this.generateActionsPbFiles(payload, outputDir, workspaceFolder)
         } catch (error) {
-            this.logger.warn(`Error occurred: ${JSON.stringify(error)}`)
+            this.logger.warn(`Error occurred: ${error}`)
         }
         this.logger.info("Workspace hint collection has finished")
     }
@@ -104,22 +104,23 @@ export class WorkspaceCollection {
         fs.writeFileSync(actionPackProtoFile, ActionsPackProto)
 
         protobuf.load(actionPackProtoFile, function (err, root) {
-            if (err) throw err
-            if (!root) throw new Error("Root namespace not loaded")
-
+            if (err) {
+                throw err
+            }
+            if (!root) {
+                throw new Error("Root namespace not loaded")
+            }
             // Obtain a message type
             const ActionsPack = root.lookupType("vmw.pscoe.hints.ActionsPack")
-
             // Verify the payload (i.e. incomplete or invalid)
             const errMsg = ActionsPack.verify(payload)
-            if (errMsg) throw Error(errMsg)
-
+            if (errMsg) {
+                throw Error(errMsg)
+            }
             // Create a new message
             const message = ActionsPack.create(payload)
-
             // Encode a message to a Buffer
             const buffer = ActionsPack.encode(message).finish()
-
             fs.writeFileSync(outputFile, buffer)
         })
     }
@@ -155,7 +156,7 @@ export class WorkspaceCollection {
                     parameters.push(actionParams)
                 }
                 if (tag.tag === "return") {
-                    returnType = tag.type
+                    returnType = tag?.type
                 }
             })
 
@@ -182,7 +183,7 @@ export class WorkspaceCollection {
 
         modules.forEach(module => {
             actions.forEach(action => {
-                if (action.moduleName === module.name) {
+                if (action?.moduleName === module?.name) {
                     module.actions.push(action)
                 }
             })

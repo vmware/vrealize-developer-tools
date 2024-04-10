@@ -100,7 +100,7 @@ export class HintLookup implements Disposable {
         const module = this.getActionModules(workspaceFolder).find(module => module.name === moduleName)
         this.logger.debug(`Module hint: ${JSON.stringify(module, null, 4)}`)
 
-        if (module && module.actions) {
+        if (module?.actions) {
             return module.actions.filter(action => !!action)
         }
 
@@ -122,7 +122,7 @@ export class HintLookup implements Disposable {
     getConfigElementsIn(categoryPath: string, workspaceFolder?: WorkspaceFolder): vmw.pscoe.hints.IConfig[] {
         const module = this.getConfigCategories(workspaceFolder).find(category => category.path === categoryPath)
 
-        if (module && module.configurations) {
+        if (module?.configurations) {
             return module.configurations.filter(config => !!config)
         }
 
@@ -139,9 +139,7 @@ export class HintLookup implements Disposable {
         for (const api of this.scriptingApi.global) {
             for (const cls of api.classes) {
                 const hasConstructors = !!cls.constructors && cls.constructors.length > 0
-                if (filter.isInstantiable === undefined) {
-                    result.push(cls)
-                } else if (hasConstructors === filter.isInstantiable) {
+                if (filter.isInstantiable === undefined || hasConstructors === filter.isInstantiable) {
                     result.push(cls)
                 }
             }

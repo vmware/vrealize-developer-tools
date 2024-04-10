@@ -134,6 +134,7 @@ export class ServerCollection {
     collectObjects() {
         this.getVroObjects()
             .then(objects => {
+                // todo merge both in same actions.pb file
                 this.hints.collectVroObjects(objects)
             })
             .catch(error => {
@@ -173,6 +174,7 @@ export class ServerCollection {
                 const pluginDetails = await this.restClient.getPluginDetails(parsedLink)
 
                 for (const pluginObject of pluginDetails["objects"]) {
+                    // enrich the object with vRO plugin object properties
                     const object: vmw.pscoe.hints.IClass = {
                         name: pluginObject["name"],
                         description: pluginObject["description"],
