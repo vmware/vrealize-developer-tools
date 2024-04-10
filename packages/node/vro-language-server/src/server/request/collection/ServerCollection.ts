@@ -143,7 +143,7 @@ export class ServerCollection {
 
     /**
      * Collect all vRO Scripting API (Plugin) objects like VcPlugin, ActiveDirectory, etc.
-     * Function is asynchronous and usually take 5-10 mins since the full list of plugin details
+     * Function is asynchronous and usually takes approximately 10 mins since the full list of plugin details
      * is huge (approximately 370 000 lines of JSON definitions)
      *
      * @returns vmw.pscoe.hints.IClass[]
