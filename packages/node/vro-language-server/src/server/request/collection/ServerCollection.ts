@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { CancellationToken } from "vscode-languageserver"
 import { AutoWire, HintAction, HintModule, HintPlugin, Logger, sleep, VroRestClient } from "@vmware/vrdt-common"
+import { CancellationToken } from "vscode-languageserver"
 
+import { Timeout } from "../../../constants"
+import { vmw } from "../../../proto"
 import { remote } from "../../../public"
 import { ConnectionLocator, Environment, HintLookup, Settings } from "../../core"
 import { WorkspaceCollection } from "./WorkspaceCollection"
-import { vmw } from "../../../proto"
-import { Timeout } from "../../../constants"
 
 @AutoWire
 export class CollectionStatus {
@@ -141,6 +141,13 @@ export class ServerCollection {
             })
     }
 
+    /**
+     * Collect all vRO Scripting API (Plugin) objects like VcPlugin, ActiveDirectory, etc.
+     * Function is asynchronous and usually takes approximately 10 mins since the full list of plugin details
+     * is huge (approximately 370 000 lines of JSON definitions)
+     *
+     * @returns vmw.pscoe.hints.IClass[]
+     */
     async getVroObjects() {
         this.logger.info("Collecting vRO objects...")
 
@@ -164,9 +171,15 @@ export class ServerCollection {
                 }
                 const parsedLink = link[0].substring(9).toString() // always retrieve and parse the first occurrence
                 const pluginDetails = await this.restClient.getPluginDetails(parsedLink)
+
                 for (const pluginObject of pluginDetails["objects"]) {
+                    // enrich the object with vRO plugin object properties
                     const object: vmw.pscoe.hints.IClass = {
-                        name: pluginObject["name"]
+                        name: pluginObject["name"],
+                        description: pluginObject["description"],
+                        constructors: pluginObject["constructors"],
+                        properties: pluginObject["attributes"],
+                        methods: pluginObject["methods"]
                     }
                     allObjects.push(object)
                 }

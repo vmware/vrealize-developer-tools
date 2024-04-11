@@ -96,3 +96,25 @@ The `vrdev.tasks.exclude` setting can be used to _exclude_ certain projects from
     "my.example.library:util" // Exclude util library (<groupId>:<artifactId>)
 ]
 ```
+
+#### Display Hints in Java Script Projects
+
+The VS Code plugin supports displaying action hints for modules and actions that are present in vRO along with the modules and actions that are part of the currently opened project. If you type:
+
+```javascript
+System.getModule("com.module.path.").
+```
+
+or
+
+```javascript
+Class.load("com.module.path.").
+```
+
+a list of hints with modules available on vRO and in locally opened projects would be presented as list, furthermore methods and parameters would be also present as hints, as shown in the example below:
+
+./images/js-code-hinting.png
+
+The hinting functionality also supports displaying hints for constructors, methods and attributes of all Scripting API (vRO plugin) objects available on the vRO server, as shown in the example below:
+
+./images/js-plugin-hinting.png
