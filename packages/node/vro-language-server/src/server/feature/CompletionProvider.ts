@@ -47,7 +47,7 @@ class CompletionPrefixPattern {
 const prefixPatterns = [
     new CompletionPrefixPattern(
         CompletionPrefixKind.MODULE_IMPORT,
-        /System\.getModule\s*\(["']((?:[a-zA-Z_$][\w$]*\.)*)([a-zA-Z_$]?[\w$]*)$/, // https://regex101.com/r/bsVfwk/1
+        /System\.getModule\s*\(["']((?:[a-zA-Z_$][-\w$]*\.)*)([a-zA-Z_$]?[\w$]*)$/, // https://regex101.com/r/WKCK3Y/1
         /Class\.load\s*\(["']((?:[a-zA-Z_$][\w$]*\.)*)([a-zA-Z_$]?[\w$]*)$/ // https://regex101.com/r/90B9Db/1
     ),
 
