@@ -31,8 +31,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install NPM 8
-        run: npm install -g npm@8.3.1 # lock to 8.3.1 until actions/setup-node#411 and npm/cli#4341 are fixed
+      - name: Install NPM 9.4.0
+        run: npm install -g npm@9.4.0 # lock to 9.4.0 until actions/setup-node#411 and npm/cli#4341 are fixed
 
       - name: Set version number of package.json and build artifact
         id: version_step
