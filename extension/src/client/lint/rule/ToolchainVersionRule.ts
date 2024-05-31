@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as xmlParser from "fast-xml-parser"
-import * as semver from "semver"
 import { Logger, PomFile } from "@vmware/vrdt-common"
+import { XMLParser, XMLValidator } from "fast-xml-parser"
+import * as semver from "semver"
 import * as vscode from "vscode"
 
 import { Patterns } from "../../constants"
@@ -20,7 +20,7 @@ export class ToolchainVersionRule extends PomLintRule {
 
     apply(document: vscode.TextDocument): vscode.Diagnostic[] {
         const pomXmlContent = document.getText()
-        if (!xmlParser.validate(pomXmlContent)) {
+        if (!XMLValidator.validate(pomXmlContent)) {
             this.logger.info("Not valid XML")
             return []
         }
@@ -59,7 +59,7 @@ export class ToolchainVersionRule extends PomLintRule {
     }
 
     private extractParentVersion(pomXmlContent: string): string | null {
-        const pomXml = xmlParser.parse(pomXmlContent)
+        const pomXml = new XMLParser().parse(pomXmlContent)
 
         if (!pomXml.project || !pomXml.project.parent) {
             this.logger.warn("Missing parent tag")
