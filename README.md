@@ -13,7 +13,7 @@
 
 To use most of the vRealize Developer Tools's functionality, you will need a development [vRealize Orchestrator](https://www.vmware.com/products/vrealize-orchestrator.html) instance and to set up vRealize Build Tools.
 
--   [vRealize Build Tools v2.12.5+](https://labs.vmware.com/flings/vrealize-build-tools)
+-   [vRealize Build Tools v2.29.0+](https://github.com/vmware/build-tools-for-vmware-aria)
 -   Access to Artifact Repository - [setup instructions](https://github.com/vmware/vrealize-developer-tools/wiki/Setup-Artifact-Repository)
 -   maven v3.5+ available on the PATH system variable
 -   jdk 1.8
