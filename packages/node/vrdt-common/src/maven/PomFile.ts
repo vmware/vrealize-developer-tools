@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as xmlParser from "fast-xml-parser"
+import { XMLParser } from "fast-xml-parser"
 import * as fs from "fs-extra"
 
 export class PomFile {
@@ -56,7 +56,7 @@ export class PomFile {
 
     constructor(public readonly filePath: string) {
         const pomContent = fs.readFileSync(filePath, { encoding: "utf8" })
-        this.jsonContent = xmlParser.parse(pomContent)
+        this.jsonContent = new XMLParser().parse(pomContent)
 
         if (!this.jsonContent.project || !this.jsonContent.project.parent) {
             throw new Error(`Missing parent tag [file = ${filePath}]`)

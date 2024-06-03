@@ -6,10 +6,10 @@
 import * as path from "path"
 
 import { Logger, VroRestClient } from "@vmware/vrdt-common"
-import * as vscode from "vscode"
 import * as AdmZip from "adm-zip"
+import { XMLParser } from "fast-xml-parser"
 import * as fs from "fs-extra"
-import * as xmlParser from "fast-xml-parser"
+import * as vscode from "vscode"
 
 import { ContentLocation } from "./ContentLocation"
 
@@ -105,7 +105,7 @@ export class RemoteDocument {
             "@t": string
             "#text": string
         }
-        let xml = xmlParser.parse(source, { ignoreAttributes: false, attributeNamePrefix: "@" })
+        let xml = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@" }).parse(source)
         xml = xml["dunes-script-module"]
         let js = "/**\n"
 
