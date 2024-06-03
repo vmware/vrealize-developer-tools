@@ -502,7 +502,7 @@
         "vrdev.buildTools.defaultVersion": {
           "type": "string",
           "required": false,
-          "default": "2.12.5",
+          "default": "2.38.1",
           "description": "The version of vRealize Build Tools to be used outside the context of a project (e.g. when onboarding project and running untitled actions).",
           "scope": "application"
         },
