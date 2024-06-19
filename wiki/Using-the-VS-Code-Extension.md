@@ -75,6 +75,10 @@ A vRO explorer view is available in the activity bar that allows browsing the wh
 
 ![vRO Explorer](./images/explorer.png)
 
+#### Inventory Caching
+
+There is a support for vRO inventory items caching in order not to overload vRO on heavily loaded environments. If the vrdev:vro:inventory:cache setting is enabled in the plugin settings, the vRO inventory items will be fetched once from the vRO server during visual studion code session. When there are changes in vRO inventory made during visual studio code session they will not be fetched. In order to maintain fresh load of data either disable the cache setting or reload the visual studio code.
+
 ### Push and Pull content
 
 The VS Code build tasks palette (<kbd>Cmd+Shift+B</kbd> / <kbd>Ctrl+Shift+B</kbd>) contains commands for pushing content to a live vRO/vRA instance and for pulling workflows, configurations, resources and vRA content back to your local machine – in a form suitable for committing into source control.
@@ -92,3 +96,25 @@ The `vrdev.tasks.exclude` setting can be used to _exclude_ certain projects from
     "my.example.library:util" // Exclude util library (<groupId>:<artifactId>)
 ]
 ```
+
+#### Display Hints in Java Script Projects
+
+The VS Code plugin supports displaying action hints for modules and actions that are present in vRO along with the modules and actions that are part of the currently opened project. If you type:
+
+```javascript
+System.getModule("com.module.path.").
+```
+
+or
+
+```javascript
+Class.load("com.module.path.").
+```
+
+a list of hints with modules available on vRO and in locally opened projects would be presented as list, furthermore methods and parameters would be also present as hints, as shown in the example below:
+
+./images/js-code-hinting.png
+
+The hinting functionality also supports displaying hints for constructors, methods and attributes of all Scripting API (vRO plugin) objects available on the vRO server, as shown in the example below:
+
+./images/js-plugin-hinting.png

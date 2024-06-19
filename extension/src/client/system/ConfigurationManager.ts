@@ -5,9 +5,6 @@
 
 import * as path from "path"
 
-import * as chokidar from "chokidar"
-import * as xmlParser from "fast-xml-parser"
-import * as fs from "fs-extra"
 import {
     AutoWire,
     BaseConfiguration,
@@ -16,6 +13,9 @@ import {
     MavenProfileWrapper,
     VrealizeSettings
 } from "@vmware/vrdt-common"
+import * as chokidar from "chokidar"
+import { XMLParser } from "fast-xml-parser"
+import * as fs from "fs-extra"
 import * as vscode from "vscode"
 
 import { BuiltInCommands } from "../constants"
@@ -23,7 +23,7 @@ import { Registrable } from "../Registrable"
 
 @AutoWire
 export class ConfigurationManager extends BaseConfiguration implements Registrable {
-    private homeDir = process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"] || "~"
+    private homeDir = process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"] ?? "~"
     private readonly logger = Logger.get("ConfigurationManager")
 
     readonly settingsXmlPath: string = path.resolve(this.homeDir, ".m2", "settings.xml")
@@ -105,7 +105,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
             return
         }
 
-        const settingsJson = xmlParser.parse(settingsXmlContent.toString("utf8"))
+        const settingsJson = new XMLParser().parse(settingsXmlContent.toString("utf8"))
         const allProfiles = settingsJson?.settings?.profiles?.profile
         const vroProfiles: MavenProfilesMap = {}
 

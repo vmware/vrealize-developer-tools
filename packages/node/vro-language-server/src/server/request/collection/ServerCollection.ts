@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { AutoWire, HintAction, HintModule, HintPlugin, Logger, sleep, VroRestClient } from "@vmware/vrdt-common"
 import { CancellationToken } from "vscode-languageserver"
-import { AutoWire, HintAction, HintModule, HintPlugin, Logger, VroRestClient } from "@vmware/vrdt-common"
 
+import { Timeout } from "../../../constants"
+import { vmw } from "../../../proto"
 import { remote } from "../../../public"
 import { ConnectionLocator, Environment, HintLookup, Settings } from "../../core"
 import { WorkspaceCollection } from "./WorkspaceCollection"
-import { vmw } from "../../../proto"
 
 @AutoWire
 export class CollectionStatus {
@@ -47,7 +48,7 @@ export class ServerCollection {
 
         connectionLocator.connection.onRequest(remote.server.triggerVroCollection, this.triggerCollection.bind(this))
 
-        this.restClient = new VroRestClient(settings, environment)
+        this.restClient = new VroRestClient(settings)
     }
 
     giveCollectionStatus(): CollectionStatus {
@@ -97,6 +98,7 @@ export class ServerCollection {
 
     async getModulesAndActions() {
         this.logger.info("Collecting Modules and Actions...")
+        // fetch the root script module categories
         const modules: HintModule[] = (await this.restClient.getRootCategories("ScriptModuleCategory")).map(module => {
             return {
                 id: module.id,
@@ -104,24 +106,18 @@ export class ServerCollection {
                 actions: []
             }
         })
-        await Promise.all(
-            modules.map(
-                async module =>
-                    (module.actions = await this.restClient.getChildrenOfCategoryWithDetails(module.id).then(actions =>
-                        actions.map(action => {
-                            return {
-                                id: action.id,
-                                name: action.name,
-                                version: action.version,
-                                description: action.description,
-                                returnType: action.returnType,
-                                parameters: action.parameters
-                            } as HintAction
-                        })
-                    ))
-            )
-        )
+        // add delay between the 2 REST calls in order not to overload the vRO vco service cache
+        // see also: https://kb.vmware.com/s/article/95783?lang=en_US
+        await this.setDelay(Timeout.THREE_SECONDS)
+
+        // Enrichment of category actions execution has to be executed in serial order for not to overload the vRO
+        // see also: https://kb.vmware.com/s/article/95783?lang=en_US
+        for (const module of modules) {
+            await this.enrichHintModuleWithActions(module)
+        }
+
         this.logger.info("Modules and Actions collected from vRO")
+
         return modules
     }
 
@@ -145,6 +141,13 @@ export class ServerCollection {
             })
     }
 
+    /**
+     * Collect all vRO Scripting API (Plugin) objects like VcPlugin, ActiveDirectory, etc.
+     * Function is asynchronous and usually takes approximately 10 mins since the full list of plugin details
+     * is huge (approximately 370 000 lines of JSON definitions)
+     *
+     * @returns vmw.pscoe.hints.IClass[]
+     */
     async getVroObjects() {
         this.logger.info("Collecting vRO objects...")
 
@@ -162,17 +165,21 @@ export class ServerCollection {
             this.logger.error("No vRO objects found")
         } else {
             for (const plugin of plugins) {
-                const link = plugin.detailsLink.match(regex)
+                const link = RegExp(regex).exec(plugin.detailsLink)
                 if (!link) {
                     throw new Error(`No plugin details found`)
                 }
-
                 const parsedLink = link[0].substring(9).toString() // always retrieve and parse the first occurrence
                 const pluginDetails = await this.restClient.getPluginDetails(parsedLink)
 
                 for (const pluginObject of pluginDetails["objects"]) {
+                    // enrich the object with vRO plugin object properties
                     const object: vmw.pscoe.hints.IClass = {
-                        name: pluginObject["name"]
+                        name: pluginObject["name"],
+                        description: pluginObject["description"],
+                        constructors: pluginObject["constructors"],
+                        properties: pluginObject["attributes"],
+                        methods: pluginObject["methods"]
                     }
                     allObjects.push(object)
                 }
@@ -195,5 +202,16 @@ export class ServerCollection {
         this.currentStatus.message = "An error occurred"
         this.currentStatus.error = message
         this.currentStatus.finished = true
+    }
+
+    private async setDelay(delayMs: number) {
+        await sleep(delayMs)
+    }
+
+    private async enrichHintModuleWithActions(module: HintModule): Promise<HintModule> {
+        const actions: HintAction[] = await this.restClient.getChildrenOfCategoryWithDetails(module.id)
+        module.actions = actions
+
+        return module
     }
 }

@@ -24,7 +24,7 @@ export class ContentProvider implements vscode.TextDocumentContentProvider, Regi
     private readonly logger = Logger.get("ContentProvider")
 
     constructor(environment: EnvironmentManager, config: ConfigurationManager) {
-        this.restClient = new VroRestClient(config, environment)
+        this.restClient = new VroRestClient(config)
     }
 
     dispose() {

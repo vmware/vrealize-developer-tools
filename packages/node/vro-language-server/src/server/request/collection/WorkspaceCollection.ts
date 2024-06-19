@@ -3,14 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as path from "path"
 import * as os from "os"
+import * as path from "path"
 
-import { parse } from "comment-parser"
-import * as protobuf from "protobufjs"
-import { v4 as uuidv4 } from "uuid"
-import * as fs from "fs-extra"
-import * as _ from "lodash"
 import {
     ActionParameters,
     AutoWire,
@@ -20,11 +15,16 @@ import {
     PomFile,
     WorkspaceFolder
 } from "@vmware/vrdt-common"
+import { parse } from "comment-parser"
+import * as fs from "fs-extra"
+import * as _ from "lodash"
+import * as protobuf from "protobufjs"
+import { v4 as uuidv4 } from "uuid"
 import { FileChangeType } from "vscode-languageserver"
 
+import { ActionsPackProto, Timeout } from "../../../constants"
 import { Environment, FileChangeEventParams, HintLookup, WorkspaceFilesWatcher } from "../../core"
 import { FileSavedEventParams, WorkspaceDocumentWatcher } from "../../core/WorkspaceDocumentWatcher"
-import { ActionsPackProto, Timeout } from "../../../constants"
 
 @AutoWire
 export class WorkspaceCollection {
@@ -68,6 +68,7 @@ export class WorkspaceCollection {
 
     async triggerCollectionAndRefresh(workspaceFolder: WorkspaceFolder): Promise<void> {
         await this.triggerCollection(workspaceFolder)
+        // workspace collection
         this.hints.refreshForWorkspace(workspaceFolder)
     }
 
@@ -84,12 +85,11 @@ export class WorkspaceCollection {
 
         const fullPath = path.join(workspaceFolder.uri.fsPath, modules.join(","))
         const modulesPath = path.join(fullPath, "src/main/resources")
-
         try {
             const payload = this.collectLocalData(modulesPath)
             this.generateActionsPbFiles(payload, outputDir, workspaceFolder)
         } catch (error) {
-            this.logger.warn(`Error occurred: ${JSON.stringify(error)}`)
+            this.logger.warn(`Error occurred: ${error}`)
         }
         this.logger.info("Workspace hint collection has finished")
     }
@@ -104,22 +104,23 @@ export class WorkspaceCollection {
         fs.writeFileSync(actionPackProtoFile, ActionsPackProto)
 
         protobuf.load(actionPackProtoFile, function (err, root) {
-            if (err) throw err
-            if (!root) throw new Error("Root namespace not loaded")
-
+            if (err) {
+                throw err
+            }
+            if (!root) {
+                throw new Error("Root namespace not loaded")
+            }
             // Obtain a message type
             const ActionsPack = root.lookupType("vmw.pscoe.hints.ActionsPack")
-
             // Verify the payload (i.e. incomplete or invalid)
             const errMsg = ActionsPack.verify(payload)
-            if (errMsg) throw Error(errMsg)
-
+            if (errMsg) {
+                throw Error(errMsg)
+            }
             // Create a new message
             const message = ActionsPack.create(payload)
-
             // Encode a message to a Buffer
             const buffer = ActionsPack.encode(message).finish()
-
             fs.writeFileSync(outputFile, buffer)
         })
     }
@@ -145,17 +146,17 @@ export class WorkspaceCollection {
                 .replace(/[\/\\]$/, "") // remove trailing slash or backslash
                 .replace(/[\/\\]/g, ".") // replace remaining slashes or backslashes with dots
 
-            parsedActions[0].tags.forEach(tag => {
+            parsedActions[0]?.tags.forEach(tag => {
                 if (tag.tag === "param") {
                     const actionParams: ActionParameters = {
                         name: tag.name,
                         type: tag.type,
-                        description: tag.description
+                        description: tag?.description
                     }
                     parameters.push(actionParams)
                 }
                 if (tag.tag === "return") {
-                    returnType = tag.type
+                    returnType = tag?.type
                 }
             })
 
@@ -164,7 +165,7 @@ export class WorkspaceCollection {
                 name: actionName,
                 moduleName: moduleName,
                 returnType: returnType,
-                description: parsedActions[0].description,
+                description: parsedActions[0]?.description,
                 parameters: parameters
             }
             actions.push(actionObj)
@@ -182,7 +183,7 @@ export class WorkspaceCollection {
 
         modules.forEach(module => {
             actions.forEach(action => {
-                if (action.moduleName === module.name) {
+                if (action?.moduleName === module?.name) {
                     module.actions.push(action)
                 }
             })

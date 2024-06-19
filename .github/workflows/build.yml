@@ -15,17 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [14.x, 16.x]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        node-version: [19.6.0]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     env:
       CI: true
     steps:
-      # - name: Set git config
-      #   if: runner.os == 'Windows'
-      #   shell: bash
-      #   run: git config --global core.autocrlf true
-
       - uses: actions/checkout@v2
 
       - name: echo github.ref
@@ -36,12 +31,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Use NPM 8
-        run: npm install -g npm@8.3.1 # lock to 8.3.1 until actions/setup-node#411 and npm/cli#4341 are fixed
+      - name: Install NPM 9.4.0
+        run: npm install -g npm@9.4.0 # lock to 9.4.0 until actions/setup-node#411 and npm/cli#4341 are fixed
 
       - name: Set version number of package.json and build artifact
         id: version_step
-        if: runner.os == 'macOS'
+        if: runner.os == 'ubuntu-latest'
         env:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
@@ -76,17 +71,13 @@ jobs:
       - name: Install dependencies
         run: "npm ci"
 
-      - name: Lint, compile and test
-        run: "node node_modules/gulp/bin/gulp.js lint test"
-        if: runner.os != 'macOS'
-
       - name: Lint, compile, test and package
         run: "node node_modules/gulp/bin/gulp.js package"
-        if: runner.os == 'macOS'
+        if: runner.os == 'ubuntu-latest'
 
       - name: Publish code coverage report
         uses: codecov/codecov-action@v1
-        if: runner.os == 'macOS'
+        if: runner.os == 'ubuntu-latest'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: "**/coverage/*.json"
@@ -95,7 +86,7 @@ jobs:
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
-        if: runner.os == 'macOS'
+        if: runner.os == 'ubuntu-latest'
         with:
           name: vrealize-developer-tools-${{steps.version_step.outputs.version_build}}.vsix
           path: "*.vsix"

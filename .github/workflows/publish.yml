@@ -5,12 +5,12 @@ on:
 jobs:
   publish:
     name: Publish to Visual Studio Marketplace and GitHub Packages
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
-      - name: Use Node.js 16.x
+      - name: Use Node.js 19.6.0
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 19.6.0
 
       - name: Install vsce
         run: npm install -g vsce

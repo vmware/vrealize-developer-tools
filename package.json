@@ -3,7 +3,7 @@
   "name": "vrealize-developer-tools",
   "displayName": "vRealize Developer Tools",
   "description": "Provides code intelligence features and enables a more developer-friendly experience when creating VMware vRealize Orchestrator and VMware vRealize Automation content.",
-  "version": "2.5.1",
+  "version": "2.5.3",
   "publisher": "vmware-pscoe",
   "license": "MIT",
   "homepage": "https://github.com/vmware/vrealize-developer-tools",
@@ -46,7 +46,7 @@
     "onCommand:vrdev.blueprint.upload",
     "onCommand:vrdev.blueprint.deploy"
   ],
-  "main": "./extension/out/extension",
+  "main": "./extension/dist/extension",
   "icon": "assets/logo.png",
   "contributes": {
     "viewsContainers": {
@@ -502,7 +502,7 @@
         "vrdev.buildTools.defaultVersion": {
           "type": "string",
           "required": false,
-          "default": "2.12.5",
+          "default": "2.38.1",
           "description": "The version of vRealize Build Tools to be used outside the context of a project (e.g. when onboarding project and running untitled actions).",
           "scope": "application"
         },
@@ -520,6 +520,12 @@
             "Displays action packages as a list"
           ],
           "markdownDescription": "Specifies how the _Explorer_ view will display vRO action packages",
+          "scope": "window"
+        },
+        "vrdev.vro.inventory.cache": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable vRO inventory caching (can be used in heavily loaded environments)",
           "scope": "window"
         }
       }
@@ -585,7 +591,7 @@
     "adm-zip": "^0.5.4",
     "chokidar": "~3.5.1",
     "di": "^0.0.1",
-    "fast-xml-parser": "3.19.0",
+    "fast-xml-parser": "4.1.2",
     "fs-extra": "~9.1.0",
     "jsonc-parser": "^3.0.0",
     "lodash": "^4.17.21",

@@ -32,6 +32,15 @@ export interface TasksInfo {
     disable: boolean
     exclude: string[]
 }
+
+export interface VroInfo {
+    inventory: InventoryInfo
+}
+
+export interface InventoryInfo {
+    cache: boolean
+}
+
 export interface BuildTools {
     defaultVersion: string
 }
@@ -57,4 +66,5 @@ export interface VrealizeSettings {
     buildTools: BuildTools
     views: Views
     vra: VraInfo
+    vro: VroInfo
 }

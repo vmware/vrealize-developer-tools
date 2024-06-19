@@ -17,15 +17,8 @@ import { URI } from "vscode-uri"
 import { ConnectionLocator, Environment, HintLookup } from "../core"
 import { Synchronizer, TextDocumentWrapper } from "../document"
 import { Previewer } from "../util"
-
-enum CompletionPrefixKind {
-    UNKNOWN = "Unknown",
-    CLASS_IMPORT = "Class Import",
-    CLASS_REFERENCE = "Class Reference",
-    STATIC_MEMBER_REFERENCE = "Static Member Reference",
-    NEW_INSTANCE = "New Instance",
-    MODULE_IMPORT = "Module Import"
-}
+import { CompletionPrefixKind } from "../../constants"
+import { vmw } from "../../proto"
 
 interface CompletionPrefix {
     readonly value: string
@@ -54,7 +47,7 @@ class CompletionPrefixPattern {
 const prefixPatterns = [
     new CompletionPrefixPattern(
         CompletionPrefixKind.MODULE_IMPORT,
-        /System\.getModule\s*\(["']((?:[a-zA-Z_$][\w$]*\.)*)([a-zA-Z_$]?[\w$]*)$/, // https://regex101.com/r/bsVfwk/1
+        /System\.getModule\s*\(["']((?:[a-zA-Z_$][-\w$]*\.)*)([a-zA-Z_$]?[\w$]*)$/, // https://regex101.com/r/WKCK3Y/1
         /Class\.load\s*\(["']((?:[a-zA-Z_$][\w$]*\.)*)([a-zA-Z_$]?[\w$]*)$/ // https://regex101.com/r/90B9Db/1
     ),
 
@@ -172,7 +165,7 @@ export class CompletionProvider {
                 .concat(this.hints.getFunctionSets())
                 .filter(cls => !!cls.name && cls.name.startsWith(prefix.filter || ""))
                 .map(cls => {
-                    const name = cls.name || ""
+                    const name = cls.name ?? ""
                     const completionItem = CompletionItem.create(name)
                     completionItem.kind = CompletionItemKind.Class
                     completionItem.documentation = cls.description ? cls.description.trim() : undefined
@@ -180,59 +173,6 @@ export class CompletionProvider {
                     completionItem.sortText = `000${name}`
                     return completionItem
                 })
-
-        return suggestions
-    }
-
-    private getStaticMemberSuggestions(prefix: CompletionPrefix): CompletionItem[] {
-        // TODO: Set isInstantiable back to `false`, once there are other ways to find out
-        // the members of non-static classes. At the moment, the only way to do that
-        // is to reference the class directly and check its members using the auto-complete feature
-        const cls = this.hints
-            .getClasses({ isInstantiable: undefined })
-            .concat(this.hints.getFunctionSets())
-            .find(c => c.name === prefix.value)
-
-        if (!cls) return []
-
-        const suggestions: CompletionItem[] = []
-
-        if (cls.methods && cls.methods.length > 0) {
-            cls.methods
-                .filter(method => !!method.name && method.name.startsWith(prefix.filter || ""))
-                .forEach(method => {
-                    const name = method.name || ""
-                    const completionItem = CompletionItem.create(name)
-                    completionItem.kind = CompletionItemKind.Method
-                    completionItem.documentation = Previewer.extendDescriptionWithParams(
-                        method.description,
-                        method.parameters
-                    )
-                    completionItem.detail = Previewer.computeDetailsForMethod(method)
-                    completionItem.sortText = `000${name}`
-                    suggestions.push(completionItem)
-                })
-        }
-
-        if (cls.properties && cls.properties.length > 0) {
-            cls.properties
-                .filter(prop => !!prop.name && prop.name.startsWith(prefix.filter || ""))
-                .forEach(prop => {
-                    const name = prop.name || ""
-                    const completionItem = CompletionItem.create(name)
-                    completionItem.kind = CompletionItemKind.Variable
-
-                    if (prop.readOnly) {
-                        completionItem.kind =
-                            name.toUpperCase() === name ? CompletionItemKind.Enum : CompletionItemKind.Value
-                    }
-
-                    completionItem.documentation = prop.description ? prop.description.trim() : undefined
-                    completionItem.detail = Previewer.computeDetailsForProperty(prop)
-                    completionItem.sortText = `000${name}`
-                    suggestions.push(completionItem)
-                })
-        }
 
         return suggestions
     }
@@ -246,7 +186,7 @@ export class CompletionProvider {
             .forEach(cls => {
                 if (cls.constructors && cls.constructors.length > 0) {
                     for (const constr of cls.constructors) {
-                        const name = cls.name || ""
+                        const name = cls.name ?? ""
                         const completionItem = CompletionItem.create(name)
                         completionItem.kind = CompletionItemKind.Constructor
 
@@ -269,14 +209,90 @@ export class CompletionProvider {
         return suggestions
     }
 
+    private getStaticMemberSuggestions(prefix: CompletionPrefix): CompletionItem[] {
+        // TODO: Set isInstantiable back to `false`, once there are other ways to find out
+        // the members of non-static classes. At the moment, the only way to do that
+        // is to reference the class directly and check its members using the auto-complete feature
+        const cls = this.hints
+            .getClasses({ isInstantiable: undefined })
+            .concat(this.hints.getFunctionSets())
+            .find(c => c.name === prefix.value)
+        if (!cls) {
+            return []
+        }
+
+        const suggestions: CompletionItem[] = []
+        const methods: CompletionItem[] = this.getMethodsSuggestions(cls, prefix)
+        const properties: CompletionItem[] = this.getPropertiesSuggestions(cls, prefix)
+        if (methods?.length) {
+            methods.forEach(item => suggestions.push(item))
+        }
+        if (properties?.length) {
+            properties.forEach(item => suggestions.push(item))
+        }
+
+        return suggestions
+    }
+
+    private getMethodsSuggestions(cls: vmw.pscoe.hints.IClass, prefix: CompletionPrefix): CompletionItem[] {
+        if (!cls.methods?.length) {
+            return []
+        }
+
+        const suggestions: CompletionItem[] = []
+        cls.methods
+            .filter((method: vmw.pscoe.hints.IMethod) => !!method.name && method.name.startsWith(prefix.filter || ""))
+            .forEach((method: vmw.pscoe.hints.IMethod) => {
+                const name = method.name ?? ""
+                const completionItem = CompletionItem.create(name)
+                completionItem.kind = CompletionItemKind.Method
+                completionItem.documentation = Previewer.extendDescriptionWithParams(
+                    method.description,
+                    method.parameters
+                )
+                completionItem.detail = Previewer.computeDetailsForMethod(method)
+                completionItem.sortText = `000${name}`
+                suggestions.push(completionItem)
+            })
+
+        return suggestions
+    }
+
+    private getPropertiesSuggestions(cls: vmw.pscoe.hints.IClass, prefix: CompletionPrefix): CompletionItem[] {
+        if (!cls.properties?.length) {
+            return []
+        }
+
+        const suggestions: CompletionItem[] = []
+        cls.properties
+            .filter((prop: vmw.pscoe.hints.IProperty) => !!prop.name && prop.name.startsWith(prefix.filter || ""))
+            .forEach((prop: vmw.pscoe.hints.IProperty) => {
+                const name = prop.name ?? ""
+                const completionItem = CompletionItem.create(name)
+                completionItem.kind = CompletionItemKind.Variable
+
+                if (prop.readOnly) {
+                    completionItem.kind =
+                        name.toUpperCase() === name ? CompletionItemKind.Enum : CompletionItemKind.Value
+                }
+
+                completionItem.documentation = prop.description ? prop.description.trim() : undefined
+                completionItem.detail = Previewer.computeDetailsForProperty(prop)
+                completionItem.sortText = `000${name}`
+                suggestions.push(completionItem)
+            })
+
+        return suggestions
+    }
+
     private getModuleClassSuggestions(prefix: CompletionPrefix, workspaceFolder: WorkspaceFolder): CompletionItem[] {
         const suggestions = this.hints
             .getActionsIn(prefix.value, workspaceFolder)
             .filter(a => !!a.name && a.name.startsWith(prefix.filter || ""))
             .map(action => {
-                const name = action.name || ""
+                const name = action.name ?? ""
                 const completionItem = CompletionItem.create(name)
-                const isClass = name[0] === name[0].toUpperCase()
+                const isClass = name[0].startsWith(name[0].toUpperCase())
                 completionItem.kind = isClass ? CompletionItemKind.Class : CompletionItemKind.Function
                 completionItem.documentation = Previewer.extendDescriptionWithParams(
                     action.description,
@@ -294,7 +310,6 @@ export class CompletionProvider {
         const lineContent = document.getLineContentUntil(position)
 
         this.logger.debug(`Trying to provide auto completion for line '${lineContent}'`)
-
         for (const pattern of prefixPatterns) {
             const prefix = pattern.match(lineContent)
             if (prefix) {
@@ -302,8 +317,8 @@ export class CompletionProvider {
                 return prefix
             }
         }
-
         this.logger.debug("None of the patterns matched.")
+
         return null
     }
 }
