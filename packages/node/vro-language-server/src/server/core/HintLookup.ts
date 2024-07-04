@@ -114,7 +114,7 @@ export class HintLookup implements Disposable {
         }
 
         const localCategories = workspaceFolder
-            // @ts-ignore
+            // @ts-ignore eslint-disable-line
             ? _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories) // eslint-disable-line
             : []
         const globalCategories = _.flatMap(this.configs.global, pack => pack.categories)
