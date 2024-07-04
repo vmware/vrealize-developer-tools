@@ -15,10 +15,11 @@ function getNodeModule<T>(moduleName: string): T | undefined {
     return undefined
 }
 
+/* eslint-disable */
 export type Keytar = {
-    getPassword: (typeof keytarType["getPassword"])
-    setPassword: (typeof keytarType["setPassword"])
-    deletePassword: (typeof keytarType["deletePassword"])
+    getPassword: typeof keytarType["getPassword"]
+    setPassword: typeof keytarType["setPassword"]
+    deletePassword: typeof keytarType["deletePassword"]
 }
 
 const failingKeytar: Keytar = {
