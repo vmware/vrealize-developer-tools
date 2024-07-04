@@ -35,6 +35,7 @@ class HintStore<T> {
 }
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable prettier/prettier */
 @AutoWire
 export class HintLookup implements Disposable {
     private readonly logger = Logger.get("HintLookup")
@@ -114,8 +115,8 @@ export class HintLookup implements Disposable {
         }
 
         const localCategories = workspaceFolder
-            // @ts-ignore eslint-disable-line
-            ? _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories) // eslint-disable-line
+            // @ts-ignore
+            ? _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories)
             : []
         const globalCategories = _.flatMap(this.configs.global, pack => pack.categories)
         return _.unionWith(localCategories, globalCategories, (x, y) => x.path === y.path)
