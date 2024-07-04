@@ -113,9 +113,8 @@ export class HintLookup implements Disposable {
             return []
         }
 
-        const localCategories = workspaceFolder ?
-            // @ts-ignore
-            _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories)
+        const localCategories = workspaceFolder
+/** @ts-ignore */ ? _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories)
             : []
         const globalCategories = _.flatMap(this.configs.global, pack => pack.categories)
         return _.unionWith(localCategories, globalCategories, (x, y) => x.path === y.path)
