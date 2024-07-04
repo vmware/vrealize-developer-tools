@@ -157,6 +157,8 @@ export class ServerCollection {
         } catch (error) {
             this.logger.error(error)
         }
+
+        // @ts-ignore
         const plugins: HintPlugin[] = objects["plugins"]
         const allObjects: vmw.pscoe.hints.IClass[] = []
         const regex = new RegExp(/\/plugins\/([a-zA-Z0-9\_\-\.\/]+)/)

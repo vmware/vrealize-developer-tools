@@ -113,6 +113,7 @@ export class HintLookup implements Disposable {
         }
 
         const localCategories = workspaceFolder
+            // @ts-ignore
             ? _.flatMap(this.configs.local[workspaceFolder.uri.fsPath], pack => pack.categories)
             : []
         const globalCategories = _.flatMap(this.configs.global, pack => pack.categories)
@@ -246,6 +247,7 @@ export class HintLookup implements Disposable {
         if (!scope) {
             target.global = result
         } else {
+            // @ts-ignore
             target.local[scope.uri.fsPath] = result
         }
     }
