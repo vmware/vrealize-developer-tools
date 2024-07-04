@@ -11,7 +11,7 @@ import { ScopedMemento } from "../client/storage/ScopedMemento"
 import "jest-extended"
 
 describe("ScopedMemento", () => {
-    let storage = {} as any;
+    let storage = {} as any
 
     const MementoMock = jest.fn<Memento, any[]>(() => ({
         get: jest.fn((key: string, defaultValue?: any) => {
