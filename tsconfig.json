@@ -19,6 +19,7 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
+    "ignoreDeprecations": "5.0",
     "strictNullChecks": true,
     "strictBindCallApply": true,
     "experimentalDecorators": true,
