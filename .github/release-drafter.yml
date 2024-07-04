@@ -5,15 +5,19 @@ categories:
     labels:
       - 'feature'
       - 'enhancement'
+      - 'type:enhancement'
+      - 'type:feature-request'
   - title: '🐛 Bug Fixes'
     labels:
       - 'fix'
       - 'bugfix'
       - 'bug'
+      - 'type:bug'
   - title: '⬆️ Dependencies'
     labels:
       - 'dependencies'
       - 'dependency'
+      - 'type:dependency'
 exclude-labels:
   - 'skip-changelog'
 exclude-contributors:
@@ -37,6 +41,8 @@ template: |
 
   $CHANGES
 
+  ---
+  **Full Changelog**: https://github.com/vmware/vrealize-developer-tools/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
 autolabeler:
   - label: 'bug'
     branch:
