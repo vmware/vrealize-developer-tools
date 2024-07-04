@@ -27,6 +27,7 @@ export class CollectionData {
     vpkResourceId: string | undefined = undefined
 }
 
+/* eslint-disable ban-ts-comment */
 @AutoWire
 export class ServerCollection {
     private readonly logger = Logger.get("ServerCollection")
