@@ -109,7 +109,7 @@ export class ScopedMemento {
     }
 
     all() {
-        const items = {}
+        const items = {} as any;
         for (const key in this.state) {
             items[key] = this.state[key].value
         }

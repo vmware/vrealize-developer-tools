@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { ExtensionContext, Memento } from "vscode"
 import { sleep } from "@vmware/vrdt-common"
+import { ExtensionContext, Memento } from "vscode"
 
 import { ScopedMemento } from "../client/storage/ScopedMemento"
 
 import "jest-extended"
 
 describe("ScopedMemento", () => {
-    let storage = {}
+    let storage = {} as any;
 
     const MementoMock = jest.fn<Memento, any[]>(() => ({
         get: jest.fn((key: string, defaultValue?: any) => {
@@ -218,7 +218,7 @@ describe("ScopedMemento", () => {
             }
 
             for (const k of Object.keys(entries)) {
-                globalState.set(k, entries[k])
+                globalState.set(k, (entries as any)[k])
             }
 
             const all = globalState.all()
@@ -239,7 +239,7 @@ describe("ScopedMemento", () => {
             }
 
             for (const k of Object.keys(entries)) {
-                globalState.set(k, entries[k])
+                globalState.set(k, (entries as any)[k])
             }
 
             globalState.clear()

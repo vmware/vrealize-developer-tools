@@ -5,18 +5,18 @@
 
 import * as path from "path"
 
+import { AutoWire, Logger, PomFile, TasksInfo } from "@vmware/vrdt-common"
 import * as fs from "fs-extra"
 import * as jsonParser from "jsonc-parser"
 import * as _ from "lodash"
 import * as micromatch from "micromatch"
-import { AutoWire, Logger, PomFile, TasksInfo } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
-import { extensionShortName } from "../../constants"
 import { Registrable } from "../../Registrable"
-import { TASKS_BY_TOOLCHAIN_PARENT, VrealizeTaskConfiguration } from "./DefaultTasksJson"
-import { EnvironmentManager } from "../../system"
+import { extensionShortName } from "../../constants"
 import { ScopedMemento } from "../../storage/ScopedMemento"
+import { EnvironmentManager } from "../../system"
+import { TASKS_BY_TOOLCHAIN_PARENT, VrealizeTaskConfiguration } from "./DefaultTasksJson"
 
 interface VrealizeTaskDefinition extends vscode.TaskDefinition {
     command: string
@@ -109,6 +109,8 @@ export class TaskProvider implements vscode.TaskProvider, Registrable {
         const pomFile = new PomFile(pomFilePath)
 
         if (!micromatch.any(`${pomFile.groupId}:${pomFile.artifactId}`, excludePatterns)) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //@ts-ignore
             const defaultTasks: VrealizeTaskConfiguration[] = TASKS_BY_TOOLCHAIN_PARENT[pomFile.parentId] || []
 
             for (const task of defaultTasks) {

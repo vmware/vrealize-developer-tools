@@ -75,7 +75,7 @@ export class ToolchainVersionRule extends PomLintRule {
             return null
         }
 
-        if (PomFile.ParentGroupByArtifact[artifactId] !== groupId) {
+        if ((PomFile.ParentGroupByArtifact as any)[artifactId] !== groupId) {
             this.logger.warn(`Not a valid vRO project parent ID - ${groupId}.${artifactId}`)
             return null
         }

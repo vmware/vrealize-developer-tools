@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { InputBox, QuickInputButton, QuickPick, QuickPickItem } from "vscode"
 import { Logger } from "@vmware/vrdt-common"
+import { InputBox, QuickInputButton, QuickPick, QuickPickItem } from "vscode"
 
 export class BreakMultiStep extends Error {
     constructor() {
@@ -25,6 +25,7 @@ export interface QuickInputStep {
     title?: string
     maskChars?: boolean
     value?: string
+    isHead?: boolean
 
     onDidClickButton?(input: InputBox, button: QuickInputButton): void
     validate?(value: string | undefined): [boolean, string | undefined] | Promise<[boolean, string | undefined]>
@@ -48,6 +49,7 @@ export interface QuickPickStep<T extends QuickPickItem = any> {
     selectedItems?: T[]
     title?: string
     value?: string
+    isHead?: boolean
 
     onDidAccept?(quickpick: QuickPick<T>): boolean | Promise<boolean>
     onDidChangeValue?(quickpick: QuickPick<T>): boolean | Promise<boolean>
