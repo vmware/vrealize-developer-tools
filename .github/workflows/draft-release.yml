@@ -27,7 +27,7 @@ jobs:
 
       - name: Install sha256sum and minisign
         run: |
-          curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew update
           brew install coreutils minisign
 
