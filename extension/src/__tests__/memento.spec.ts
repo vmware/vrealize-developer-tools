@@ -202,7 +202,7 @@ describe("ScopedMemento", () => {
 
             const keys = globalState.keys()
             expect(keys).toBeDefined()
-            expect(keys).toIncludeAllMembers(["number", "string", "boolean", "object", "null"])
+            expect(keys).toMatchObject(["number", "string", "boolean", "object", "null"])
         })
     })
 

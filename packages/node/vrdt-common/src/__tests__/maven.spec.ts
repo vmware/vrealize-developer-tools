@@ -48,7 +48,7 @@ describe("Maven", () => {
         it("Can read pom.xml modules", () => {
             const actionsPom = new PomFile(ACTIONS_POM_PATH)
             expect(actionsPom.isBase).toBe(false)
-            expect(actionsPom.modules).toBeEmpty()
+            expect(actionsPom.modules).toHaveLength(0)
 
             const basePom = new PomFile(BASE_POM_PATH)
             expect(basePom.isBase).toBe(true)

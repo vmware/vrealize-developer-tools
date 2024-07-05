@@ -78,11 +78,13 @@ describe("utility", () => {
 
                 const error = new Error("error")
                 error.stack = "stack trace"
+                // @ts-ignore
                 logger[level]("message:", error)
                 formattedMessage = `[2019-03-31T12:13:14.000Z ${level.toUpperCase()} - TestLog] message: stack trace`
                 expect(logChannel[level]).toHaveBeenCalledWith(formattedMessage)
 
                 error.stack = undefined
+                // @ts-ignore
                 logger[level]("message:", error)
                 formattedMessage = `[2019-03-31T12:13:14.000Z ${level.toUpperCase()} - TestLog] message: error`
                 expect(logChannel[level]).toHaveBeenCalledWith(formattedMessage)
