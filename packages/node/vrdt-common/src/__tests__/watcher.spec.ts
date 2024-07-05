@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: MIT
  */
 
-import createMockInstance from "jest-create-mock-instance"
 
 import { AbstractWatcher } from "../event"
-import { default as Logger } from "../logger"
 
 class SomeWatcher extends AbstractWatcher<string> {
-    protected readonly logger = createMockInstance(Logger)
+    protected readonly logger
 
     constructor() {
         super()
