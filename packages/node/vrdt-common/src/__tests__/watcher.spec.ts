@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 import { AbstractWatcher } from "../event"
 
 class SomeWatcher extends AbstractWatcher<string> {
