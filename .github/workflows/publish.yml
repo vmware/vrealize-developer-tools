@@ -15,11 +15,6 @@ jobs:
       - name: Install vsce
         run: npm install -g vsce
 
-      - name: Install sha256sum and minisign
-        run: |
-          brew update
-          brew install coreutils minisign
-
       - name: Download release assets
         id: release_asset
         env:
@@ -29,6 +24,12 @@ jobs:
 
       - name: Verify checksum signatures
         run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/runner/.bashrc
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew update
+          brew install coreutils minisign
+
           minisign -Vm vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
           minisign -Vm packages.sha256 -P "RWSLXIQU0b52vHvyFK7d0SQmt3he8hrZnBzwp/e30XALf4rtRc0Cluhh"
         env:
