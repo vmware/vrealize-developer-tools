@@ -26,14 +26,6 @@ jobs:
       - name: Use NPM 9.4.0
         run: npm install -g npm@9.4.0 # lock to 9.4.0 until actions/setup-node#411 and npm/cli#4341 are fixed
 
-      - name: Install sha256sum and minisign
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/runner/.bashrc
-          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          brew update
-          brew install coreutils minisign
-
       - name: Get version number
         id: version_step
         run: |
@@ -60,6 +52,12 @@ jobs:
 
       - name: Checksum and sign all artifacts
         run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/runner/.bashrc
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew update
+          brew install coreutils minisign
+
           sha256sum --tag vrealize-developer-tools-$PKG_VERSION.vsix > vrealize-developer-tools-$PKG_VERSION.vsix.sha256
           find *.tgz -type f -exec sha256sum --tag {} \; | sort > packages.sha256
 
