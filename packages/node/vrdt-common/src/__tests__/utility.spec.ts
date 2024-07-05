@@ -65,7 +65,7 @@ describe("utility", () => {
                 expect(logChannel[level]).toHaveBeenCalled()
             })
         })
-
+        /* eslint-disable @typescript-eslint/ban-ts-comment */
         describe("format", () => {
             it.each(["debug", "info", "warn", "error"])(".%s() should format logged messages", level => {
                 logger[level]("message:", "data")
