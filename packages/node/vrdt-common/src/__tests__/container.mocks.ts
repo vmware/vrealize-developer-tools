@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { AutoWire } from "../di/AutoWire";
+import { AutoWire } from "../di/AutoWire"
 
 @AutoWire
 export class NoConstructor {}
