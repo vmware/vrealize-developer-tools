@@ -595,7 +595,7 @@
     "fs-extra": "~9.1.0",
     "jsonc-parser": "^3.0.0",
     "lodash": "^4.17.21",
-    "micromatch": "^4.0.2",
+    "micromatch": "^4.0.8",
     "moment": "^2.29.4",
     "semver": "^7.5.2",
     "tmp": "^0.2.1",
