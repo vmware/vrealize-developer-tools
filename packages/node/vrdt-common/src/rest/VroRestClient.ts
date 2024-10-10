@@ -321,8 +321,7 @@ export class VroRestClient {
             "GET",
             `workflows/${workflowId}/executions/${executionId}/syslogs` +
                 `?conditions=severity=${severity}` +
-                `&conditions=timestamp${encodeURIComponent(">")}${timestamp}` +
-                "&conditions=type=system"
+                `&conditions=timestamp${encodeURIComponent(">")}${timestamp}` // + "&conditions=type=system"
         )
 
         const messages: LogMessage[] = []
