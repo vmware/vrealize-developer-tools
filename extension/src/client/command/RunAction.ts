@@ -287,13 +287,6 @@ class ActionRunner {
                 value: {
                     string: { value: fileContent }
                 }
-            },
-            {
-                name: "printInOutput",
-                type: "boolean",
-                value: {
-                    boolean: { value: true }
-                }
             }
         ]
 
