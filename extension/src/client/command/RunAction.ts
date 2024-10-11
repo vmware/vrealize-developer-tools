@@ -415,7 +415,8 @@ abstract class FetchSysLogsStrategy extends FetchLogsStrategy {
         const logs = await this.getLogMessages()
         logs.forEach(logMessage => {
             const timestamp = moment(logMessage.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")
-            const msg = `[${timestamp}] [${logMessage.severity}] ${logMessage.description}`
+            const origin = !logMessage.origin ? "" : `[${logMessage.origin}] `
+            const msg = `[${timestamp}] ${origin}[${logMessage.severity}] ${logMessage.description}`
             if (!this.printedMessages.has(msg)) {
                 this.log(msg)
                 this.printedMessages.add(msg)

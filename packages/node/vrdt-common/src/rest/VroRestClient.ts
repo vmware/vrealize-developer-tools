@@ -334,7 +334,8 @@ export class VroRestClient {
             messages.push({
                 timestamp: e["time-stamp"],
                 severity: e.severity,
-                description
+                description,
+                origin: e.origin
             })
         }
 
