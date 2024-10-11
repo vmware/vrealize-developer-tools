@@ -15,6 +15,7 @@ export interface LogMessage {
     timestamp: string
     severity: string
     description: string
+    origin?: string
 }
 
 export interface Version {

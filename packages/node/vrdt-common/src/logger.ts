@@ -37,6 +37,13 @@ export default class Logger {
         }
     }
 
+    /**
+     * Configured log level.
+     */
+    static get level(): LogLevel {
+        return Logger.logLevel
+    }
+
     debug(message: string, data?: any): void {
         if (this.channel && Logger.logLevel === "debug") {
             this.channel.debug(this.format("DEBUG", message, data))

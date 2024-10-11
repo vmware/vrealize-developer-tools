@@ -85,7 +85,7 @@ jobs:
           name: codecov
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: runner.os == 'ubuntu-latest'
         with:
           name: vrealize-developer-tools-${{steps.version_step.outputs.version_build}}.vsix

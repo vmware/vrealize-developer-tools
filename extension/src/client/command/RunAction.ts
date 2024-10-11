@@ -280,20 +280,12 @@ class ActionRunner {
         }
 
         this.logger.info(`Running workflow ${RUN_SCRIPT_WORKFLOW_ID} (vRO ${this.vroVersion})`)
-        const supportsSysLog = semver.gt(this.vroVersion, "7.3.1")
         const params = [
             {
                 name: "script",
                 type: "string",
                 value: {
                     string: { value: fileContent }
-                }
-            },
-            {
-                name: "printInOutput",
-                type: "boolean",
-                value: {
-                    boolean: { value: !supportsSysLog }
                 }
             }
         ]
@@ -416,11 +408,15 @@ abstract class FetchSysLogsStrategy extends FetchLogsStrategy {
     protected abstract getLogMessages(): Promise<LogMessage[]>
 
     async printMessages(): Promise<void> {
+        if (Logger.level === "off") {
+            return
+        }
         const timestamp = Date.now() - 10000 // 10sec earlier
         const logs = await this.getLogMessages()
         logs.forEach(logMessage => {
             const timestamp = moment(logMessage.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")
-            const msg = `[${timestamp}] [${logMessage.severity}] ${logMessage.description}`
+            const origin = !logMessage.origin ? "" : `[${logMessage.origin}] `
+            const msg = `[${timestamp}] ${origin}[${logMessage.severity}] ${logMessage.description}`
             if (!this.printedMessages.has(msg)) {
                 this.log(msg)
                 this.printedMessages.add(msg)
@@ -455,7 +451,7 @@ class FetchLogsPre76 extends FetchSysLogsStrategy {
         return this.restClient.getWorkflowLogsPre76(
             RUN_SCRIPT_WORKFLOW_ID,
             this.executionToken,
-            "debug",
+            Logger.level,
             this.lastTimestamp
         )
     }
@@ -475,7 +471,7 @@ class FetchLogsPost76 extends FetchSysLogsStrategy {
         return this.restClient.getWorkflowLogsPost76(
             RUN_SCRIPT_WORKFLOW_ID,
             this.executionToken,
-            "debug",
+            Logger.level,
             this.lastTimestamp
         )
     }
