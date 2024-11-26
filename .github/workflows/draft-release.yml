@@ -96,7 +96,7 @@ jobs:
       - name: Create a release
         run: |
           tagname="${GITHUB_REF#refs/tags/}"
-          gh release create "$tagname" --draft --notes "$RELEASE_NOTES" *.tgz *.vsix *.sha256 *.minisig
+          gh release upload "$tagname" *.tgz *.vsix *.sha256 *.minisig
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           RELEASE_NOTES: ${{steps.generate_changelog.outputs.result}}
