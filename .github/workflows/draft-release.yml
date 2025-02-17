@@ -1,9 +1,15 @@
 name: Draft Release
+
 on:
   workflow_dispatch:
   push:
     tags:
       - "v*"
+
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   build_release:
     name: Build and Release
@@ -42,7 +48,7 @@ jobs:
         run: "npm pack --workspaces"
 
       - name: Publish code coverage report
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@e3f7b8baf8199f0945b1a1a79d355e4f22c53e4f # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: "**/coverage/*.json"
@@ -88,7 +94,7 @@ jobs:
 
       - name: Generate release notes
         id: generate_changelog
-        uses: nblagoev/pull-release-notes-action@v1.0.2
+        uses: nblagoev/pull-release-notes-action@f2ccb8e7976e86655c98d5e77b655b31b005dc05 # v1.0.2
         with:
           base-ref: ${{ env.baseRef }}
           head-ref: ${{ github.ref }}

@@ -6,6 +6,10 @@ on:
     paths:
       - "wiki/**"
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
