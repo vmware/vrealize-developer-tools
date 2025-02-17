@@ -1,8 +1,14 @@
 name: Publish Release
+
 on:
   workflow_dispatch:
   release:
     types: [released]
+
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   publish:
     name: Publish to Visual Studio Marketplace and GitHub Packages

@@ -1,8 +1,13 @@
 name: Lint Pull Request
+
 on:
   pull_request:
     branches:
       - master
+
+permissions:
+  actions: write
+  contents: read
 
 jobs:
   lint:
@@ -20,7 +25,7 @@ jobs:
         run: npm install -g npm@8.3.1 # lock to 8.3.1 until actions/setup-node#411 and npm/cli#4341 are fixed
 
       - name: reviewdog
-        uses: reviewdog/action-eslint@v1
+        uses: reviewdog/action-eslint@9b5b0150e399e1f007ee3c27bc156549810a64e3 # v1.33.0
         with:
           reporter: github-pr-review
           eslint_flags: "packages/node/vrdt-common/src/**/*.ts packages/node/vro-language-server/src/**/*.ts extension/src/**/*.ts "
