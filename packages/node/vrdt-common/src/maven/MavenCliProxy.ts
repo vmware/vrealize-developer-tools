@@ -71,23 +71,26 @@ export class MavenCliProxy {
             archetypeGroup = "vra-ng"
         }
 
-        let command =
-            `mvn archetype:generate -DinteractiveMode=false ` +
-            `-DarchetypeGroupId=com.vmware.pscoe.${archetypeGroup}.archetypes ` +
-            `-DarchetypeArtifactId=${archetypeId} ` +
-            `-DarchetypeVersion=${this.environment.buildToolsVersion} ` +
-            `-DgroupId=${groupId} ` +
+        let mavenCmd = 'mvn';
+        let args = [
+            'archetype:generate',
+            '-DinteractiveMode=false',
+            `-DarchetypeGroupId=com.vmware.pscoe.${archetypeGroup}.archetypes`,
+            `-DarchetypeArtifactId=${archetypeId}`,
+            `-DarchetypeVersion=${this.environment.buildToolsVersion}`,
+            `-DgroupId=${groupId}`,
             `-DartifactId=${artifactId}`
+        ];
 
         if (requiresWorkflows) {
             if (!workflowsPath) {
                 return Promise.reject(`Project type ${projectType} requires a workflows directory`)
             }
 
-            command += ` -DworkflowsPath="${workflowsPath}"`
+            args.push(`-DworkflowsPath=${workflowsPath}`);
         }
 
-        return proc.exec(command, { cwd: destinationDir }, this.logger)
+        return proc.execFile(mavenCmd, args, { cwd: destinationDir }, this.logger)
     }
 
     copyDependency(
