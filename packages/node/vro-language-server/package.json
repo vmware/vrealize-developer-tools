@@ -27,7 +27,7 @@
   "dependencies": {
     "adm-zip": "^0.5.4",
     "fs-extra": "~9.1.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "protobufjs": "^6.11.4",
     "vscode-languageserver": "^6.1.1",
     "vscode-languageserver-textdocument": "^1.0.1",
