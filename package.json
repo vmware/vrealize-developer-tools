@@ -611,7 +611,6 @@
   },
   "peerDependencies": {
     "bufferutil": "^4.0.1",
-    "canvas": "^2.11.0",
     "utf-8-validate": "^5.0.2"
   },
   "overrides": {
