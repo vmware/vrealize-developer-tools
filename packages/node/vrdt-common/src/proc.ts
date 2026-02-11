@@ -38,7 +38,12 @@ export function exec(command: string, options: cp.ExecOptions, logger: Logger): 
     })
 }
 
-export function execFile(file: string, args: string[], options: cp.ExecFileOptions, logger: Logger): Promise<CmdResult> {
+export function execFile(
+    file: string,
+    args: string[],
+    options: cp.ExecFileOptions,
+    logger: Logger
+): Promise<CmdResult> {
     logger.error(`Executing file "${file}" with args`, args)
     return new Promise<CmdResult>((resolve, reject) => {
         cp.execFile(file, args, options, (err: cp.ExecException, stdout, stderr) => {

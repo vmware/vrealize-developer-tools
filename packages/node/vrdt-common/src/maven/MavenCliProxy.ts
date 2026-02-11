@@ -41,13 +41,7 @@ export class MavenCliProxy {
 
         let token = fs.existsSync(tokenFile) ? this.readTokenFile(tokenFile) : null
         if (!token || this.isExpired(token) || this.isDiffUserOrTenant(token)) {
-            const args = [
-                "vrealize:auth",
-                `-P${this.mavenSettings.profile}`,
-                `-DoutputDir=${tokenFolder}`,
-                "-N",
-                "-e"
-            ]
+            const args = ["vrealize:auth", `-P${this.mavenSettings.profile}`, `-DoutputDir=${tokenFolder}`, "-N", "-e"]
             const cmdOptions = { cwd: tokenFolder }
 
             await proc.execFile(MavenCliProxy.MAVEN_CMD, args, cmdOptions, this.logger)
