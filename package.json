@@ -622,8 +622,6 @@
     "external-editor": {
       "tmp": "0.2.4"
     }
-    ,
-    "inquirer": "13.2.2"
   },
   "workspaces": [
     "packages/node/*"
