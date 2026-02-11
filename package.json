@@ -617,7 +617,8 @@
     "glob-parent": "^5.1.2",
     "glob-stream": "^7.0.0",
     "ansi-regex": "^5.0.1",
-    "form-data": "2.5.5"
+    "form-data": "2.5.5",
+    "js-yaml": "3.14.2"
   },
   "workspaces": [
     "packages/node/*"
