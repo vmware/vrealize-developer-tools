@@ -618,6 +618,11 @@
     "glob-stream": "^7.0.0",
     "ansi-regex": "^5.0.1",
     "form-data": "2.5.5",
+    "qs": "6.14.2",
+    "request": {
+      "form-data": "2.5.5",
+      "qs": "6.14.2"
+    },
     "js-yaml": "3.14.2",
     "external-editor": {
       "tmp": "0.2.4"
