@@ -5,11 +5,11 @@
 
 import * as path from "path"
 
+import { AutoWire, Logger, LogMessage, MavenCliProxy, PomFile, proc, sleep, VroRestClient } from "@vmware/vrdt-common"
 import * as fs from "fs-extra"
 import * as moment from "moment"
 import * as semver from "semver"
 import * as tmp from "tmp"
-import { AutoWire, Logger, LogMessage, MavenCliProxy, PomFile, proc, sleep, VroRestClient } from "@vmware/vrdt-common"
 import * as vscode from "vscode"
 
 import { Commands, OutputChannels } from "../constants"
@@ -171,12 +171,12 @@ export class RunAction extends Command<void> {
     private async compileFile(inputFile: string, projectDirPath: string, namespace?: string): Promise<string> {
         const outputDir = tmp.dirSync({ prefix: "o11n-ts-" }).name
         const vrotscBin = path.join(".", "node_modules", "@vmware-pscoe", "vrotsc", "bin", "vrotsc")
-        let command = `${vrotscBin} src/ --actionsOut ${outputDir} --files ${inputFile}`
+        const args = ["src/", "--actionsOut", outputDir, "--files", inputFile]
 
         if (namespace) {
-            command += ` -n ${namespace}`
+            args.push("-n", namespace)
         }
-        await proc.exec(command, { cwd: projectDirPath }, this.logger)
+        await proc.execFile(vrotscBin, args, { cwd: projectDirPath }, this.logger)
 
         return path.join(outputDir, inputFile.replace(/\.ts$/, ".js"))
     }

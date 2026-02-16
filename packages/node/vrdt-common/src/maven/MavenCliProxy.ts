@@ -8,9 +8,9 @@ import * as path from "path"
 import * as fs from "fs-extra"
 import jwt_decode from "jwt-decode"
 
+import { Logger, proc } from ".."
 import { BaseEnvironment } from "../platform"
 import { MavenInfo } from "../types"
-import { Logger, proc } from ".."
 
 const archetypeIdByProjectType: { [key: string]: string } = {
     "vro-ts": "package-typescript-archetype",
@@ -23,6 +23,8 @@ const archetypeIdByProjectType: { [key: string]: string } = {
 }
 
 export class MavenCliProxy {
+    private static readonly MAVEN_CMD = "mvn"
+
     constructor(private environment: BaseEnvironment, private mavenSettings: MavenInfo, private logger: Logger) {
         logger.debug(`Initializing Maven CLI proxy for profile '${mavenSettings.profile}'`)
     }
@@ -39,10 +41,10 @@ export class MavenCliProxy {
 
         let token = fs.existsSync(tokenFile) ? this.readTokenFile(tokenFile) : null
         if (!token || this.isExpired(token) || this.isDiffUserOrTenant(token)) {
-            const command = `mvn vrealize:auth -P${this.mavenSettings.profile} -DoutputDir="${tokenFolder}" -N -e`
+            const args = ["vrealize:auth", `-P${this.mavenSettings.profile}`, `-DoutputDir=${tokenFolder}`, "-N", "-e"]
             const cmdOptions = { cwd: tokenFolder }
 
-            await proc.exec(command, cmdOptions, this.logger)
+            await proc.execFile(MavenCliProxy.MAVEN_CMD, args, cmdOptions, this.logger)
             token = this.readTokenFile(tokenFile)
         }
 
@@ -71,23 +73,25 @@ export class MavenCliProxy {
             archetypeGroup = "vra-ng"
         }
 
-        let command =
-            `mvn archetype:generate -DinteractiveMode=false ` +
-            `-DarchetypeGroupId=com.vmware.pscoe.${archetypeGroup}.archetypes ` +
-            `-DarchetypeArtifactId=${archetypeId} ` +
-            `-DarchetypeVersion=${this.environment.buildToolsVersion} ` +
-            `-DgroupId=${groupId} ` +
+        const args = [
+            "archetype:generate",
+            "-DinteractiveMode=false",
+            `-DarchetypeGroupId=com.vmware.pscoe.${archetypeGroup}.archetypes`,
+            `-DarchetypeArtifactId=${archetypeId}`,
+            `-DarchetypeVersion=${this.environment.buildToolsVersion}`,
+            `-DgroupId=${groupId}`,
             `-DartifactId=${artifactId}`
+        ]
 
         if (requiresWorkflows) {
             if (!workflowsPath) {
                 return Promise.reject(`Project type ${projectType} requires a workflows directory`)
             }
 
-            command += ` -DworkflowsPath="${workflowsPath}"`
+            args.push(`-DworkflowsPath=${workflowsPath}`)
         }
 
-        return proc.exec(command, { cwd: destinationDir }, this.logger)
+        return proc.execFile(MavenCliProxy.MAVEN_CMD, args, { cwd: destinationDir }, this.logger)
     }
 
     copyDependency(
@@ -97,13 +101,14 @@ export class MavenCliProxy {
         packaging: string,
         destinationDir: string
     ): Promise<proc.CmdResult> {
-        const command =
-            `mvn dependency:copy ` +
-            `-Dartifact=${groupId}:${artifactId}:${version}:${packaging} ` +
-            `-DoutputDirectory="${destinationDir}" ` +
-            `-Dmdep.stripVersion=true `
+        const args = [
+            "dependency:copy",
+            `-Dartifact=${groupId}:${artifactId}:${version}:${packaging}`,
+            `-DoutputDirectory=${destinationDir}`,
+            "-Dmdep.stripVersion=true"
+        ]
 
-        return proc.exec(command, { cwd: destinationDir }, this.logger)
+        return proc.execFile(MavenCliProxy.MAVEN_CMD, args, { cwd: destinationDir }, this.logger)
     }
 
     private readTokenFile(filePath: string): { value: string; expirationDate: string } {
