@@ -17,17 +17,17 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: echo github.ref
         run: echo ${{ github.ref }}
 
-      - name: Use Node.js 19.6.0
-        uses: actions/setup-node@v2
+      - name: Use Node.js 22.13.1
+        uses: actions/setup-node@v6
         with:
-          node-version: 19.6.0
+          node-version: 22.13.1
 
       - name: Use NPM 9.4.0
         run: npm install -g npm@9.4.0 # lock to 9.4.0 until actions/setup-node#411 and npm/cli#4341 are fixed
