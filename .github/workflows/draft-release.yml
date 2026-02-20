@@ -29,8 +29,8 @@ jobs:
         with:
           node-version: 22.13.1
 
-      - name: Use NPM 9.4.0
-        run: npm install -g npm@9.4.0 # lock to 9.4.0 until actions/setup-node#411 and npm/cli#4341 are fixed
+      - name: Install latest npm version
+        run: npm install -g npm
 
       - name: Get version number
         id: version_step
