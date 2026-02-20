@@ -48,12 +48,12 @@ jobs:
         run: |
           sha256sum -c vrealize-developer-tools-${TAG_NAME#v}.vsix.sha256
           sha256sum -c packages.sha256
-
-      - name: Publish extension to VS Marketplace
-        env:
-          TAG_NAME: ${{ github.event.release.tag_name }}
-          MARKETPLACE_SECRET: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-        run: "vsce publish -p $MARKETPLACE_SECRET --packagePath vrealize-developer-tools-${TAG_NAME#v}.vsix"
+      # temporarily remove this task
+      # - name: Publish extension to VS Marketplace
+      #   env:
+      #     TAG_NAME: ${{ github.event.release.tag_name }}
+      #     MARKETPLACE_SECRET: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+      #   run: "vsce publish -p $MARKETPLACE_SECRET --packagePath vrealize-developer-tools-${TAG_NAME#v}.vsix"
 
       - name: Publish npm packages to GitHub Packages Registry
         env:
