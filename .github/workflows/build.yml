@@ -79,20 +79,3 @@ jobs:
 
       - name: Lint, compile, test and package
         run: "node node_modules/gulp/bin/gulp.js package"
-        if: runner.os == 'ubuntu-latest'
-
-      - name: Publish code coverage report
-        uses: codecov/codecov-action@e3f7b8baf8199f0945b1a1a79d355e4f22c53e4f # v1
-        if: runner.os == 'ubuntu-latest'
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: "**/coverage/*.json"
-          flags: unittest
-          name: codecov
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        if: runner.os == 'ubuntu-latest'
-        with:
-          name: vrealize-developer-tools-${{steps.version_step.outputs.version_build}}.vsix
-          path: "*.vsix"
