@@ -22,7 +22,7 @@ jobs:
           node-version: 22
 
       - name: Install latest npm version
-        run: npm install -g npm
+        run: npm install -g npm@10.9.2
 
       - name: reviewdog
         uses: reviewdog/action-eslint@9b5b0150e399e1f007ee3c27bc156549810a64e3 # v1.33.0

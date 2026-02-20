@@ -30,7 +30,7 @@ jobs:
           node-version: 22.13.1
 
       - name: Install latest npm version
-        run: npm install -g npm
+        run: npm install -g npm@10.9.2
 
       - name: Get version number
         id: version_step
