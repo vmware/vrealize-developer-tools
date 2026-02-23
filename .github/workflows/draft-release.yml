@@ -92,13 +92,6 @@ jobs:
           PREV_TAG=$(git describe --abbrev=0 --tags "${{ github.ref }}^")
           echo "baseRef=$PREV_TAG" >> $GITHUB_ENV
 
-      - name: Generate release notes
-        id: generate_changelog
-        uses: nblagoev/pull-release-notes-action@f2ccb8e7976e86655c98d5e77b655b31b005dc05 # v1.0.2
-        with:
-          base-ref: ${{ env.baseRef }}
-          head-ref: ${{ github.ref }}
-
       - name: Create a release
         run: |
           tagname="${GITHUB_REF#refs/tags/}"
