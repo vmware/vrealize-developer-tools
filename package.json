@@ -567,7 +567,7 @@
     "gulp": "^5.0.0",
     "gulp-eslint": "^6.0.0",
     "gulp-if": "^3.0.0",
-    "gulp-json-editor": "^2.5.5",
+    "gulp-json-editor": "^2.6.0",
     "jest": "^29.7.0",
     "jest-create-mock-instance": "^1.1.0",
     "jest-extended": "4.0.2",
