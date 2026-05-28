@@ -43,12 +43,10 @@ gulp.task("generate-proto", done => {
     fs.emptyDirSync(path.resolve(protoPath))
 
     const pbjsArgs = [
-        "-t",
-        "static-module",
-        "-w",
-        "commonjs",
-        "-o",
-        path.resolve(protoPath, "index.js"),
+        "-t", "static-module",
+        "-w", "commonjs",
+        "-p", path.join(root, "protocol", "src"),
+        "-o", path.resolve(protoPath, "index.js"),
         path.join(root, "protocol", "src", "**", "*.proto")
     ]
 
