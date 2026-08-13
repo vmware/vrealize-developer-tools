@@ -598,7 +598,7 @@
     "moment": "^2.29.4",
     "semver": "^7.5.2",
     "tmp": "^0.2.7",
-    "uuid": "^9.0.0",
+    "uuid": "^14.0.1",
     "vscode-languageclient": "^6.1.3",
     "vscode-languageserver": "^6.1.1",
     "vscode-languageserver-textdocument": "^1.0.1",
