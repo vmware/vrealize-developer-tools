@@ -15,7 +15,9 @@ export class PomFile {
         "typescript-project-all": "com.vmware.pscoe.o11n",
         "vra-package": "com.vmware.pscoe.vra",
         "vra-ng-package": "com.vmware.pscoe.vra-ng",
-        "polyglot-project": "com.vmware.pscoe.polyglot"
+        "polyglot-project": "com.vmware.pscoe.polyglot",
+        "all-apps-package": "com.vmware.pscoe.vcf",
+        "vrops-package": "com.vmware.pscoe.vrops"
     }
 
     readonly jsonContent: any
@@ -51,7 +53,8 @@ export class PomFile {
             return []
         }
 
-        return modules.module || []
+        // a single <module> is parsed as a string rather than an array
+        return modules.module ? [].concat(modules.module) : []
     }
 
     constructor(public readonly filePath: string) {

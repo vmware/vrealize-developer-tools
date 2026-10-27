@@ -59,16 +59,23 @@ export class StatusBarController implements Registrable, vscode.Disposable {
 
         const serverConfIsValid = !!this.profileName
         if (serverConfIsValid) {
-            if (this.env.hasRelevantProject()) {
+            const profile = this.config.activeProfile
+
+            // hint collection is only possible against vRO; other profiles (vROps, VCD, VCFA) have no vro.host
+            if (this.env.hasRelevantProject() && profile.getOptional("vro.host", "")) {
                 this.collectionButton.show()
 
                 this.collectionButton.text = "$(cloud-download)"
                 this.collectionButton.command = Commands.TriggerServerCollection
                 this.collectionButton.tooltip = "Trigger vRO hint collection"
                 this.collectionButton.color = undefined
+            } else {
+                this.collectionButton.hide()
             }
 
-            const hostname = this.config.activeProfile.get("vro.host")
+            const hostname = ConfigurationManager.profileHostKeys
+                .map(key => profile.getOptional(key, ""))
+                .find(value => !!value)
             this.collectionStatus.text = `$(server) ${this.profileName} (${hostname})`
             this.collectionStatus.tooltip = "Change active profile"
             this.collectionStatus.command = Commands.ChangeProfile
@@ -91,7 +98,12 @@ export class StatusBarController implements Registrable, vscode.Disposable {
     private onConfigurationOrProfilesChanged() {
         const currentProfileName = this.config.hasActiveProfile() ? this.config.activeProfile.get("id") : undefined
 
-        if (this.verifyConfiguration() && currentProfileName !== this.profileName && this.env.hasRelevantProject()) {
+        if (
+            this.verifyConfiguration() &&
+            currentProfileName !== this.profileName &&
+            this.env.hasRelevantProject() &&
+            this.config.activeProfile.getOptional("vro.host", "")
+        ) {
             vscode.commands.executeCommand(Commands.TriggerServerCollection)
         }
     }

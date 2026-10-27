@@ -13,6 +13,7 @@ describe("Maven", () => {
     const PARTIAL_POM_PATH = path.join(__dirname, "__fixtures__/partial.pom.xml")
     const UNKNOWN_POM_PATH = path.join(__dirname, "__fixtures__/unknown.pom.xml")
     const BASE_POM_PATH = path.join(__dirname, "__fixtures__/base.pom.xml")
+    const BASE_SINGLE_MODULE_POM_PATH = path.join(__dirname, "__fixtures__/base-single-module.pom.xml")
     const ACTIONS_POM_PATH = path.join(__dirname, "__fixtures__/actions.pom.xml")
 
     describe("PomFile", () => {
@@ -53,6 +54,11 @@ describe("Maven", () => {
             const basePom = new PomFile(BASE_POM_PATH)
             expect(basePom.isBase).toBe(true)
             expect(basePom.modules).toEqual(["actions", "workflows", "vra"])
+        })
+
+        it("Can read pom.xml with a single module", () => {
+            const basePom = new PomFile(BASE_SINGLE_MODULE_POM_PATH)
+            expect(basePom.modules).toEqual(["actions"])
         })
     })
 })

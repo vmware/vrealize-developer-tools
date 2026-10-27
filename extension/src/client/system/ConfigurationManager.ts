@@ -9,6 +9,7 @@ import {
     AutoWire,
     BaseConfiguration,
     Logger,
+    MavenProfile,
     MavenProfilesMap,
     MavenProfileWrapper,
     VrealizeSettings
@@ -25,6 +26,15 @@ import { Registrable } from "../Registrable"
 export class ConfigurationManager extends BaseConfiguration implements Registrable {
     private homeDir = process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"] ?? "~"
     private readonly logger = Logger.get("ConfigurationManager")
+
+    /** A Maven profile is listed when it defines at least one of these hosts */
+    static readonly profileHostKeys: (keyof MavenProfile)[] = [
+        "vro.host",
+        "vrang.host",
+        "vcd.host",
+        "vrops.host",
+        "vcfa.host"
+    ]
 
     readonly settingsXmlPath: string = path.resolve(this.homeDir, ".m2", "settings.xml")
 
@@ -45,7 +55,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         try {
             return super.activeProfile
         } catch (e) {
-            vscode.window.showErrorMessage(e.message)
+            vscode.window.showErrorMessage((e as Error).message)
             throw e
         }
     }
@@ -118,7 +128,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
         for (const profile of allProfiles) {
             const propKeys = Object.keys(profile.properties || {})
 
-            if (propKeys.some(key => key === "vro.host")) {
+            if (propKeys.some(key => ConfigurationManager.profileHostKeys.includes(key as keyof MavenProfile))) {
                 vroProfiles[profile.id] = {
                     id: profile.id,
                     ...profile.properties
@@ -126,7 +136,7 @@ export class ConfigurationManager extends BaseConfiguration implements Registrab
             }
         }
 
-        this.logger.info("Found vRO profiles: ", vroProfiles)
+        this.logger.info("Found profiles: ", vroProfiles)
         this.allProfiles = vroProfiles
         this._onDidChangeProfiles.fire(vroProfiles)
     }
