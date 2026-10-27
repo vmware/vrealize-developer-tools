@@ -46,7 +46,7 @@
     "onCommand:vrdev.blueprint.upload",
     "onCommand:vrdev.blueprint.deploy"
   ],
-  "main": "./extension/dist/extension",
+  "main": "./extension/out/extension",
   "icon": "assets/logo.png",
   "contributes": {
     "viewsContainers": {
