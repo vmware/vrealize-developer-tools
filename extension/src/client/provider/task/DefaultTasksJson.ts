@@ -151,7 +151,7 @@ export const TASKS_BY_TOOLCHAIN_PARENT: Record<ProjectArchetypes, VrealizeTaskCo
         }
     ],
 
-        [ProjectArchetypes.VcfaAllApps]: [
+    [ProjectArchetypes.VcfaAllApps]: [
         {
             label: "Push",
             command:
@@ -163,7 +163,7 @@ export const TASKS_BY_TOOLCHAIN_PARENT: Record<ProjectArchetypes, VrealizeTaskCo
         }
     ],
 
-            [ProjectArchetypes.Vrops]: [
+    [ProjectArchetypes.Vrops]: [
         {
             label: "Push",
             command:
@@ -174,5 +174,4 @@ export const TASKS_BY_TOOLCHAIN_PARENT: Record<ProjectArchetypes, VrealizeTaskCo
             command: "mvn vrops:pull -P${config:vrdev.maven.profile}"
         }
     ]
-
 }
