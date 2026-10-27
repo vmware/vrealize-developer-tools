@@ -108,7 +108,9 @@ export enum ProjectArchetypes {
     Xml = "com.vmware.pscoe.o11n:xml-package",
     Vra = "com.vmware.pscoe.vra:vra-package",
     VraNg = "com.vmware.pscoe.vra-ng:vra-ng-package",
-    Polyglot = "com.vmware.pscoe.polyglot:polyglot-project"
+    Polyglot = "com.vmware.pscoe.polyglot:polyglot-project",
+    VcfaAllApps = "com.vmware.pscoe.vcf:all-apps-package",
+    Vrops = "com.vmware.pscoe.vrops:vrops-package"
 }
 
 export enum LanguageServerConfig {

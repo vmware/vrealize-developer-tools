@@ -149,5 +149,30 @@ export const TASKS_BY_TOOLCHAIN_PARENT: Record<ProjectArchetypes, VrealizeTaskCo
             label: "Build",
             command: "mvn clean package"
         }
+    ],
+
+        [ProjectArchetypes.VcfaAllApps]: [
+        {
+            label: "Push",
+            command:
+                "mvn clean package vcfa-all-apps:push -DincludeDependencies=false -DskipTests -P${config:vrdev.maven.profile}"
+        },
+        {
+            label: "Pull",
+            command: "mvn vcfa-all-apps:pull -P${config:vrdev.maven.profile}"
+        }
+    ],
+
+            [ProjectArchetypes.Vrops]: [
+        {
+            label: "Push",
+            command:
+                "mvn clean package vrops:push -DincludeDependencies=false -DskipTests -P${config:vrdev.maven.profile}"
+        },
+        {
+            label: "Pull",
+            command: "mvn vrops:pull -P${config:vrdev.maven.profile}"
+        }
     ]
+
 }
