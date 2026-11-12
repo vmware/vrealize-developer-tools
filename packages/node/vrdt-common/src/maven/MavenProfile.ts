@@ -11,7 +11,7 @@ export interface MavenProfile extends Partial<Record<MavenProfileKeys, string>> 
     id: string
 }
 
-type MavenProfileKeys = VroProfileKeys | VraProfileKeys
+type MavenProfileKeys = VroProfileKeys | VraProfileKeys | OtherHostKeys
 type VroProfileKeys =
     | "vro.host"
     | "vro.port"
@@ -28,3 +28,4 @@ type VraProfileKeys =
     | "vrang.password"
     | "vrang.tenant"
     | "vrang.refresh.token"
+type OtherHostKeys = "vcd.host" | "vrops.host" | "vcfa.host"

@@ -35,7 +35,9 @@ class MavenProfileItem implements vscode.QuickPickItem {
     }
 
     get description(): string {
-        return `(${this.profile["vro.host"]})` || ""
+        const host = ConfigurationManager.profileHostKeys.map(key => this.profile[key]).find(value => !!value)
+
+        return host ? `(${host})` : ""
     }
 
     constructor(entry: [string, MavenProfile]) {
